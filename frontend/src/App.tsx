@@ -1,72 +1,154 @@
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './store/authStore';
 
-function App() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+import DashboardPage from './pages/DashboardPage';
+import UploadPage from './pages/UploadPage';
+import AnalysisResultsPage from './pages/AnalysisResultsPage';
+import SettingsPage from './pages/SettingsPage';
+import FAQPage from './pages/FAQPage';
 
-  const handleSignup = async (e: React.FormEvent) => {
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+function LoginPage() {
+  const { login } = useAuthStore();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage('Signing up...');
-    
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessage('✅ Signup successful! Token: ' + data.accessToken.substring(0, 20) + '...');
+      const data = await res.json();
+      if (res.ok) {
+        login(data.user, data.accessToken, data.refreshToken);
+        window.location.href = '/dashboard';
       } else {
-        setMessage('❌ Error: ' + data.error);
+        alert(data.error || 'Login failed');
       }
-    } catch (error) {
-      setMessage('❌ Failed to connect to backend');
+    } catch {
+      alert('Failed to connect to server');
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', fontFamily: 'Arial' }}>
-      <h1>🦠 ParasitePro MVP</h1>
-      <p>Backend Health Check & Auth Test</p>
-      
-      <form onSubmit={handleSignup} style={{ marginTop: '30px' }}>
-        <div style={{ marginBottom: '15px' }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
-          />
-        </div>
-        
-        <div style={{ marginBottom: '15px' }}>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
-          />
-        </div>
-        
-        <button type="submit" style={{ width: '100%', padding: '10px', fontSize: '16px', backgroundColor: '#2563EB', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Sign Up
-        </button>
-      </form>
-      
-      {message && (
-        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-          {message}
-        </div>
-      )}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow">
+        <h1 className="text-2xl font-bold text-center mb-6">🦠 ParasitePro</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input name="email" type="email" placeholder="Email" required
+            className="w-full border rounded px-4 py-2 text-sm" />
+          <input name="password" type="password" placeholder="Password" required
+            className="w-full border rounded px-4 py-2 text-sm" />
+          <button type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">
+            Sign In
+          </button>
+        </form>
+        <p className="text-center text-sm mt-4 text-gray-500">
+          No account?{' '}
+          <a href="/signup" className="text-blue-600 hover:underline">Sign up</a>
+        </p>
+      </div>
     </div>
+  );
+}
+
+function SignupPage() {
+  const { login } = useAuthStore();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+    const firstName = (form.elements.namedItem('firstName') as HTMLInputElement).value;
+    const lastName = (form.elements.namedItem('lastName') as HTMLInputElement).value;
+
+    try {
+      const res = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        login(data.user, data.accessToken, data.refreshToken);
+        window.location.href = '/dashboard';
+      } else {
+        alert(data.error || 'Signup failed');
+      }
+    } catch {
+      alert('Failed to connect to server');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow">
+        <h1 className="text-2xl font-bold text-center mb-6">🦠 Create Account</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input name="firstName" type="text" placeholder="First name"
+            className="w-full border rounded px-4 py-2 text-sm" />
+          <input name="lastName" type="text" placeholder="Last name"
+            className="w-full border rounded px-4 py-2 text-sm" />
+          <input name="email" type="email" placeholder="Email" required
+            className="w-full border rounded px-4 py-2 text-sm" />
+          <input name="password" type="password" placeholder="Password" required
+            className="w-full border rounded px-4 py-2 text-sm" />
+          <button type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">
+            Create Account
+          </button>
+        </form>
+        <p className="text-center text-sm mt-4 text-gray-500">
+          Already have an account?{' '}
+          <a href="/login" className="text-blue-600 hover:underline">Sign in</a>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Toaster position="top-right" />
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route
+          path="/dashboard"
+          element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/upload"
+          element={<ProtectedRoute><UploadPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/analysis/:id"
+          element={<ProtectedRoute><AnalysisResultsPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/settings"
+          element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
+        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
