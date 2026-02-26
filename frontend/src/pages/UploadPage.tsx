@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Upload, Camera, FileImage, AlertCircle, Loader, X,
-  Calendar, MapPin, Info, Sun, Focus, Ruler,
+  Calendar, MapPin, Sun, Focus, Ruler,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Upload, Microscope, CreditCard, Clock, CheckCircle,
-  AlertTriangle, Loader, Filter, Grid, List,
+  AlertTriangle, Loader, Grid, List,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';

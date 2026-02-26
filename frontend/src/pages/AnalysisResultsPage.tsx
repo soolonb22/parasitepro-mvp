@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  AlertTriangle, CheckCircle, Loader, Download, Share2,
+  AlertTriangle, CheckCircle, Loader, Download,
   ThumbsUp, ThumbsDown, BookOpen, Pill, Shield, ArrowLeft,
   Microscope, Info,
 } from 'lucide-react';
@@ -56,7 +56,7 @@ interface Analysis {
 const AnalysisResultsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { accessToken, user } = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,7 +115,6 @@ const AnalysisResultsPage = () => {
 
   const handleDownloadReport = () => {
     if (!analysis) return;
-    const primary = analysis.detections[0];
     const detail = analysis.parasiteDetails?.[0];
 
     const date = new Date(analysis.uploadedAt).toLocaleDateString('en-AU');
@@ -473,7 +472,7 @@ const AnalysisResultsPage = () => {
           )}
 
           {/* Prevention */}
-          {primaryParasite.preventionMethods?.length > 0 && (
+          {primaryParasite.preventionMethods && primaryParasite.preventionMethods.length > 0 && (
             <div className="bg-gray-800 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Shield className="text-blue-400" size={22} />

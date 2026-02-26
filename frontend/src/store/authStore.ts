@@ -53,12 +53,6 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'parasitepro-auth',
-      partialState: (state: AuthState) => ({
-        user: state.user,
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
-        isAuthenticated: state.isAuthenticated,
-      }),
     }
   )
 );

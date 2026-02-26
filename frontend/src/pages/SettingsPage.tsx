@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Shield, Trash2, Bell, Lock, LogOut, AlertTriangle, CheckCircle, ChevronRight } from 'lucide-react';
+import { Settings, Shield, Trash2, Bell, Lock, LogOut, AlertTriangle, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
