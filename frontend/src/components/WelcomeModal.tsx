@@ -20,7 +20,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, firstName 
             <div className="p-3 bg-blue-600 rounded-xl"><Microscope size={28} className="text-white" /></div>
             <div>
               <h2 className="text-2xl font-bold text-white">Welcome{firstName ? `, ${firstName}` : ''}! 👋</h2>
-              <p className="text-blue-400 text-sm font-medium">ParasitePro — AI Parasite Detection</p>
+              <p className="text-blue-400 text-sm font-medium">NotWorms — AI Parasite Detection</p>
             </div>
           </div>
         </div>

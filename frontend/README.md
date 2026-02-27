@@ -82,7 +82,7 @@ React + TypeScript + Vite frontend for ParasitePro MVP - AI-powered parasite det
 
 5. **Configure Custom Domain:**
    - In Vercel Dashboard → Settings → Domains
-   - Add `parasitepro.com` and `www.parasitepro.com`
+   - Add `notworms.com` and `www.notworms.com`
    - Update DNS records at your registrar:
      ```
      A     @     76.76.21.21

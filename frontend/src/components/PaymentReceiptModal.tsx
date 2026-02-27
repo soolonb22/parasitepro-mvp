@@ -18,12 +18,12 @@ const PaymentReceiptModal: React.FC<PaymentReceiptModalProps> = ({ isOpen, trans
   const amountAUD = ((amountPaid / 100) * 1.55).toFixed(2);
   const receiptDate = new Date().toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   const handleDownloadReceipt = () => {
-    const receiptContent = `ParasitePro — Payment Receipt\n==============================\nDate:         ${receiptDate}\nTransaction:  ${transactionId}\nCredits:      ${creditsAdded} analysis credit${creditsAdded > 1 ? 's' : ''}\nAmount (USD): $${amountUSD}\nAmount (AUD): ~$${amountAUD}\nNew Balance:  ${newBalance} credits\n==============================\nThank you for your purchase!\nFor support: support@parasitepro.com`.trim();
+    const receiptContent = `NotWorms — Payment Receipt\n==============================\nDate:         ${receiptDate}\nTransaction:  ${transactionId}\nCredits:      ${creditsAdded} analysis credit${creditsAdded > 1 ? 's' : ''}\nAmount (USD): $${amountUSD}\nAmount (AUD): ~$${amountAUD}\nNew Balance:  ${newBalance} credits\n==============================\nThank you for your purchase!\nFor support: support@notworms.com`.trim();
     const blob = new Blob([receiptContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ParasitePro-Receipt-${transactionId.slice(0, 8)}.txt`;
+    a.download = `NotWorms-Receipt-${transactionId.slice(0, 8)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -43,7 +43,7 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full p-8 bg-white rounded-xl shadow">
-        <h1 className="text-2xl font-bold text-center mb-6">🦠 ParasitePro</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">🦠 NotWorms</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input name="email" type="email" placeholder="Email" required
             className="w-full border rounded px-4 py-2 text-sm" />

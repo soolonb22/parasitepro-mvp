@@ -123,7 +123,7 @@ const AnalysisResultsPage = () => {
       : 'N/A';
 
     const reportLines = [
-      'PARASITEPRO — AI ANALYSIS REPORT',
+      'NOTWORMS — AI ANALYSIS REPORT',
       '='.repeat(45),
       '',
       `Analysis ID:     ${analysis.id}`,
@@ -169,14 +169,14 @@ const AnalysisResultsPage = () => {
       'It is NOT a substitute for professional medical diagnosis.',
       'Please consult a qualified healthcare provider to confirm these findings.',
       '',
-      'ParasitePro | parasitepro.com | support@parasitepro.com',
+      'NotWorms | notworms.com | support@notworms.com',
     ].join('\n');
 
     const blob = new Blob([reportLines], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ParasitePro-Report-${analysis.id.slice(0, 8)}.txt`;
+    a.download = `NotWorms-Report-${analysis.id.slice(0, 8)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Report downloaded!');

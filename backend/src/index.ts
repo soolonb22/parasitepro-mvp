@@ -36,7 +36,7 @@ app.use(cors({
 app.get('/', (req: Request, res: Response) => {
   res.json({
     status: 'ok',
-    service: 'ParasitePro Backend',
+    service: 'NotWorms Backend',
     timestamp: new Date().toISOString()
   });
 });
@@ -86,7 +86,7 @@ process.on('SIGTERM', () => {
 // Start server
 app.listen(PORT, () => {
   console.log('╔═══════════════════════════════════════╗');
-  console.log('║  🦠 ParasitePro MVP Backend          ║');
+  console.log('║  🦠 NotWorms Backend                 ║');
   console.log(`║  Port: ${PORT}                           ║`);
   console.log(`║  Environment: ${process.env.NODE_ENV || 'development'}            ║`);
   console.log('╚═══════════════════════════════════════╝');

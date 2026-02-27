@@ -12,7 +12,7 @@ interface ReferralSectionProps {
 const ReferralSection: React.FC<ReferralSectionProps> = ({ userId, referralCode, referralCount = 0, creditsEarned = 0 }) => {
   const [copied, setCopied] = useState(false);
   const code = referralCode || `PARA-${userId.slice(0, 6).toUpperCase()}`;
-  const referralLink = `https://parasitepro.com/signup?ref=${code}`;
+  const referralLink = `https://notworms.com/signup?ref=${code}`;
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink).then(() => {
       setCopied(true);
@@ -22,7 +22,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({ userId, referralCode,
   };
   const handleShare = async () => {
     if (navigator.share) {
-      try { await navigator.share({ title: 'ParasitePro — AI Parasite Detection', text: 'Check out ParasitePro — AI-powered parasite identification from your phone. Much cheaper than a GP visit!', url: referralLink }); }
+      try { await navigator.share({ title: 'NotWorms — AI Parasite Detection', text: 'Check out NotWorms — AI-powered parasite identification from your phone. Much cheaper than a GP visit!', url: referralLink }); }
       catch { handleCopy(); }
     } else { handleCopy(); }
   };
