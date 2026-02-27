@@ -24,6 +24,72 @@ const upload = multer({
   },
 });
 
+// ─── BACKGROUND PROCESSING ───────────────────────────────────────────────────
+async function processAnalysis(analysisId: string, imageUrl: string): Promise<void> {
+  try {
+    const result = await analyzeImage(imageUrl);
+
+    // Store each detected organism in detections table
+    for (const detection of result.detections) {
+      await pool.query(
+        `INSERT INTO detections
+          (analysis_id, parasite_id, common_name, scientific_name, confidence_score,
+           parasite_type, urgency_level, life_stage,
+           bounding_box_x, bounding_box_y, bounding_box_width, bounding_box_height)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        [
+          analysisId,
+          detection.parasiteId,
+          detection.commonName,
+          detection.scientificName,
+          detection.confidenceScore,
+          detection.parasiteType,
+          detection.urgencyLevel,
+          detection.lifeStage || null,
+          detection.boundingBox?.x ?? null,
+          detection.boundingBox?.y ?? null,
+          detection.boundingBox?.width ?? null,
+          detection.boundingBox?.height ?? null,
+        ]
+      );
+    }
+
+    // Store rich analysis data in the analyses table
+    await pool.query(
+      `UPDATE analyses SET
+        status = 'completed',
+        processing_completed_at = NOW(),
+        overall_assessment = $1,
+        visual_findings = $2,
+        urgency_level = $3,
+        differential_diagnoses = $4,
+        recommended_actions = $5,
+        health_risks = $6,
+        treatment_options = $7,
+        gp_testing_list = $8,
+        gp_script = $9
+       WHERE id = $10`,
+      [
+        result.overallAssessment,
+        result.visualFindings,
+        result.urgencyLevel,
+        JSON.stringify(result.differentialDiagnoses),
+        JSON.stringify(result.recommendedActions),
+        JSON.stringify(result.healthRisks),
+        JSON.stringify(result.treatmentOptions),
+        JSON.stringify(result.gpTestingList),
+        JSON.stringify(result.gpScriptIfDismissed),
+        analysisId,
+      ]
+    );
+
+    console.log(`✅ Analysis ${analysisId} completed successfully`);
+  } catch (error) {
+    console.error('❌ Processing error for', analysisId, ':', error);
+    await pool.query("UPDATE analyses SET status = 'failed', processing_completed_at = NOW() WHERE id = $1", [analysisId]);
+  }
+}
+
 /**
  * POST /api/analysis/upload
  * Upload and analyze parasite sample image
@@ -81,7 +147,7 @@ router.post(
 
       console.log('📤 Uploading image to Cloudinary...');
 
-      const { url, thumbnailUrl, publicId } = await uploadImage(req.file.buffer, {
+      const { url, thumbnailUrl } = await uploadImage(req.file.buffer, {
         folder: `parasitepro/user-${userId}`,
         public_id: `analysis-${Date.now()}`,
       });
@@ -101,25 +167,8 @@ router.post(
       const analysisId = analysisResult.id;
       console.log('🔬 Starting AI analysis for:', analysisId);
 
-      analyzeImage(url)
-        .then(async ({ detections }) => {
-          console.log('✅ AI analysis complete for:', analysisId);
-          await withTransaction(async (client) => {
-            for (const detection of detections) {
-              await client.query(
-                `INSERT INTO detections (analysis_id, parasite_id, common_name, scientific_name, confidence_score, parasite_type, urgency_level, life_stage, bounding_box_x, bounding_box_y, bounding_box_width, bounding_box_height)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-                [analysisId, detection.parasiteId, detection.commonName, detection.scientificName, detection.confidenceScore, detection.parasiteType, detection.urgencyLevel, detection.lifeStage || null, detection.boundingBox?.x || null, detection.boundingBox?.y || null, detection.boundingBox?.width || null, detection.boundingBox?.height || null]
-              );
-            }
-            await client.query(`UPDATE analyses SET status = 'completed', processing_completed_at = NOW() WHERE id = $1`, [analysisId]);
-          });
-          console.log('✅ Analysis saved to database:', analysisId);
-        })
-        .catch(async (error) => {
-          console.error('❌ AI analysis failed:', error);
-          await pool.query(`UPDATE analyses SET status = 'failed', processing_completed_at = NOW() WHERE id = $1`, [analysisId]);
-        });
+      // Fire-and-forget: processAnalysis handles all saving and status updates
+      processAnalysis(analysisId, url);
 
       res.status(202).json({ analysisId, status: 'processing', message: 'Image uploaded successfully. Analysis in progress.' });
     } catch (error) {
@@ -135,7 +184,7 @@ router.post(
 
 /**
  * GET /api/analysis/:id
- * Get analysis results by ID
+ * Get analysis results by ID (includes rich AI fields)
  */
 router.get(
   '/:id',
@@ -153,45 +202,62 @@ router.get(
       const userId = req.userId!;
 
       const analysisResult = await pool.query(
-        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id FROM analyses a WHERE a.id = $1`,
-        [id]
+        'SELECT * FROM analyses WHERE id = $1 AND user_id = $2',
+        [id, userId]
       );
 
       if (analysisResult.rows.length === 0) {
-        res.status(404).json({ error: 'Analysis not found', details: { message: 'The requested analysis does not exist' } });
+        res.status(404).json({ error: 'Analysis not found' });
         return;
       }
 
-      const analysis = analysisResult.rows[0];
-
-      if (analysis.user_id !== userId) {
-        res.status(403).json({ error: 'Unauthorized', details: { message: 'You do not have access to this analysis' } });
-        return;
-      }
+      const a = analysisResult.rows[0];
 
       const detectionsResult = await pool.query(
-        `SELECT id, parasite_id, common_name, scientific_name, confidence_score, parasite_type, urgency_level, life_stage, bounding_box_x, bounding_box_y, bounding_box_width, bounding_box_height FROM detections WHERE analysis_id = $1 ORDER BY confidence_score DESC`,
+        'SELECT * FROM detections WHERE analysis_id = $1 ORDER BY confidence_score DESC',
         [id]
       );
 
-      const detections = detectionsResult.rows.map((d) => ({
-        id: d.id,
-        parasiteId: d.parasite_id,
-        commonName: d.common_name,
-        scientificName: d.scientific_name,
-        confidenceScore: parseFloat(d.confidence_score),
-        parasiteType: d.parasite_type,
-        urgencyLevel: d.urgency_level,
-        lifeStage: d.life_stage,
-        boundingBox: d.bounding_box_x !== null ? { x: d.bounding_box_x, y: d.bounding_box_y, width: d.bounding_box_width, height: d.bounding_box_height } : undefined,
-      }));
-
-      res.status(200).json({
-        id: analysis.id, imageUrl: analysis.image_url, thumbnailUrl: analysis.thumbnail_url,
-        status: analysis.status, sampleType: analysis.sample_type, collectionDate: analysis.collection_date,
-        location: analysis.location, uploadedAt: analysis.uploaded_at,
-        processingStartedAt: analysis.processing_started_at, processingCompletedAt: analysis.processing_completed_at,
-        detections,
+      res.json({
+        id: a.id,
+        imageUrl: a.image_url,
+        thumbnailUrl: a.thumbnail_url,
+        status: a.status,
+        sampleType: a.sample_type,
+        collectionDate: a.collection_date,
+        location: a.location,
+        uploadedAt: a.uploaded_at,
+        processingCompletedAt: a.processing_completed_at,
+        // Rich analysis fields
+        overallAssessment: a.overall_assessment || null,
+        visualFindings: a.visual_findings || null,
+        urgencyLevel: a.urgency_level || null,
+        differentialDiagnoses: a.differential_diagnoses || [],
+        recommendedActions: a.recommended_actions || [],
+        healthRisks: a.health_risks || [],
+        treatmentOptions: a.treatment_options || [],
+        gpTestingList: a.gp_testing_list || [],
+        gpScript: a.gp_script || [],
+        // Detected organisms
+        detections: detectionsResult.rows.map((row) => ({
+          id: row.id,
+          parasiteId: row.parasite_id,
+          commonName: row.common_name,
+          scientificName: row.scientific_name,
+          confidenceScore: parseFloat(row.confidence_score),
+          parasiteType: row.parasite_type,
+          urgencyLevel: row.urgency_level,
+          lifeStage: row.life_stage,
+          boundingBox:
+            row.bounding_box_x != null
+              ? {
+                  x: row.bounding_box_x,
+                  y: row.bounding_box_y,
+                  width: row.bounding_box_width,
+                  height: row.bounding_box_height,
+                }
+              : null,
+        })),
       });
     } catch (error) {
       console.error('Get analysis error:', error);

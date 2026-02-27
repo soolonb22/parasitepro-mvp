@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle, Loader, Download,
   ThumbsUp, ThumbsDown, BookOpen, Pill, Shield, ArrowLeft,
-  Microscope, Info,
+  Microscope, Info, FileText, ClipboardList, MessageSquare, Activity,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -11,6 +11,8 @@ import { useAuthStore } from '../store/authStore';
 import JournalPromptModal from '../components/JournalPromptModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// ─── TYPES ───────────────────────────────────────────────────────────────────
 
 interface Detection {
   id: string;
@@ -22,21 +24,31 @@ interface Detection {
   lifeStage?: string;
   parasiteType: string;
   urgencyLevel: string;
-  riskFactors?: string[];
 }
 
-interface ParasiteDetail {
-  id: string;
-  commonName: string;
-  scientificName: string;
+interface DifferentialDiagnosis {
+  condition: string;
+  likelihood: 'low' | 'moderate' | 'high';
+  reasoning: string;
+}
+
+interface RecommendedAction {
+  priority: 'immediate' | 'soon' | 'routine';
+  action: string;
+  detail: string;
+}
+
+interface HealthRisk {
+  category: string;
   description: string;
-  urgencyLevel: string;
-  transmission?: string[];
-  symptoms?: string[];
-  standardTreatments: any[];
-  alternativeTreatments: any[];
-  preventionMethods?: string[];
-  mythsFacts: Array<{ myth: string; fact: string }>;
+  severity: 'low' | 'moderate' | 'high';
+}
+
+interface TreatmentOption {
+  type: 'medical' | 'supportive' | 'environmental';
+  name: string;
+  description: string;
+  requiresPrescription: boolean;
 }
 
 interface Analysis {
@@ -48,10 +60,65 @@ interface Analysis {
   sampleType?: string;
   collectionDate?: string;
   location?: string;
-  detections: Detection[];
-  parasiteDetails?: ParasiteDetail[];
   processingCompletedAt?: string;
+  detections: Detection[];
+  // Rich AI fields
+  overallAssessment?: string;
+  visualFindings?: string;
+  urgencyLevel?: string;
+  differentialDiagnoses: DifferentialDiagnosis[];
+  recommendedActions: RecommendedAction[];
+  healthRisks: HealthRisk[];
+  treatmentOptions: TreatmentOption[];
+  gpTestingList: string[];
+  gpScript: string[];
 }
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+const urgencyColor = (level: string) => {
+  switch (level?.toLowerCase()) {
+    case 'emergency': return 'bg-red-600 text-white';
+    case 'high': return 'bg-orange-600 text-white';
+    case 'moderate': return 'bg-yellow-600 text-white';
+    default: return 'bg-green-700 text-white';
+  }
+};
+
+const urgencyBorder = (level: string) => {
+  switch (level?.toLowerCase()) {
+    case 'emergency': return 'border-red-600';
+    case 'high': return 'border-orange-600';
+    case 'moderate': return 'border-yellow-600';
+    default: return 'border-green-700';
+  }
+};
+
+const likelihoodColor = (l: string) => {
+  switch (l) {
+    case 'high': return 'bg-orange-700 text-white';
+    case 'moderate': return 'bg-yellow-700 text-white';
+    default: return 'bg-gray-600 text-gray-200';
+  }
+};
+
+const priorityColor = (p: string) => {
+  switch (p) {
+    case 'immediate': return 'bg-red-700 text-white';
+    case 'soon': return 'bg-orange-700 text-white';
+    default: return 'bg-blue-700 text-white';
+  }
+};
+
+const severityBorder = (s: string) => {
+  switch (s) {
+    case 'high': return 'border-l-red-500';
+    case 'moderate': return 'border-l-orange-500';
+    default: return 'border-l-yellow-500';
+  }
+};
+
+// ─── COMPONENT ───────────────────────────────────────────────────────────────
 
 const AnalysisResultsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,8 +130,8 @@ const AnalysisResultsPage = () => {
   const [showJournalPrompt, setShowJournalPrompt] = useState(false);
   const [journalPromptShown, setJournalPromptShown] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [copiedScript, setCopiedScript] = useState<number | null>(null);
 
-  // Poll while processing
   useEffect(() => {
     fetchAnalysis();
     // eslint-disable-next-line
@@ -76,7 +143,6 @@ const AnalysisResultsPage = () => {
       const interval = setInterval(fetchAnalysis, 5000);
       return () => clearInterval(interval);
     }
-    // Show journal prompt 2 seconds after results load (once)
     if (analysis.status === 'completed' && !journalPromptShown) {
       const timer = setTimeout(() => {
         setShowJournalPrompt(true);
@@ -92,7 +158,7 @@ const AnalysisResultsPage = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setAnalysis(response.data);
-    } catch (error: any) {
+    } catch {
       toast.error('Failed to load analysis');
     } finally {
       setLoading(false);
@@ -113,16 +179,21 @@ const AnalysisResultsPage = () => {
     }
   };
 
+  const copyToClipboard = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedScript(idx);
+      setTimeout(() => setCopiedScript(null), 2000);
+    });
+  };
+
   const handleDownloadReport = () => {
     if (!analysis) return;
-    const detail = analysis.parasiteDetails?.[0];
-
     const date = new Date(analysis.uploadedAt).toLocaleDateString('en-AU');
     const completed = analysis.processingCompletedAt
       ? new Date(analysis.processingCompletedAt).toLocaleDateString('en-AU')
       : 'N/A';
 
-    const reportLines = [
+    const lines = [
       'PARASITEPRO — AI ANALYSIS REPORT',
       '='.repeat(45),
       '',
@@ -131,48 +202,50 @@ const AnalysisResultsPage = () => {
       `Completed:       ${completed}`,
       `Sample Type:     ${analysis.sampleType || 'Not specified'}`,
       `Location:        ${analysis.location || 'Not specified'}`,
+      `Urgency:         ${(analysis.urgencyLevel || 'Unknown').toUpperCase()}`,
       '',
-      '— DETECTION RESULTS —',
+      '— OVERALL ASSESSMENT —',
+      analysis.overallAssessment || 'N/A',
+      '',
+      '— VISUAL FINDINGS —',
+      analysis.visualFindings || 'N/A',
+      '',
+      '— DETECTIONS —',
       '',
       ...(analysis.detections.length > 0
         ? analysis.detections.map(
-            (d, i) => [
-              `Detection ${i + 1}: ${d.commonName} (${d.scientificName})`,
-              `  Confidence:    ${(d.confidenceScore * 100).toFixed(1)}%`,
-              `  Type:          ${d.parasiteType}`,
-              `  Urgency:       ${d.urgencyLevel.toUpperCase()}`,
-              `  Life Stage:    ${d.lifeStage || 'Unknown'}`,
-              '',
-            ].join('\n')
+            (d, i) =>
+              `Detection ${i + 1}: ${d.commonName} (${d.scientificName})\n` +
+              `  Confidence: ${(d.confidenceScore * 100).toFixed(1)}%  Urgency: ${d.urgencyLevel?.toUpperCase()}  Stage: ${d.lifeStage || 'Unknown'}`
           )
         : ['No parasites detected.']),
       '',
-      detail
-        ? [
-            '— PARASITE INFORMATION —',
-            '',
-            detail.description || '',
-            '',
-            '— TREATMENT OPTIONS —',
-            '',
-            ...(detail.standardTreatments?.map((t: any) => `• ${t.name}${t.dosage ? ` — ${t.dosage}` : ''}`) || []),
-            '',
-            '— PREVENTION —',
-            '',
-            ...(detail.preventionMethods?.map((p: string) => `• ${p}`) || []),
-          ].join('\n')
-        : '',
+      '— DIFFERENTIAL DIAGNOSES —',
+      '',
+      ...(analysis.differentialDiagnoses || []).map(
+        (d) => `• ${d.condition} [${d.likelihood}]\n  ${d.reasoning}`
+      ),
+      '',
+      '— RECOMMENDED ACTIONS —',
+      '',
+      ...(analysis.recommendedActions || []).map(
+        (a) => `[${a.priority.toUpperCase()}] ${a.action}\n  ${a.detail}`
+      ),
+      '',
+      '— GP TESTING LIST —',
+      '',
+      ...(analysis.gpTestingList || []).map((t) => `• ${t}`),
+      '',
+      '— GP SCRIPT (if dismissed) —',
+      '',
+      ...(analysis.gpScript || []).map((s, i) => `${i + 1}. ${s}`),
       '',
       '='.repeat(45),
-      'IMPORTANT DISCLAIMER',
-      'This report is for informational purposes only.',
-      'It is NOT a substitute for professional medical diagnosis.',
-      'Please consult a qualified healthcare provider to confirm these findings.',
-      '',
-      'ParasitePro | parasitepro.com | support@parasitepro.com',
+      'DISCLAIMER: For informational purposes only. Not a substitute for professional medical diagnosis.',
+      'ParasitePro | parasitepro.com',
     ].join('\n');
 
-    const blob = new Blob([reportLines], { type: 'text/plain' });
+    const blob = new Blob([lines], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -182,25 +255,8 @@ const AnalysisResultsPage = () => {
     toast.success('Report downloaded!');
   };
 
-  const getUrgencyColor = (level: string) => {
-    switch (level?.toLowerCase()) {
-      case 'emergency': return 'bg-red-600 text-white';
-      case 'high': return 'bg-orange-600 text-white';
-      case 'moderate': return 'bg-yellow-600 text-white';
-      default: return 'bg-green-700 text-white';
-    }
-  };
+  // ── States ──────────────────────────────────────────────────────────────────
 
-  const getUrgencyBorder = (level: string) => {
-    switch (level?.toLowerCase()) {
-      case 'emergency': return 'border-red-600';
-      case 'high': return 'border-orange-600';
-      case 'moderate': return 'border-yellow-600';
-      default: return 'border-green-700';
-    }
-  };
-
-  // --- Loading ---
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto p-4 flex items-center justify-center min-h-[60vh]">
@@ -226,7 +282,6 @@ const AnalysisResultsPage = () => {
     );
   }
 
-  // --- Still processing ---
   if (analysis.status === 'processing' || analysis.status === 'pending') {
     return (
       <div className="max-w-4xl mx-auto p-4">
@@ -243,11 +298,11 @@ const AnalysisResultsPage = () => {
   }
 
   const primaryDetection = analysis.detections[0];
-  const primaryParasite = analysis.parasiteDetails?.[0];
+
+  // ── Main results ────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-6">
-      {/* Journal Prompt */}
       <JournalPromptModal
         isOpen={showJournalPrompt}
         analysisId={analysis.id}
@@ -292,6 +347,26 @@ const AnalysisResultsPage = () => {
         )}
       </div>
 
+      {/* Overall Assessment */}
+      {analysis.overallAssessment && (
+        <div className={`bg-gray-800 border-2 rounded-xl p-5 ${urgencyBorder(analysis.urgencyLevel || 'moderate')}`}>
+          <div className="flex items-start gap-3">
+            <Activity className="text-blue-400 flex-shrink-0 mt-0.5" size={22} />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-lg font-bold text-white">Clinical Assessment</h2>
+                {analysis.urgencyLevel && (
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${urgencyColor(analysis.urgencyLevel)}`}>
+                    {analysis.urgencyLevel.toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-200 leading-relaxed">{analysis.overallAssessment}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* No detections */}
       {analysis.detections.length === 0 && (
         <div className="bg-green-900 border border-green-600 rounded-xl p-6 flex items-start gap-4">
@@ -307,9 +382,8 @@ const AnalysisResultsPage = () => {
 
       {/* Primary Detection Card */}
       {primaryDetection && (
-        <div className={`bg-gray-800 border-2 rounded-xl overflow-hidden ${getUrgencyBorder(primaryDetection.urgencyLevel)}`}>
+        <div className={`bg-gray-800 border-2 rounded-xl overflow-hidden ${urgencyBorder(primaryDetection.urgencyLevel)}`}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-            {/* Image */}
             <div>
               <img
                 src={analysis.imageUrl}
@@ -317,11 +391,9 @@ const AnalysisResultsPage = () => {
                 className="w-full h-80 object-contain bg-gray-900 rounded-xl"
               />
             </div>
-
-            {/* Detection info */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className={`px-3 py-1 rounded-full text-sm font-bold ${getUrgencyColor(primaryDetection.urgencyLevel)}`}>
+                <span className={`px-3 py-1 rounded-full text-sm font-bold ${urgencyColor(primaryDetection.urgencyLevel)}`}>
                   {primaryDetection.urgencyLevel.toUpperCase()}
                 </span>
                 <span className="px-3 py-1 bg-blue-900 rounded-full text-blue-200 text-sm">
@@ -331,20 +403,15 @@ const AnalysisResultsPage = () => {
                   {primaryDetection.parasiteType}
                 </span>
               </div>
-
               <div>
                 <h2 className="text-2xl font-bold text-white">{primaryDetection.commonName}</h2>
                 <p className="text-gray-400 italic">{primaryDetection.scientificName}</p>
                 {primaryDetection.lifeStage && (
-                  <p className="text-gray-400 text-sm mt-1">Life stage: <span className="text-white capitalize">{primaryDetection.lifeStage}</span></p>
+                  <p className="text-gray-400 text-sm mt-1">
+                    Life stage: <span className="text-white capitalize">{primaryDetection.lifeStage}</span>
+                  </p>
                 )}
               </div>
-
-              {primaryParasite?.description && (
-                <p className="text-gray-300 text-sm leading-relaxed">{primaryParasite.description}</p>
-              )}
-
-              {/* Emergency alert */}
               {primaryDetection.urgencyLevel === 'emergency' && (
                 <div className="bg-red-900 border border-red-600 rounded-xl p-4">
                   <h3 className="font-bold text-red-100 mb-1 flex items-center gap-2">
@@ -356,7 +423,6 @@ const AnalysisResultsPage = () => {
                   </p>
                 </div>
               )}
-
               {primaryDetection.urgencyLevel === 'high' && (
                 <div className="bg-orange-900 border border-orange-600 rounded-xl p-4">
                   <h3 className="font-bold text-orange-100 mb-1 flex items-center gap-2">
@@ -373,7 +439,7 @@ const AnalysisResultsPage = () => {
         </div>
       )}
 
-      {/* Additional detections */}
+      {/* Additional Detections */}
       {analysis.detections.length > 1 && (
         <div className="bg-gray-800 rounded-xl p-5">
           <h3 className="text-white font-bold mb-3 flex items-center gap-2">
@@ -388,7 +454,7 @@ const AnalysisResultsPage = () => {
                   <span className="text-gray-400 text-sm ml-2 italic">{det.scientificName}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${getUrgencyColor(det.urgencyLevel)}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${urgencyColor(det.urgencyLevel)}`}>
                     {det.urgencyLevel.toUpperCase()}
                   </span>
                   <span className="text-gray-400 text-sm">{(det.confidenceScore * 100).toFixed(0)}%</span>
@@ -399,95 +465,156 @@ const AnalysisResultsPage = () => {
         </div>
       )}
 
-      {/* Detailed info */}
-      {primaryParasite && (
-        <div className="space-y-4">
-          {/* Treatments */}
-          {(primaryParasite.standardTreatments?.length > 0 || primaryParasite.alternativeTreatments?.length > 0) && (
-            <div className="bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Pill className="text-green-400" size={22} />
-                Treatment Options
-              </h3>
-              {primaryParasite.standardTreatments?.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-green-300 font-medium mb-3">Standard Medical Treatments</h4>
-                  <div className="space-y-3">
-                    {primaryParasite.standardTreatments.map((t: any, i: number) => (
-                      <div key={i} className="bg-gray-700 rounded-lg p-4">
-                        <p className="text-white font-medium">{t.name}</p>
-                        {t.dosage && <p className="text-gray-300 text-sm mt-1"><span className="text-gray-400">Dosage:</span> {t.dosage}</p>}
-                        {t.duration && <p className="text-gray-300 text-sm"><span className="text-gray-400">Duration:</span> {t.duration}</p>}
-                        {t.pregnancySafe === false && <p className="text-orange-300 text-xs mt-2">⚠️ Not recommended during pregnancy</p>}
-                        {t.childSafe === false && <p className="text-orange-300 text-xs">⚠️ Not recommended for children</p>}
-                      </div>
-                    ))}
+      {/* Visual Findings */}
+      {analysis.visualFindings && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+            <FileText className="text-cyan-400" size={22} />
+            Visual Findings
+          </h3>
+          <p className="text-gray-300 leading-relaxed text-sm">{analysis.visualFindings}</p>
+        </div>
+      )}
+
+      {/* Differential Diagnoses */}
+      {analysis.differentialDiagnoses?.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Info className="text-purple-400" size={22} />
+            Differential Diagnoses
+          </h3>
+          <div className="space-y-3">
+            {analysis.differentialDiagnoses.map((d, i) => (
+              <div key={i} className="bg-gray-700 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-white font-semibold">{d.condition}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${likelihoodColor(d.likelihood)}`}>
+                    {d.likelihood} likelihood
+                  </span>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">{d.reasoning}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recommended Actions */}
+      {analysis.recommendedActions?.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Shield className="text-blue-400" size={22} />
+            Recommended Actions
+          </h3>
+          <div className="space-y-3">
+            {analysis.recommendedActions.map((a, i) => (
+              <div key={i} className="bg-gray-700 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${priorityColor(a.priority)}`}>
+                    {a.priority.toUpperCase()}
+                  </span>
+                  <span className="text-white font-semibold">{a.action}</span>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">{a.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Health Risks */}
+      {analysis.healthRisks?.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <AlertTriangle className="text-orange-400" size={22} />
+            Health Risks
+          </h3>
+          <div className="space-y-3">
+            {analysis.healthRisks.map((r, i) => (
+              <div key={i} className={`bg-gray-700 rounded-xl p-4 border-l-4 ${severityBorder(r.severity)}`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-white font-semibold">{r.category}</span>
+                  <span className="text-gray-400 text-xs capitalize">({r.severity} severity)</span>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">{r.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Treatment Options */}
+      {analysis.treatmentOptions?.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Pill className="text-green-400" size={22} />
+            Treatment Options
+          </h3>
+          <div className="space-y-3">
+            {analysis.treatmentOptions.map((t, i) => (
+              <div key={i} className="bg-gray-700 rounded-xl p-4">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <span className="text-white font-semibold">{t.name}</span>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <span className="px-2 py-0.5 bg-gray-600 rounded text-xs text-gray-300 capitalize">{t.type}</span>
+                    {t.requiresPrescription ? (
+                      <span className="px-2 py-0.5 bg-orange-900 text-orange-200 rounded text-xs">Rx required</span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-green-900 text-green-200 rounded text-xs">No Rx needed</span>
+                    )}
                   </div>
                 </div>
-              )}
-              {primaryParasite.alternativeTreatments?.length > 0 && (
-                <div>
-                  <h4 className="text-blue-300 font-medium mb-3">Alternative Treatments</h4>
-                  <div className="space-y-3">
-                    {primaryParasite.alternativeTreatments.map((t: any, i: number) => (
-                      <div key={i} className="bg-gray-700 rounded-lg p-4">
-                        <p className="text-white font-medium">{t.name}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">Evidence level: {t.evidenceLevel}</p>
-                        {t.dosage && <p className="text-gray-300 text-sm mt-1">{t.dosage}</p>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="mt-4 bg-yellow-900 border border-yellow-700 rounded-lg p-3">
-                <p className="text-yellow-200 text-xs">
-                  <strong>Disclaimer:</strong> Always consult a qualified healthcare professional before starting any treatment. This information is for educational purposes only.
-                </p>
+                <p className="text-gray-300 text-sm leading-relaxed">{t.description}</p>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+          <div className="mt-4 bg-yellow-900 border border-yellow-700 rounded-lg p-3">
+            <p className="text-yellow-200 text-xs">
+              <strong>Disclaimer:</strong> Always consult a qualified healthcare professional before starting any treatment. This information is for educational purposes only.
+            </p>
+          </div>
+        </div>
+      )}
 
-          {/* Myths vs Facts */}
-          {primaryParasite.mythsFacts?.length > 0 && (
-            <div className="bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Info className="text-purple-400" size={22} />
-                Myths vs Facts
-              </h3>
-              <div className="space-y-3">
-                {primaryParasite.mythsFacts.map((item: any, i: number) => (
-                  <div key={i} className="bg-gray-700 rounded-xl p-4">
-                    <div className="flex items-start gap-3 mb-2">
-                      <span className="px-2 py-0.5 bg-red-900 text-red-200 text-xs font-bold rounded flex-shrink-0 mt-0.5">MYTH</span>
-                      <p className="text-gray-300 text-sm">{item.myth}</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="px-2 py-0.5 bg-green-900 text-green-200 text-xs font-bold rounded flex-shrink-0 mt-0.5">FACT</span>
-                      <p className="text-white text-sm">{item.fact}</p>
-                    </div>
-                  </div>
-                ))}
+      {/* GP Testing List */}
+      {analysis.gpTestingList?.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <ClipboardList className="text-teal-400" size={22} />
+            Tests to Request from Your GP
+          </h3>
+          <ul className="space-y-2">
+            {analysis.gpTestingList.map((test, i) => (
+              <li key={i} className="flex items-start gap-3 bg-gray-700 rounded-lg px-4 py-3">
+                <CheckCircle size={16} className="text-teal-400 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-200 text-sm">{test}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* GP Script */}
+      {analysis.gpScript?.length > 0 && (
+        <div className="bg-gray-800 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+            <MessageSquare className="text-indigo-400" size={22} />
+            What to Say to Your GP
+          </h3>
+          <p className="text-gray-400 text-sm mb-4">Exact scripts for common dismissals — tap to copy.</p>
+          <div className="space-y-3">
+            {analysis.gpScript.map((script, i) => (
+              <div key={i} className="bg-indigo-950 border border-indigo-700 rounded-xl p-4">
+                <p className="text-indigo-100 text-sm leading-relaxed mb-3">{script}</p>
+                <button
+                  onClick={() => copyToClipboard(script, i)}
+                  className="text-xs px-3 py-1 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg transition-colors"
+                >
+                  {copiedScript === i ? '✓ Copied!' : 'Copy'}
+                </button>
               </div>
-            </div>
-          )}
-
-          {/* Prevention */}
-          {primaryParasite.preventionMethods && primaryParasite.preventionMethods.length > 0 && (
-            <div className="bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Shield className="text-blue-400" size={22} />
-                Prevention Methods
-              </h3>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {primaryParasite.preventionMethods.map((method: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2 text-gray-300 text-sm bg-gray-700 rounded-lg p-3">
-                    <CheckCircle size={16} className="text-blue-400 flex-shrink-0 mt-0.5" />
-                    {method}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       )}
 
@@ -518,7 +645,7 @@ const AnalysisResultsPage = () => {
         </div>
       )}
 
-      {/* Journal prompt button */}
+      {/* Journal prompt */}
       <div className="bg-purple-900 border border-purple-700 rounded-xl p-5 flex items-center justify-between">
         <div>
           <p className="text-white font-semibold">Track your progress</p>
