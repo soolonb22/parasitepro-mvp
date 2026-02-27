@@ -63,6 +63,25 @@ CREATE TABLE payments (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Refresh tokens table
+CREATE TABLE refresh_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Feedback table
+CREATE TABLE feedback (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  analysis_id UUID NOT NULL REFERENCES analyses(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  was_helpful BOOLEAN,
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT feedback_unique UNIQUE (analysis_id, user_id)
+);
+
 -- Indexes for performance
 CREATE INDEX idx_analyses_user ON analyses(user_id);
 CREATE INDEX idx_analyses_status ON analyses(status);
@@ -70,3 +89,5 @@ CREATE INDEX idx_detections_analysis ON detections(analysis_id);
 CREATE INDEX idx_payments_user ON payments(user_id);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_analyses_uploaded_at ON analyses(uploaded_at DESC);
+CREATE INDEX idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE INDEX idx_feedback_analysis ON feedback(analysis_id);

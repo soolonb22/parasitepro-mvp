@@ -40,3 +40,13 @@ export const generateAccessToken = (userId: string, email: string): string => {
   const secret = process.env.JWT_SECRET!;
   return jwt.sign({ userId, email }, secret, { expiresIn: '1h' });
 };
+
+export const generateRefreshToken = (userId: string, email: string): string => {
+  const secret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET!;
+  return jwt.sign({ userId, email }, secret, { expiresIn: '7d' });
+};
+
+export const verifyRefreshToken = (token: string): { userId: string; email: string } => {
+  const secret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET!;
+  return jwt.verify(token, secret) as { userId: string; email: string };
+};

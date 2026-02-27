@@ -7,6 +7,9 @@ import UploadPage from './pages/UploadPage';
 import AnalysisResultsPage from './pages/AnalysisResultsPage';
 import SettingsPage from './pages/SettingsPage';
 import FAQPage from './pages/FAQPage';
+import PricingPage from './pages/PricingPage';
+import JournalPage from './pages/JournalPage';
+import ProfilePage from './pages/ProfilePage';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -145,6 +148,18 @@ function App() {
         <Route
           path="/settings"
           element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/pricing"
+          element={<ProtectedRoute><PricingPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/journal"
+          element={<ProtectedRoute><JournalPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/profile"
+          element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
         />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

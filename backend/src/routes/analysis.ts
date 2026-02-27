@@ -264,4 +264,52 @@ router.get(
   }
 );
 
+/**
+ * POST /api/analysis/:id/feedback
+ * Submit feedback for an analysis
+ */
+router.post(
+  '/:id/feedback',
+  authenticateToken,
+  [param('id').isUUID().withMessage('Invalid analysis ID')],
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ error: 'Validation failed', details: errors.array() });
+        return;
+      }
+
+      const { id } = req.params;
+      const userId = req.userId!;
+      const { wasHelpful, comment } = req.body;
+
+      const analysisResult = await pool.query(
+        'SELECT id, user_id FROM analyses WHERE id = $1',
+        [id]
+      );
+
+      if (analysisResult.rows.length === 0) {
+        res.status(404).json({ error: 'Analysis not found' });
+        return;
+      }
+
+      if (analysisResult.rows[0].user_id !== userId) {
+        res.status(403).json({ error: 'Unauthorized' });
+        return;
+      }
+
+      await pool.query(
+        'INSERT INTO feedback (analysis_id, user_id, was_helpful, comment) VALUES ($1, $2, $3, $4) ON CONFLICT (analysis_id, user_id) DO UPDATE SET was_helpful = $3, comment = $4, created_at = NOW()',
+        [id, userId, wasHelpful ?? null, comment || null]
+      );
+
+      res.status(200).json({ message: 'Feedback submitted successfully' });
+    } catch (error) {
+      console.error('Feedback error:', error);
+      res.status(500).json({ error: 'Failed to submit feedback' });
+    }
+  }
+);
+
 export default router;
