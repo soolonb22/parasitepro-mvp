@@ -51,7 +51,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/analysis', analysisRoutes);
-app.use('/api/payment', paymentRoutes);
+app.use('/api/payment', paymentRouter);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
