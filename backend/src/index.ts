@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth';
 import analysisRoutes from './routes/analysis';
-import * as paymentRouter from './routes/payment';
+import paymentRouter from './routes/payment';
 import pool from './config/database';
 
 dotenv.config();
