@@ -12,6 +12,7 @@ const router = express.Router();
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16'
+});
 
 const PRICE_PER_CREDIT = parseInt(process.env.STRIPE_PRICE_PER_CREDIT || '499'); // cents
 
