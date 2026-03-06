@@ -97,6 +97,11 @@ const SettingsPage = () => {
             )}
           </div>
         </div>
+
+        {/* Educational disclaimer */}
+        <div className="px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-center">
+          <p className="text-gray-500 text-xs">⚠️ ParasitePro is an educational tool only. It does not diagnose, treat, or assess health conditions. Always consult a qualified healthcare professional for medical advice.</p>
+        </div>
       </div>
     </div>
   );
