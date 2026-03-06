@@ -26,10 +26,28 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
+const allowedOrigins = [
+  'https://www.notworms.com',
+  'https://notworms.com',
+  'https://parasitepro-mvp.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
   credentials: true
 }));
+```
+
+**Then also** — while you're in Railway, check `FRONTEND_URL` and make sure it's:
+```
+https://www.notworms.com
 
 // Health check endpoints
 app.get('/', (req: Request, res: Response) => {
