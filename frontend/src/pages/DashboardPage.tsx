@@ -94,13 +94,18 @@ const DashboardPage = () => {
         firstName={user?.firstName}
       />
 
+      {/* Educational disclaimer banner */}
+      <div className="mb-6 px-4 py-3 bg-teal-900 border border-teal-700 rounded-xl text-teal-200 text-xs text-center">
+        ⚠️ ParasitePro is an educational tool only. It does not diagnose, treat, or assess health conditions. Always consult a qualified healthcare professional for medical advice.
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">
             {user?.firstName ? `Hello, ${user.firstName}` : 'Dashboard'}
           </h1>
-          <p className="text-gray-400 mt-1">Your parasite analysis history</p>
+          <p className="text-gray-400 mt-1">Your image analysis history</p>
         </div>
         <button
           onClick={() => navigate('/upload')}
@@ -282,16 +287,16 @@ const DashboardPage = () => {
                 <Upload size={16} /> New Analysis
               </button>
               <button
-                onClick={() => navigate('/journal')}
-                className="w-full flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
-              >
-                <Clock size={16} /> Health Journal
-              </button>
-              <button
                 onClick={() => navigate('/faq')}
                 className="w-full flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
               >
-                Help & FAQ
+                <Clock size={16} /> Help & FAQ
+              </button>
+              <button
+                onClick={() => navigate('/settings')}
+                className="w-full flex items-center gap-2 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
+              >
+                Settings
               </button>
             </div>
           </div>
