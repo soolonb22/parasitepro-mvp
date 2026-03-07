@@ -11,7 +11,7 @@ import pool from './config/database';
 dotenv.config();
 
 // Validate required environment variables
-const required = ['DATABASE_URL', 'JWT_SECRET', 'FRONTEND_URL'];
+const required = ['DATABASE_URL', 'JWT_SECRET'];
 const missing = required.filter(v => !process.env[v]);
 if (missing.length > 0) {
   console.error('❌ Missing environment variables:', missing.join(', '));
@@ -26,6 +26,8 @@ const allowedOrigins = [
   'https://www.notworms.com',
   'https://notworms.com',
   'https://parasitepro-mvp.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
 ];
 
 const frontendUrl = process.env.FRONTEND_URL;
@@ -33,12 +35,9 @@ if (frontendUrl && !allowedOrigins.includes(frontendUrl)) {
   allowedOrigins.push(frontendUrl);
 }
 
-// Middleware
-app.use(helmet());
-app.use(compression());
-app.use(express.json({ limit: '10mb' }));
-app.use(cors({
-  origin: (origin, callback) => {
+const corsOptions: cors.CorsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -47,8 +46,20 @@ app.use(cors({
       callback(null, false);
     }
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200,
+};
+
+// Middleware
+app.use(helmet());
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(cors(corsOptions));
+
+// Handle preflight requests for all routes
+app.options('*', cors(corsOptions));
 
 // Health check endpoints
 app.get('/', (req: Request, res: Response) => {
@@ -102,8 +113,3 @@ app.listen(PORT, () => {
 });
 
 export default app;
-```
-
-Paste that into GitHub at:
-```
-https://github.com/soolonb22/parasitepro-mvp/edit/main/backend/src/index.ts
