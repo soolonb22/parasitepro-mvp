@@ -3,18 +3,38 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth';
-import analysisRoutes from './routes/analysis';
-import paymentRouter from './routes/payment';
 import pool from './config/database';
 
 dotenv.config();
+
+// ─── Crash guards FIRST — before anything else ───────────────────────────────
+process.on('uncaughtException', (err) => {
+  console.error('❌ UNCAUGHT EXCEPTION:', err.message, err.stack);
+  // Don't exit — keep serving requests
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ UNHANDLED REJECTION at:', promise, 'reason:', reason);
+  // Don't exit — keep serving requests
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Log all env vars available (masked)
+console.log('🔧 ENV CHECK:', {
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  DATABASE_URL: process.env.DATABASE_URL ? '✅ set' : '❌ MISSING',
+  JWT_SECRET: process.env.JWT_SECRET ? '✅ set' : '❌ MISSING',
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ? '✅ set' : '❌ MISSING',
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? '✅ set' : '❌ MISSING',
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ? '✅ set' : '❌ MISSING',
+});
 
 // Validate required environment variables
 const required = ['DATABASE_URL', 'JWT_SECRET'];
 const missing = required.filter(v => !process.env[v]);
 if (missing.length > 0) {
-  console.error('❌ Missing environment variables:', missing.join(', '));
+  console.error('❌ Missing required environment variables:', missing.join(', '));
   process.exit(1);
 }
 
@@ -37,7 +57,6 @@ if (frontendUrl && !allowedOrigins.includes(frontendUrl)) {
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -57,31 +76,50 @@ app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(cors(corsOptions));
-
-// Handle preflight requests for all routes
 app.options('*', cors(corsOptions));
 
-// Health check endpoints
-app.get('/', (req: Request, res: Response) => {
-  res.json({
-    status: 'ok',
-    service: 'ParasitePro Backend',
-    timestamp: new Date().toISOString()
-  });
+// ─── Health checks ─────────────────────────────────────────────────────────
+app.get('/', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', service: 'ParasitePro Backend', timestamp: new Date().toISOString() });
 });
 
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-app.get('/api/health', (req: Request, res: Response) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
+// ───────────────────────────────────────────────────────────────────────────
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/analysis', analysisRoutes);
-app.use('/api/payment', paymentRouter);
+// Lazy-load routes to avoid startup crashes from missing env vars
+let authRoutes: express.Router;
+let analysisRoutes: express.Router;
+let paymentRouter: express.Router;
+
+try {
+  authRoutes = require('./routes/auth').default;
+  app.use('/api/auth', authRoutes);
+  console.log('✅ Auth routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load auth routes:', e.message);
+}
+
+try {
+  analysisRoutes = require('./routes/analysis').default;
+  app.use('/api/analysis', analysisRoutes);
+  console.log('✅ Analysis routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load analysis routes:', e.message);
+}
+
+try {
+  paymentRouter = require('./routes/payment').default;
+  app.use('/api/payment', paymentRouter);
+  console.log('✅ Payment routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load payment routes:', e.message);
+}
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -89,7 +127,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('❌ Server error:', err.message);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -104,12 +142,27 @@ process.on('SIGTERM', () => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log('╔═══════════════════════════════════════╗');
   console.log('║  🦠 ParasitePro MVP Backend          ║');
   console.log(`║  Port: ${PORT}                           ║`);
   console.log(`║  Environment: ${process.env.NODE_ENV || 'development'}            ║`);
   console.log('╚═══════════════════════════════════════╝');
+  console.log('✅ Server listening on port', PORT);
+
+  // Run migrations and test DB connection (non-fatal)
+  (async () => {
+    try {
+      const { runMigrations } = await import('./migrate');
+      await runMigrations();
+    } catch (err: any) {
+      console.error('⚠️  Startup migration failed (non-fatal):', err.message);
+    }
+  })();
+});
+
+server.on('error', (err: any) => {
+  console.error('❌ Server error:', err);
 });
 
 export default app;
