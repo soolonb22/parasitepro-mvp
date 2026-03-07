@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
-
 import authRoutes from './routes/auth';
 import analysisRoutes from './routes/analysis';
 import paymentRouter from './routes/payment';
@@ -22,32 +21,34 @@ if (missing.length > 0) {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(helmet());
-app.use(compression());
-app.use(express.json({ limit: '10mb' }));
+// Allowed CORS origins
 const allowedOrigins = [
   'https://www.notworms.com',
   'https://notworms.com',
   'https://parasitepro-mvp.vercel.app',
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+];
 
+const frontendUrl = process.env.FRONTEND_URL;
+if (frontendUrl && !allowedOrigins.includes(frontendUrl)) {
+  allowedOrigins.push(frontendUrl);
+}
+
+// Middleware
+app.use(helmet());
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error(`CORS blocked: ${origin}`));
+      console.warn('CORS blocked origin:', origin);
+      callback(null, false);
     }
   },
   credentials: true
 }));
-```
-
-**Then also** — while you're in Railway, check `FRONTEND_URL` and make sure it's:
-```
-https://www.notworms.com
 
 // Health check endpoints
 app.get('/', (req: Request, res: Response) => {
@@ -101,3 +102,8 @@ app.listen(PORT, () => {
 });
 
 export default app;
+```
+
+Paste that into GitHub at:
+```
+https://github.com/soolonb22/parasitepro-mvp/edit/main/backend/src/index.ts
