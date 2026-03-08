@@ -143,7 +143,7 @@ const DashboardPage = () => {
               label: 'Credits Remaining',
               value: stats.credits,
               accent: stats.credits === 0,
-              cta: stats.credits === 0 ? { label: 'Top up →', href: '/settings' } : null,
+              cta: stats.credits === 0 ? { label: 'Top up →', href: '/pricing' } : null,
             },
           ].map(({ icon, label, value, accent, cta }, i) => (
             <div key={label}

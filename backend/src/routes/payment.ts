@@ -8,176 +8,121 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const router = express.Router();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2023-10-16' });
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.notworms.com';
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16'
+// Credit bundles — live Stripe price IDs (AUD)
+const BUNDLES: Record<string, { credits: number; priceId: string; label: string; aud: number; popular?: boolean }> = {
+  bundle_5:  { credits: 5,  priceId: 'price_1T8gC0KP9uxdve7jWtDs8iTn', label: '5 Credits',  aud: 1999 },
+  bundle_10: { credits: 10, priceId: 'price_1T8gC4KP9uxdve7jolsajyEt', label: '10 Credits', aud: 3499, popular: true },
+  bundle_25: { credits: 25, priceId: 'price_1T8gC7KP9uxdve7jpjJJctrr', label: '25 Credits', aud: 7499 },
+};
+
+// ── GET /api/payment/pricing ──────────────────────────────────────────────────
+router.get('/pricing', async (_req: Request, res: Response): Promise<void> => {
+  const options = Object.entries(BUNDLES).map(([id, b]) => ({
+    id, credits: b.credits, label: b.label, popular: b.popular || false,
+    aud: (b.aud / 100).toFixed(2), audPerCredit: (b.aud / b.credits / 100).toFixed(2),
+  }));
+  res.json({ options, currency: 'AUD' });
 });
 
-const PRICE_PER_CREDIT = parseInt(process.env.STRIPE_PRICE_PER_CREDIT || '499'); // cents
+// ── POST /api/payment/create-checkout-session ─────────────────────────────────
+router.post('/create-checkout-session', authenticateToken,
+  [body('bundleId').isIn(Object.keys(BUNDLES)).withMessage('Invalid bundle')],
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) { res.status(400).json({ error: errors.array()[0].msg }); return; }
 
-/**
- * GET /api/payment/pricing
- * Get pricing information (public endpoint)
- */
-router.get('/pricing', async (req: Request, res: Response): Promise<void> => {
+    const { bundleId } = req.body;
+    const bundle = BUNDLES[bundleId];
+    const userId = req.userId!;
+
+    try {
+      const userRow = await pool.query('SELECT email FROM users WHERE id = $1', [userId]);
+      const email = userRow.rows[0]?.email;
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{ price: bundle.priceId, quantity: 1 }],
+        success_url: `${FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${FRONTEND_URL}/pricing?cancelled=1`,
+        customer_email: email,
+        metadata: { userId, credits: bundle.credits.toString(), bundleId },
+        payment_intent_data: { metadata: { userId, credits: bundle.credits.toString() } },
+      });
+
+      console.log(`✅ Checkout session: ${session.id} — ${bundle.label} — user ${userId}`);
+      res.json({ sessionUrl: session.url });
+    } catch (error) {
+      console.error('Create checkout session error:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  }
+);
+
+// ── GET /api/payment/verify-session ──────────────────────────────────────────
+router.get('/verify-session', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
+  const sessionId = req.query.session_id as string;
+  if (!sessionId) { res.status(400).json({ error: 'session_id required' }); return; }
   try {
-    const options = [
-      { credits: 1, price: (PRICE_PER_CREDIT / 100).toFixed(2), pricePerCredit: (PRICE_PER_CREDIT / 100).toFixed(2) },
-      { credits: 5, price: ((PRICE_PER_CREDIT * 5 * 0.8) / 100).toFixed(2), pricePerCredit: ((PRICE_PER_CREDIT * 0.8) / 100).toFixed(2), savings: '20%' },
-      { credits: 10, price: ((PRICE_PER_CREDIT * 10 * 0.7) / 100).toFixed(2), pricePerCredit: ((PRICE_PER_CREDIT * 0.7) / 100).toFixed(2), savings: '30%' },
-    ];
-    res.status(200).json({ options, currency: 'USD' });
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (session.payment_status !== 'paid') {
+      res.status(402).json({ error: 'Payment not completed', status: session.payment_status });
+      return;
+    }
+    const result = await pool.query('SELECT image_credits FROM users WHERE id = $1', [req.userId]);
+    res.json({ paid: true, credits: result.rows[0]?.image_credits ?? 0 });
   } catch (error) {
-    console.error('Get pricing error:', error);
-    res.status(500).json({ error: 'Failed to retrieve pricing', details: { message: 'Internal server error' } });
+    console.error('Verify session error:', error);
+    res.status(500).json({ error: 'Failed to verify session' });
   }
 });
 
-/**
- * POST /api/payment/create-intent
- * Create Stripe payment intent
- */
-router.post(
-  '/create-intent',
-  authenticateToken,
-  [body('credits').isInt({ min: 1, max: 100 }).withMessage('Credits must be between 1 and 100')],
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        res.status(400).json({ error: 'Validation failed', details: errors.array() });
-        return;
-      }
-
-      const { credits } = req.body;
-      const userId = req.userId!;
-
-      let pricePerCredit = PRICE_PER_CREDIT;
-      if (credits >= 10) { pricePerCredit = Math.floor(PRICE_PER_CREDIT * 0.7); }
-      else if (credits >= 5) { pricePerCredit = Math.floor(PRICE_PER_CREDIT * 0.8); }
-
-      const amount = pricePerCredit * credits;
-
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount, currency: 'usd',
-        metadata: { userId, credits: credits.toString() },
-        automatic_payment_methods: { enabled: true },
-      });
-
-      console.log('✅ Payment intent created:', paymentIntent.id);
-      res.status(200).json({ clientSecret: paymentIntent.client_secret, amount, credits });
-    } catch (error) {
-      console.error('Create payment intent error:', error);
-      res.status(500).json({ error: 'Failed to create payment', details: { message: 'Internal server error' } });
-    }
-  }
-);
-
-/**
- * POST /api/payment/confirm
- * Confirm payment and add credits to user account
- */
-router.post(
-  '/confirm',
-  authenticateToken,
-  [body('paymentIntentId').notEmpty().withMessage('Payment intent ID is required')],
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        res.status(400).json({ error: 'Validation failed', details: errors.array() });
-        return;
-      }
-
-      const { paymentIntentId } = req.body;
-      const userId = req.userId!;
-
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-      if (paymentIntent.status !== 'succeeded') {
-        res.status(400).json({ error: 'Payment not completed', details: { message: 'Payment has not been successfully processed', status: paymentIntent.status } });
-        return;
-      }
-
-      if (paymentIntent.metadata.userId !== userId) {
-        res.status(403).json({ error: 'Unauthorized', details: { message: 'Payment does not belong to this user' } });
-        return;
-      }
-
-      const credits = parseInt(paymentIntent.metadata.credits);
-
-      const existingPayment = await pool.query('SELECT id FROM payments WHERE stripe_payment_intent_id = $1', [paymentIntentId]);
-      if (existingPayment.rows.length > 0) {
-        res.status(400).json({ error: 'Payment already processed', details: { message: 'This payment has already been credited' } });
-        return;
-      }
-
-      const result = await withTransaction(async (client) => {
-        await client.query('UPDATE users SET image_credits = image_credits + $1 WHERE id = $2', [credits, userId]);
-        await client.query(
-          `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, credits_purchased, status) VALUES ($1, $2, $3, $4, $5, $6)`,
-          [userId, paymentIntentId, paymentIntent.amount, paymentIntent.currency, credits, 'succeeded']
-        );
-        const userResult = await client.query('SELECT image_credits FROM users WHERE id = $1', [userId]);
-        return userResult.rows[0].image_credits;
-      });
-
-      console.log('✅ Credits added to user:', { userId, credits });
-      res.status(200).json({ success: true, creditsAdded: credits, newBalance: result });
-    } catch (error) {
-      console.error('Confirm payment error:', error);
-      res.status(500).json({ error: 'Failed to process payment', details: { message: 'Internal server error' } });
-    }
-  }
-);
-
-/**
- * POST /api/payment/webhook
- * Stripe webhook handler for payment events
- */
-router.post(
-  '/webhook',
-  express.raw({ type: 'application/json' }),
+// ── POST /api/payment/webhook ─────────────────────────────────────────────────
+router.post('/webhook', express.raw({ type: 'application/json' }),
   async (req: Request, res: Response): Promise<void> => {
+    const sig = req.headers['stripe-signature'] as string;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) { console.error('❌ STRIPE_WEBHOOK_SECRET not set'); res.status(500).send('Not configured'); return; }
+
+    let event: Stripe.Event;
     try {
-      const sig = req.headers['stripe-signature'] as string;
-      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } catch (err) {
+      console.error('Webhook sig failed:', err);
+      res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown'}`);
+      return;
+    }
 
-      if (!webhookSecret) {
-        console.error('Webhook secret not configured');
-        res.status(500).send('Webhook secret not configured');
-        return;
-      }
+    try {
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (session.payment_status !== 'paid') { res.json({ received: true }); return; }
 
-      let event: Stripe.Event;
-      try {
-        event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-      } catch (err) {
-        console.error('Webhook signature verification failed:', err);
-        res.status(400).send(`Webhook Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        return;
-      }
+        const userId = session.metadata?.userId;
+        const credits = parseInt(session.metadata?.credits || '0');
 
-      switch (event.type) {
-        case 'payment_intent.succeeded':
-          const paymentIntent = event.data.object as Stripe.PaymentIntent;
-          console.log('✅ Payment succeeded:', paymentIntent.id);
-          break;
+        if (!userId || !credits) { console.error('❌ Missing metadata:', session.id); res.json({ received: true }); return; }
 
-        case 'payment_intent.payment_failed':
-          const failedIntent = event.data.object as Stripe.PaymentIntent;
-          console.log('❌ Payment failed:', failedIntent.id);
-          await pool.query(
-            `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, credits_purchased, status) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (stripe_payment_intent_id) DO NOTHING`,
-            [failedIntent.metadata.userId, failedIntent.id, failedIntent.amount, failedIntent.currency, parseInt(failedIntent.metadata.credits || '0'), 'failed']
+        const existing = await pool.query('SELECT id FROM payments WHERE stripe_payment_intent_id = $1', [session.id]);
+        if (existing.rows.length > 0) { res.json({ received: true }); return; }
+
+        await withTransaction(async (client) => {
+          await client.query('UPDATE users SET image_credits = image_credits + $1 WHERE id = $2', [credits, userId]);
+          await client.query(
+            `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, credits_purchased, status)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [userId, session.id, session.amount_total, session.currency, credits, 'succeeded']
           );
-          break;
+        });
 
-        default:
-          console.log('Unhandled event type:', event.type);
+        console.log(`✅ Webhook: ${credits} credits granted → user ${userId}`);
+
+      } else {
+        console.log('Unhandled event:', event.type);
       }
-
       res.json({ received: true });
     } catch (error) {
       console.error('Webhook error:', error);
@@ -186,26 +131,22 @@ router.post(
   }
 );
 
-/**
- * GET /api/payment/history
- * Get user's payment history
- */
+// ── GET /api/payment/history ──────────────────────────────────────────────────
 router.get('/history', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.userId!;
     const result = await pool.query(
-      `SELECT id, stripe_payment_intent_id, amount, currency, credits_purchased, status, created_at FROM payments WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`,
-      [userId]
+      `SELECT id, stripe_payment_intent_id, amount, currency, credits_purchased, status, created_at
+       FROM payments WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`,
+      [req.userId]
     );
-    res.status(200).json({
+    res.json({
       payments: result.rows.map((p) => ({
-        id: p.id, paymentIntentId: p.stripe_payment_intent_id, amount: p.amount,
+        id: p.id, sessionId: p.stripe_payment_intent_id, amount: p.amount,
         currency: p.currency, creditsPurchased: p.credits_purchased, status: p.status, createdAt: p.created_at,
       })),
     });
   } catch (error) {
-    console.error('Get payment history error:', error);
-    res.status(500).json({ error: 'Failed to retrieve payment history', details: { message: 'Internal server error' } });
+    res.status(500).json({ error: 'Failed to retrieve payment history' });
   }
 });
 
