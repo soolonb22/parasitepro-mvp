@@ -70,6 +70,12 @@ export async function runMigrations(): Promise<void> {
 
   try {
     await pool.query(schema);
+
+    // Incremental migrations — safe to run multiple times
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+    `);
+
     console.log('✅ Database migrations complete');
   } catch (err: any) {
     console.error('⚠️  Migration error (non-fatal):', err.message);

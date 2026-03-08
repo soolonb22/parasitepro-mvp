@@ -7,6 +7,7 @@ import UploadPage from './pages/UploadPage';
 import AnalysisResultsPage from './pages/AnalysisResultsPage';
 import SettingsPage from './pages/SettingsPage';
 import FAQPage from './pages/FAQPage';
+import AdminPage from './pages/AdminPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -148,6 +149,10 @@ function App() {
           element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
         />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/admin"
+          element={<ProtectedRoute><AdminPage /></ProtectedRoute>}
+        />
       </Routes>
     </BrowserRouter>
   );

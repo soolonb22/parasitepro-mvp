@@ -96,6 +96,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 let authRoutes: express.Router;
 let analysisRoutes: express.Router;
 let paymentRouter: express.Router;
+let adminRouter: express.Router;
 
 try {
   authRoutes = require('./routes/auth').default;
@@ -121,6 +122,14 @@ try {
   console.error('❌ Failed to load payment routes:', e.message);
 }
 
+try {
+  adminRouter = require('./routes/admin').default;
+  app.use('/api/admin', adminRouter);
+  console.log('✅ Admin routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load payment routes:', e.message);
+}
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found', path: req.path });
@@ -142,7 +151,7 @@ process.on('SIGTERM', () => {
 });
 
 // Start server
-const server = app.listen(PORT, () => {
+const server = app.listen(Number(PORT), '0.0.0.0', () => {
   console.log('╔═══════════════════════════════════════╗');
   console.log('║  🦠 ParasitePro MVP Backend          ║');
   console.log(`║  Port: ${PORT}                           ║`);
