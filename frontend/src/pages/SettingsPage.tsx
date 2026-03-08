@@ -5,7 +5,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 const PRIVACY_CONSENT_KEY = 'parasite_privacy_accepted';
 
 const SettingsPage = () => {

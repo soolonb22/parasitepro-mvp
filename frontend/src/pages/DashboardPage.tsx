@@ -10,7 +10,8 @@ import { useAuthStore } from '../store/authStore';
 import WelcomeModal from '../components/WelcomeModal';
 import ReferralSection from '../components/ReferralSection';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 const WELCOME_SHOWN_KEY = 'parasite_welcome_shown';
 
 interface Analysis {

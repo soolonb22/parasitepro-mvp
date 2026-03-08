@@ -10,7 +10,8 @@ import { useAuthStore } from '../store/authStore';
 import PrivacyConsentModal from '../components/PrivacyConsentModal';
 import PricingConfirmModal from '../components/PricingConfirmModal';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const PRIVACY_CONSENT_KEY = 'parasite_privacy_accepted';
 

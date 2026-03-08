@@ -10,7 +10,8 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import JournalPromptModal from '../components/JournalPromptModal';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 interface Detection {
   id: string;
