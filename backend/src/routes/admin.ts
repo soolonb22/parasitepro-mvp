@@ -184,4 +184,26 @@ router.get('/list-users', async (req: Request, res: Response) => {
   }
 });
 
+
+// ── POST /api/admin/update-email (bootstrap only) ────────────────────────────
+router.post('/update-email', async (req: Request, res: Response) => {
+  const { oldEmail, newEmail, setupSecret } = req.body;
+  if (!setupSecret || setupSecret !== process.env.JWT_SECRET) {
+    return res.status(403).json({ error: 'Invalid setup secret' });
+  }
+  if (!oldEmail || !newEmail) {
+    return res.status(400).json({ error: 'oldEmail and newEmail required' });
+  }
+  try {
+    const result = await pool.query(
+      'UPDATE users SET email = $1 WHERE email = $2 RETURNING id, email, is_admin',
+      [newEmail, oldEmail]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true, user: result.rows[0] });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
