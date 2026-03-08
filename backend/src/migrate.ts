@@ -87,6 +87,18 @@ export async function runMigrations(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_prt_token_hash ON password_reset_tokens(token_hash);
       CREATE INDEX IF NOT EXISTS idx_prt_user_id ON password_reset_tokens(user_id);
 
+      -- Add missing bounding_box columns to detections (safe if already exist)
+      -- Add ai_summary to analyses
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS ai_summary TEXT;
+      -- Fix sample_type constraint to allow all types
+      ALTER TABLE analyses DROP CONSTRAINT IF EXISTS analyses_sample_type_check;
+      ALTER TABLE analyses ADD CONSTRAINT analyses_sample_type_check CHECK (sample_type IN ('stool', 'blood', 'skin', 'microscopy', 'environmental', 'other'));
+      -- Add bounding_box columns to detections
+      ALTER TABLE detections ADD COLUMN IF NOT EXISTS bounding_box_x INTEGER;
+      ALTER TABLE detections ADD COLUMN IF NOT EXISTS bounding_box_y INTEGER;
+      ALTER TABLE detections ADD COLUMN IF NOT EXISTS bounding_box_width INTEGER;
+      ALTER TABLE detections ADD COLUMN IF NOT EXISTS bounding_box_height INTEGER;
+
       -- One-time: grant 20 test credits to admin account
       UPDATE users SET image_credits = 20
       WHERE email = 'importantalerts26@gmail.com' AND image_credits = 0;

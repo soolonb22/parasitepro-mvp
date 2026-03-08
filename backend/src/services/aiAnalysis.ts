@@ -1,43 +1,135 @@
-// Mock AI Service for MVP
-// Replace this with real AI integration in Phase 2
+import Anthropic from '@anthropic-ai/sdk';
 
 export interface AIDetection {
   parasiteId: string;
   commonName: string;
   scientificName: string;
   confidenceScore: number;
-  parasiteType: 'protozoa' | 'helminth' | 'ectoparasite';
+  parasiteType: 'protozoa' | 'helminth' | 'ectoparasite' | 'unknown';
   urgencyLevel: 'low' | 'moderate' | 'high' | 'emergency';
   lifeStage?: string;
   boundingBox?: { x: number; y: number; width: number; height: number };
 }
 
-const MOCK_PARASITES = [
-  { parasiteId: 'giardia-001', commonName: 'Giardia lamblia', scientificName: 'Giardia intestinalis', parasiteType: 'protozoa' as const, urgencyLevel: 'moderate' as const, lifeStage: 'cyst' },
-  { parasiteId: 'ascaris-001', commonName: 'Roundworm', scientificName: 'Ascaris lumbricoides', parasiteType: 'helminth' as const, urgencyLevel: 'moderate' as const, lifeStage: 'egg' },
-  { parasiteId: 'taenia-001', commonName: 'Tapeworm', scientificName: 'Taenia saginata', parasiteType: 'helminth' as const, urgencyLevel: 'high' as const, lifeStage: 'proglottid' },
-  { parasiteId: 'entamoeba-001', commonName: 'Entamoeba', scientificName: 'Entamoeba histolytica', parasiteType: 'protozoa' as const, urgencyLevel: 'high' as const, lifeStage: 'cyst' },
-  { parasiteId: 'cryptosporidium-001', commonName: 'Cryptosporidium', scientificName: 'Cryptosporidium parvum', parasiteType: 'protozoa' as const, urgencyLevel: 'moderate' as const, lifeStage: 'oocyst' },
-  { parasiteId: 'hookworm-001', commonName: 'Hookworm', scientificName: 'Ancylostoma duodenale', parasiteType: 'helminth' as const, urgencyLevel: 'high' as const, lifeStage: 'egg' },
-];
-
-export async function analyzeImage(imageUrl: string): Promise<{ detections: AIDetection[] }> {
-  console.log('🔬 Starting mock AI analysis for:', imageUrl);
-  const processingTime = 3000 + Math.random() * 2000;
-  await new Promise((resolve) => setTimeout(resolve, processingTime));
-  const numDetections = Math.floor(Math.random() * 3) + 1;
-  const selectedParasites = MOCK_PARASITES.sort(() => Math.random() - 0.5).slice(0, numDetections);
-  const detections: AIDetection[] = selectedParasites.map((parasite, index) => {
-    const confidence = (0.95 - index * 0.15) - Math.random() * 0.1;
-    const boundingBox = { x: Math.floor(Math.random() * 400), y: Math.floor(Math.random() * 300), width: Math.floor(Math.random() * 200) + 100, height: Math.floor(Math.random() * 150) + 75 };
-    return { ...parasite, confidenceScore: Math.max(0.60, Math.min(0.99, confidence)), boundingBox };
-  });
-  console.log('✅ Mock AI analysis complete:', { detectionsCount: detections.length, parasites: detections.map((d) => d.commonName) });
-  return { detections };
+export interface AIAnalysisResult {
+  detections: AIDetection[];
+  summary?: string;
+  imageQuality?: string;
+  disclaimer?: string;
 }
 
-export async function checkAIServiceHealth(): Promise<boolean> { return true; }
-export function getSupportedSampleTypes(): string[] { return ['stool', 'blood', 'skin', 'other']; }
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+const SYSTEM_PROMPT = `You are ParasitePro, an expert AI parasite identification assistant trained in clinical parasitology, dermatology, and tropical medicine. You analyse images submitted by users (stool samples, skin presentations, microscopy slides, and environmental samples).
+
+When analysing an image, respond ONLY with a valid JSON object in this exact format:
+{
+  "imageQuality": "good" | "adequate" | "poor",
+  "detections": [
+    {
+      "parasiteId": "unique-slug-id",
+      "commonName": "Common name",
+      "scientificName": "Scientific name",
+      "confidenceScore": 0.85,
+      "parasiteType": "protozoa" | "helminth" | "ectoparasite" | "unknown",
+      "urgencyLevel": "low" | "moderate" | "high" | "emergency",
+      "lifeStage": "egg/larva/adult/cyst (optional)"
+    }
+  ],
+  "summary": "Brief plain-language summary of findings",
+  "disclaimer": "⚠️ This is an AI-assisted visual assessment only and does not constitute a medical diagnosis. Please consult a qualified healthcare professional for confirmation and treatment. In an emergency, call 000."
+}
+
+Rules:
+- If no parasite is detected, return detections as an empty array and explain in summary
+- confidenceScore must be between 0.0 and 1.0
+- urgencyLevel: low=monitor, moderate=see GP in 1-2 weeks, high=see doctor within 48hrs, emergency=call 000
+- Never prescribe specific medications or dosages
+- Frame findings as "consistent with" or "most likely" — never a definitive diagnosis
+- If image quality is too poor to assess, set imageQuality to "poor" and return empty detections
+- Respond ONLY with the JSON object, no other text`;
+
+export async function analyzeImage(
+  imageUrl: string,
+  sampleType?: string
+): Promise<AIAnalysisResult> {
+  console.log('🔬 Starting Anthropic vision analysis for:', imageUrl);
+
+  const userPrompt = `Please analyse this ${sampleType || 'sample'} image for any parasites, parasitic infections, or related conditions. Respond only with the JSON format specified.`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-opus-4-5',
+      max_tokens: 1024,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'url',
+                url: imageUrl,
+              },
+            },
+            {
+              type: 'text',
+              text: userPrompt,
+            },
+          ],
+        },
+      ],
+    });
+
+    const rawText = response.content
+      .filter((b: any) => b.type === 'text')
+      .map((b: any) => (b as any).text)
+      .join('');
+
+    console.log('✅ Anthropic raw response:', rawText.substring(0, 300));
+
+    // Strip markdown code fences if present
+    const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+
+    const detections: AIDetection[] = (parsed.detections || []).map((d: any, i: number) => ({
+      parasiteId: d.parasiteId || `detection-${i}`,
+      commonName: d.commonName || 'Unknown',
+      scientificName: d.scientificName || '',
+      confidenceScore: Math.max(0, Math.min(1, Number(d.confidenceScore) || 0.5)),
+      parasiteType: d.parasiteType || 'unknown',
+      urgencyLevel: d.urgencyLevel || 'low',
+      lifeStage: d.lifeStage || undefined,
+      boundingBox: undefined, // Vision API doesn't return pixel coordinates
+    }));
+
+    console.log(`✅ Analysis complete: ${detections.length} detection(s)`);
+
+    return {
+      detections,
+      summary: parsed.summary || '',
+      imageQuality: parsed.imageQuality || 'adequate',
+      disclaimer: parsed.disclaimer || '⚠️ This is an AI-assisted visual assessment only. Please consult a qualified healthcare professional.',
+    };
+  } catch (err: any) {
+    console.error('❌ Anthropic analysis failed:', err.message);
+    throw err;
+  }
+}
+
+export async function checkAIServiceHealth(): Promise<boolean> {
+  return !!process.env.ANTHROPIC_API_KEY;
+}
+
+export function getSupportedSampleTypes(): string[] {
+  return ['stool', 'blood', 'skin', 'microscopy', 'environmental', 'other'];
+}
+
 export function getAIServiceInfo() {
-  return { provider: 'Mock AI Service', version: '1.0.0', status: 'active', note: 'Mock service for MVP. Replace with real AI in Phase 2.' };
+  return {
+    provider: 'Anthropic Claude Vision',
+    model: 'claude-opus-4-5',
+    status: 'active',
+  };
 }

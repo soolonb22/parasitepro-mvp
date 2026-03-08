@@ -101,8 +101,8 @@ router.post(
       const analysisId = analysisResult.id;
       console.log('🔬 Starting AI analysis for:', analysisId);
 
-      analyzeImage(url)
-        .then(async ({ detections }) => {
+      analyzeImage(url, sampleType)
+        .then(async ({ detections, summary }) => {
           console.log('✅ AI analysis complete for:', analysisId);
           await withTransaction(async (client) => {
             for (const detection of detections) {
@@ -112,7 +112,7 @@ router.post(
                 [analysisId, detection.parasiteId, detection.commonName, detection.scientificName, detection.confidenceScore, detection.parasiteType, detection.urgencyLevel, detection.lifeStage || null, detection.boundingBox?.x || null, detection.boundingBox?.y || null, detection.boundingBox?.width || null, detection.boundingBox?.height || null]
               );
             }
-            await client.query(`UPDATE analyses SET status = 'completed', processing_completed_at = NOW() WHERE id = $1`, [analysisId]);
+            await client.query(`UPDATE analyses SET status = 'completed', processing_completed_at = NOW(), ai_summary = $2 WHERE id = $1`, [analysisId, summary || null]);
           });
           console.log('✅ Analysis saved to database:', analysisId);
         })
@@ -153,7 +153,7 @@ router.get(
       const userId = req.userId!;
 
       const analysisResult = await pool.query(
-        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id FROM analyses a WHERE a.id = $1`,
+        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary FROM analyses a WHERE a.id = $1`,
         [id]
       );
 
@@ -191,6 +191,7 @@ router.get(
         status: analysis.status, sampleType: analysis.sample_type, collectionDate: analysis.collection_date,
         location: analysis.location, uploadedAt: analysis.uploaded_at,
         processingStartedAt: analysis.processing_started_at, processingCompletedAt: analysis.processing_completed_at,
+        aiSummary: analysis.ai_summary,
         detections,
       });
     } catch (error) {
