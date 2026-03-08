@@ -59,7 +59,7 @@ export async function analyzeImage(
 
   try {
     const response = await client.messages.create({
-      model: 'claude-opus-4-5',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: [
@@ -129,7 +129,7 @@ export function getSupportedSampleTypes(): string[] {
 export function getAIServiceInfo() {
   return {
     provider: 'Anthropic Claude Vision',
-    model: 'claude-opus-4-5',
+    model: 'claude-3-5-sonnet-20241022',
     status: 'active',
   };
 }

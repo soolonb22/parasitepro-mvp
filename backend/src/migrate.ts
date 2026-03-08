@@ -24,7 +24,7 @@ export async function runMigrations(): Promise<void> {
       image_url TEXT NOT NULL,
       thumbnail_url TEXT,
       status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
-      sample_type VARCHAR(50) CHECK (sample_type IN ('stool', 'blood', 'skin', 'other')),
+      sample_type VARCHAR(50),
       collection_date DATE,
       location VARCHAR(255),
       uploaded_at TIMESTAMP DEFAULT NOW(),
@@ -92,7 +92,7 @@ export async function runMigrations(): Promise<void> {
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS ai_summary TEXT;
       -- Fix sample_type constraint to allow all types
       ALTER TABLE analyses DROP CONSTRAINT IF EXISTS analyses_sample_type_check;
-      ALTER TABLE analyses ADD CONSTRAINT analyses_sample_type_check CHECK (sample_type IN ('stool', 'blood', 'skin', 'microscopy', 'environmental', 'other'));
+      -- Removed sample_type constraint to allow any value
       -- Add bounding_box columns to detections
       ALTER TABLE detections ADD COLUMN IF NOT EXISTS bounding_box_x INTEGER;
       ALTER TABLE detections ADD COLUMN IF NOT EXISTS bounding_box_y INTEGER;
