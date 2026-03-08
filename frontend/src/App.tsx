@@ -10,6 +10,8 @@ import AnalysisResultsPage from './pages/AnalysisResultsPage';
 import SettingsPage from './pages/SettingsPage';
 import FAQPage from './pages/FAQPage';
 import AdminPage from './pages/AdminPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -116,6 +118,9 @@ function LoginPage() {
                 {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
+            <div className="flex justify-end mt-1">
+              <a href="/forgot-password" className="text-xs hover:underline" style={{ color: 'var(--text-muted)' }}>Forgot password?</a>
+            </div>
           </div>
           <button type="submit" disabled={loading} className="pp-btn-primary w-full" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
             {loading ? <span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Signing in…</span>
@@ -216,6 +221,8 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
