@@ -167,4 +167,21 @@ router.post('/setup-admin', async (req: Request, res: Response) => {
   }
 });
 
+
+// ── GET /api/admin/list-users (bootstrap only) ───────────────────────────────
+router.get('/list-users', async (req: Request, res: Response) => {
+  const secret = req.headers['x-setup-secret'];
+  if (!secret || secret !== process.env.JWT_SECRET) {
+    return res.status(403).json({ error: 'Invalid setup secret' });
+  }
+  try {
+    const result = await pool.query(
+      'SELECT id, email, first_name, last_name, is_admin, created_at FROM users ORDER BY created_at DESC'
+    );
+    res.json({ users: result.rows });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
