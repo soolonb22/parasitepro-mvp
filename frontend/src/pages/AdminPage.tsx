@@ -104,14 +104,11 @@ const AdminPage = () => {
 
   if (!isAdmin || loading) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%)'
-      }}>
-        <div style={{ color: 'white', fontSize: '1.25rem' }}>Loading...</div>
+      <div className="pp-page flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-12 h-12 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--amber)' }} />
+          <p className="text-sm font-mono" style={{ color: 'var(--text-muted)' }}>Loading admin…</p>
+        </div>
       </div>
     );
   }
@@ -133,24 +130,17 @@ const AdminPage = () => {
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%)',
-      padding: '2rem 1rem'
-    }}>
+    <div className="pp-page" style={{ padding: '1.5rem 1rem', minHeight: '100vh' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 style={{ 
-          color: 'white', 
-          fontSize: '2rem', 
-          fontWeight: 700, 
-          marginBottom: '2rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem'
-        }}>
-          <BarChart3 size={32} />
-          Admin Dashboard
-        </h1>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(217,119,6,0.15)', border: '1px solid rgba(217,119,6,0.3)' }}>
+            <BarChart3 size={20} style={{ color: 'var(--amber)' }} />
+          </div>
+          <div>
+            <h1 className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>Admin Dashboard</h1>
+            <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>Internal access only</p>
+          </div>
+        </div>
 
         <div style={{
           display: 'grid',
@@ -562,43 +552,16 @@ const AdminPage = () => {
 };
 
 const StatCard = ({ icon, label, value, subtext, color }) => (
-  <div style={{
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: '1rem',
-    padding: '1.5rem',
-    border: '1px solid rgba(255,255,255,0.1)'
-  }}>
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '0.75rem',
-      marginBottom: '1rem'
-    }}>
-      <div style={{
-        width: '3rem',
-        height: '3rem',
-        borderRadius: '0.75rem',
-        backgroundColor: `${color}20`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: color
-      }}>
+  <div className="pp-card p-5">
+    <div className="flex items-center gap-3 mb-3">
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{ background: `${color}15`, border: `1px solid ${color}30`, color }}>
         {icon}
       </div>
-      <span style={{ color: '#9ca3af', fontSize: '0.9rem' }}>{label}</span>
+      <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>{label}</span>
     </div>
-    <div style={{ 
-      color: 'white', 
-      fontSize: '2rem', 
-      fontWeight: 700,
-      marginBottom: '0.25rem'
-    }}>
-      {value}
-    </div>
-    <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-      {subtext}
-    </div>
+    <div className="font-display font-bold text-2xl" style={{ color: 'var(--text-primary)' }}>{value}</div>
+    <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{subtext}</div>
   </div>
 );
 
