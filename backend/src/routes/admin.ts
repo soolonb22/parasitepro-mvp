@@ -147,4 +147,24 @@ router.post('/grant-credits', authenticateToken, requireAdmin, async (req: Reque
   }
 });
 
+
+// ── POST /api/admin/setup-admin (bootstrap only - requires JWT_SECRET) ─────────
+router.post('/setup-admin', async (req: Request, res: Response) => {
+  const { email, setupSecret } = req.body;
+  if (!setupSecret || setupSecret !== process.env.JWT_SECRET) {
+    return res.status(403).json({ error: 'Invalid setup secret' });
+  }
+  try {
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;');
+    const result = await pool.query(
+      'UPDATE users SET is_admin = TRUE WHERE email = $1 RETURNING email, is_admin',
+      [email]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true, user: result.rows[0] });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
