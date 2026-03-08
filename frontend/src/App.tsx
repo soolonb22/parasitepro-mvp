@@ -12,6 +12,7 @@ import FAQPage from './pages/FAQPage';
 import AdminPage from './pages/AdminPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import LandingPage from './pages/LandingPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -218,7 +219,7 @@ function App() {
         error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
       }} />
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
