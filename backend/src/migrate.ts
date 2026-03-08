@@ -86,6 +86,10 @@ export async function runMigrations(): Promise<void> {
       );
       CREATE INDEX IF NOT EXISTS idx_prt_token_hash ON password_reset_tokens(token_hash);
       CREATE INDEX IF NOT EXISTS idx_prt_user_id ON password_reset_tokens(user_id);
+
+      -- One-time: grant 20 test credits to admin account
+      UPDATE users SET image_credits = 20
+      WHERE email = 'importantalerts26@gmail.com' AND image_credits = 0;
     `);
 
     console.log('✅ Database migrations complete');
