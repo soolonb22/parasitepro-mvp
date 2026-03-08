@@ -74,6 +74,7 @@ export async function runMigrations(): Promise<void> {
     // Incremental migrations — safe to run multiple times
     await pool.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
 
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
