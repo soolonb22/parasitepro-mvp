@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { query } from '../config/database';
-import { generateAccessToken } from '../middleware/auth';
+import { generateAccessToken, authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -204,6 +204,28 @@ router.post('/reset-password', async (req: Request, res: Response): Promise<void
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ error: 'Reset failed' });
+  }
+});
+
+// ── GET /api/auth/me ─────────────────────────────────────────────────────────
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await query(
+      'SELECT id, email, first_name, last_name, image_credits, is_admin FROM users WHERE id = $1',
+      [req.userId]
+    );
+    if (result.rows.length === 0) { res.status(404).json({ error: 'User not found' }); return; }
+    const u = result.rows[0];
+    res.json({
+      id: u.id,
+      email: u.email,
+      firstName: u.first_name,
+      lastName: u.last_name,
+      imageCredits: u.image_credits,
+      isAdmin: u.is_admin,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch profile' });
   }
 });
 

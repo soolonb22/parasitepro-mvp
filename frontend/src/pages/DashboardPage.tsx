@@ -27,7 +27,7 @@ const SAMPLE_TYPE_LABELS = {
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  const { user, accessToken } = useAuthStore();
+  const { user, accessToken, refreshUser } = useAuthStore();
   const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -35,6 +35,7 @@ const DashboardPage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
+    refreshUser(); // always pull fresh credits/profile on mount
     fetchAnalyses();
     const alreadyShown = localStorage.getItem(WELCOME_SHOWN_KEY);
     if (!alreadyShown) {

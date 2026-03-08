@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+const _BASE = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'http://localhost:5000';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
+
 export interface User {
   id: string;
   email: string;
@@ -18,11 +21,12 @@ interface AuthState {
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
   setAccessToken: (token: string) => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
@@ -50,6 +54,28 @@ export const useAuthStore = create<AuthState>()(
         })),
 
       setAccessToken: (token) => set({ accessToken: token }),
+
+      refreshUser: async () => {
+        const { accessToken } = get();
+        if (!accessToken) return;
+        try {
+          const res = await fetch(`${API_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            set((state) => ({
+              user: state.user ? {
+                ...state.user,
+                imageCredits: data.imageCredits,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+              } : null,
+            }));
+          }
+        } catch { /* silent fail */ }
+      },
     }),
     {
       name: 'parasitepro-auth',
