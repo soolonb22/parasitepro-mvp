@@ -88,8 +88,18 @@ export async function runMigrations(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_prt_user_id ON password_reset_tokens(user_id);
 
       -- Add missing bounding_box columns to detections (safe if already exist)
-      -- Add ai_summary to analyses
+      -- Rich analysis columns
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS ai_summary TEXT;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS overall_assessment TEXT;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS visual_findings TEXT;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS urgency_level VARCHAR(20);
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS image_quality VARCHAR(20);
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS differential_diagnoses JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS recommended_actions JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS health_risks JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS treatment_options JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_testing_list JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_script_if_dismissed JSONB;
       -- Fix sample_type constraint to allow all types
       ALTER TABLE analyses DROP CONSTRAINT IF EXISTS analyses_sample_type_check;
       -- Removed sample_type constraint to allow any value
