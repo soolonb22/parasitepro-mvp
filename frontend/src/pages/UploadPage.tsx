@@ -10,6 +10,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import PrivacyConsentModal from '../components/PrivacyConsentModal';
+import VoiceAssistant from '../components/VoiceAssistant';
 import PricingConfirmModal from '../components/PricingConfirmModal';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -51,6 +52,8 @@ const UploadPage = () => {
   const [showPricingConfirm, setShowPricingConfirm] = useState(false);
   const [pendingUpload, setPendingUpload] = useState(false);
 
+  const [showVoiceAssistant, setShowVoiceAssistant] = useState(false);
+  const [onboardingData, setOnboardingData] = useState(null);
   const hasCredits = (user?.imageCredits || 0) > 0;
 
   const handleUpload = () => {
@@ -77,6 +80,7 @@ const UploadPage = () => {
       if (sampleType) formData.append('sampleType', sampleType);
       if (collectionDate) formData.append('collectionDate', collectionDate);
       if (location) formData.append('location', location);
+      if (onboardingData) formData.append('onboardingContext', JSON.stringify(onboardingData));
       const response = await axios.post(`${API_URL}/analysis/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` },
         onUploadProgress: (e) => setUploadProgress(e.total ? Math.round((e.loaded * 100) / e.total) : 0),

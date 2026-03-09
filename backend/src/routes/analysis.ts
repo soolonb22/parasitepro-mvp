@@ -105,7 +105,7 @@ router.post(
         .then(async (aiResult) => {
           const { detections, summary, overallAssessment, visualFindings, urgencyLevel, imageQuality,
                   differentialDiagnoses, recommendedActions, healthRisks, treatmentOptions,
-                  gpTestingList, gpScriptIfDismissed } = aiResult;
+                  gpTestingList, gpScriptIfDismissed, naturalRemedies } = aiResult;
           console.log('✅ AI analysis complete for:', analysisId);
           await withTransaction(async (client) => {
             for (const detection of detections) {
@@ -119,13 +119,14 @@ router.post(
               `UPDATE analyses SET status = 'completed', processing_completed_at = NOW(),
                ai_summary = $2, overall_assessment = $3, visual_findings = $4, urgency_level = $5,
                image_quality = $6, differential_diagnoses = $7, recommended_actions = $8,
-               health_risks = $9, treatment_options = $10, gp_testing_list = $11, gp_script_if_dismissed = $12
+               health_risks = $9, treatment_options = $10, gp_testing_list = $11, gp_script_if_dismissed = $12, natural_remedies = $13
                WHERE id = $1`,
               [analysisId, summary || overallAssessment || null, overallAssessment || null,
                visualFindings || null, urgencyLevel || null, imageQuality || null,
                JSON.stringify(differentialDiagnoses || []), JSON.stringify(recommendedActions || []),
                JSON.stringify(healthRisks || []), JSON.stringify(treatmentOptions || []),
-               JSON.stringify(gpTestingList || []), JSON.stringify(gpScriptIfDismissed || [])]
+               JSON.stringify(gpTestingList || []), JSON.stringify(gpScriptIfDismissed || []),
+               JSON.stringify(naturalRemedies || [])]
             );
           });
           console.log('✅ Analysis saved to database:', analysisId);
@@ -167,7 +168,7 @@ router.get(
       const userId = req.userId!;
 
       const analysisResult = await pool.query(
-        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary, a.overall_assessment, a.visual_findings, a.urgency_level, a.image_quality, a.differential_diagnoses, a.recommended_actions, a.health_risks, a.treatment_options, a.gp_testing_list, a.gp_script_if_dismissed FROM analyses a WHERE a.id = $1`,
+        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary, a.overall_assessment, a.visual_findings, a.urgency_level, a.image_quality, a.differential_diagnoses, a.recommended_actions, a.health_risks, a.treatment_options, a.gp_testing_list, a.gp_script_if_dismissed, a.natural_remedies FROM analyses a WHERE a.id = $1`,
         [id]
       );
 
@@ -216,6 +217,7 @@ router.get(
         treatmentOptions: analysis.treatment_options || [],
         gpTestingList: analysis.gp_testing_list || [],
         gpScriptIfDismissed: analysis.gp_script_if_dismissed || [],
+        naturalRemedies: analysis.natural_remedies || [],
         detections,
       });
     } catch (error) {

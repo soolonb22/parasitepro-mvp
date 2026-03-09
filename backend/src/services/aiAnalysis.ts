@@ -43,6 +43,14 @@ export interface TreatmentOption {
   requiresPrescription: boolean;
 }
 
+export interface NaturalRemedy {
+  name: string;
+  category: 'herbal' | 'dietary' | 'topical' | 'environmental' | 'integrative';
+  description: string;
+  evidenceLevel: 'anecdotal' | 'traditional' | 'preliminary' | 'emerging';
+  safetyNotes: string;
+}
+
 export interface AIAnalysisResult {
   detections: AIDetection[];
   differentialDiagnoses: DifferentialDiagnosis[];
@@ -51,6 +59,7 @@ export interface AIAnalysisResult {
   treatmentOptions: TreatmentOption[];
   gpTestingList: string[];
   gpScriptIfDismissed: string[];
+  naturalRemedies: NaturalRemedy[];
   overallAssessment: string;
   urgencyLevel: 'low' | 'moderate' | 'high' | 'emergency';
   visualFindings: string;
@@ -129,6 +138,15 @@ Respond with this exact structure:
   "gpTestingList": [
     "Specific test name and why (e.g. 'Stool microscopy x3 — gold standard for protozoan detection')"
   ],
+  "naturalRemedies": [
+    {
+      "name": "Natural remedy name (e.g. Wormwood tea, Neem oil, Diatomaceous earth, Papaya seeds)",
+      "category": "herbal|dietary|topical|environmental|integrative",
+      "description": "What it is and how it is traditionally used for this condition",
+      "evidenceLevel": "anecdotal|traditional|preliminary|emerging",
+      "safetyNotes": "Important safety considerations — interactions, contraindications, not a replacement for medical treatment"
+    }
+  ],
   "gpScriptIfDismissed": [
     "What to say to your doctor if they are dismissive, in plain language (e.g. 'I'd like to request a full stool PCR panel given my travel history to tropical Queensland')"
   ],
@@ -136,6 +154,7 @@ Respond with this exact structure:
 }
 
 CRITICAL RULES:
+- Include 3-5 natural/unconventional remedies with honest evidence levels — include traditional Aboriginal Australian remedies where relevant
 - If no parasite is detected, return detections as an empty array and explain clearly in overallAssessment
 - confidenceScore must be between 0.0 and 1.0
 - Never prescribe specific medications or dosages
@@ -240,6 +259,7 @@ function parseAnalysisResponse(rawText: string): AIAnalysisResult {
     treatmentOptions: parsed.treatmentOptions || [],
     gpTestingList: parsed.gpTestingList || [],
     gpScriptIfDismissed: parsed.gpScriptIfDismissed || [],
+    naturalRemedies: parsed.naturalRemedies || [],
     overallAssessment: parsed.overallAssessment || '',
     urgencyLevel: parsed.urgencyLevel || 'low',
     visualFindings: parsed.visualFindings || '',

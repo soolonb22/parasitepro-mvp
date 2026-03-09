@@ -4,12 +4,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle, Loader, ThumbsUp, ThumbsDown,
   Microscope, Info, AlertCircle, Pill, Shield, ClipboardList,
-  MessageSquare, ArrowLeft, Eye, Activity, BookOpen,
+  MessageSquare, ArrowLeft, Eye, Activity, BookOpen, Volume2, Leaf,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import JournalPromptModal from '../components/JournalPromptModal';
+import VoiceAssistant from '../components/VoiceAssistant';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -40,6 +41,7 @@ const AnalysisResultsPage = () => {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showJournalPrompt, setShowJournalPrompt] = useState(false);
+  const [readingReport, setReadingReport] = useState(false);
   const [journalPromptShown, setJournalPromptShown] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
@@ -81,6 +83,38 @@ const AnalysisResultsPage = () => {
   };
 
   // ─── Loading ────────────────────────────────────────────────────────────────
+  const buildReportText = (a) => {
+    if (!a) return '';
+    const parts = [];
+    parts.push(`ParasitePro Analysis Report.`);
+    if (a.overallAssessment) parts.push(`Clinical Assessment. ${a.overallAssessment}`);
+    if (a.detections?.[0]) {
+      const d = a.detections[0];
+      parts.push(`Primary Finding. ${d.name}. Confidence ${d.confidence} percent.`);
+    }
+    if (a.visualFindings) parts.push(`Visual Findings. ${a.visualFindings}`);
+    const urg = getUrgency(a.urgencyLevel);
+    parts.push(`Urgency Level. ${urg.label}.`);
+    if (a.recommendedActions?.length) {
+      parts.push(`Recommended Actions.`);
+      a.recommendedActions.forEach(r => parts.push(`${r.priority}: ${r.action}. ${r.detail || ''}`));
+    }
+    if (a.healthRisks?.length) {
+      parts.push(`Health Risks.`);
+      a.healthRisks.forEach(r => parts.push(`${r.name}. ${r.description}`));
+    }
+    if (a.naturalRemedies?.length) {
+      parts.push(`Natural and Unconventional Remedies.`);
+      a.naturalRemedies.forEach(r => parts.push(`${r.name}. ${r.description}. Evidence level: ${r.evidenceLevel}. Safety note: ${r.safetyNotes}`));
+    }
+    if (a.gpTestingList?.length) {
+      parts.push(`Ask your GP for these tests.`);
+      a.gpTestingList.forEach(t => parts.push(t));
+    }
+    parts.push('This analysis is for informational purposes only and does not constitute a medical diagnosis. Please consult a qualified healthcare professional. In an emergency, call triple zero.');
+    return parts.join(' ');
+  };
+
   if (loading) return (
     <div className="pp-page flex items-center justify-center" style={{ minHeight: '60vh' }}>
       <div className="text-center">
@@ -379,6 +413,53 @@ const AnalysisResultsPage = () => {
                 <div className="mt-4 rounded-lg p-3 flex items-start gap-2 text-xs" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
                   <AlertCircle size={13} style={{ color: 'var(--amber)', marginTop: '1px', flexShrink: 0 }} />
                   <span style={{ color: 'var(--text-muted)' }}>Always consult a qualified healthcare professional before starting any treatment. No specific doses are provided here.</span>
+                </div>
+              </SectionCard>
+            )}
+
+            {/* Natural & Unconventional Remedies */}
+            {analysis.naturalRemedies?.length > 0 && (
+              <SectionCard icon={Leaf} title="Natural & Unconventional Remedies" iconColor="#34D399">
+                <p className="text-xs mb-4" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
+                  These are natural, traditional, or integrative options that may provide symptomatic relief or complementary support. Evidence levels vary — always discuss with your healthcare provider before use.
+                </p>
+                <div className="space-y-3">
+                  {analysis.naturalRemedies.map((r, i) => {
+                    const evidenceColors = {
+                      emerging: { bg: 'rgba(52,211,153,0.1)', color: '#34D399', border: 'rgba(52,211,153,0.25)' },
+                      preliminary: { bg: 'rgba(96,165,250,0.1)', color: '#60A5FA', border: 'rgba(96,165,250,0.25)' },
+                      traditional: { bg: 'rgba(167,139,250,0.1)', color: '#A78BFA', border: 'rgba(167,139,250,0.25)' },
+                      anecdotal: { bg: 'rgba(156,163,175,0.1)', color: '#9CA3AF', border: 'rgba(156,163,175,0.25)' },
+                    };
+                    const catColors = {
+                      herbal: '🌿', dietary: '🥗', topical: '🧴', environmental: '🌍', integrative: '⚕️'
+                    };
+                    const ec = evidenceColors[r.evidenceLevel] || evidenceColors.anecdotal;
+                    return (
+                      <div key={i} className="rounded-xl p-4" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm">{catColors[r.category] || '🌿'}</span>
+                            <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{r.name}</p>
+                          </div>
+                          <div className="flex gap-1.5 flex-shrink-0">
+                            <span className="text-xs font-mono px-1.5 py-0.5 rounded capitalize" style={{ background: ec.bg, color: ec.color, border: `1px solid ${ec.border}` }}>{r.evidenceLevel}</span>
+                          </div>
+                        </div>
+                        <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{r.description}</p>
+                        {r.safetyNotes && (
+                          <div className="flex items-start gap-1.5 rounded-lg p-2.5 mt-1" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
+                            <AlertCircle size={11} style={{ color: 'var(--amber)', marginTop: '2px', flexShrink: 0 }} />
+                            <p className="text-xs" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>{r.safetyNotes}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 rounded-lg p-3 flex items-start gap-2 text-xs" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
+                  <Leaf size={13} style={{ color: '#34D399', marginTop: '1px', flexShrink: 0 }} />
+                  <span style={{ color: 'var(--text-muted)' }}>Natural remedies do not replace conventional medical treatment. Consult a healthcare professional before use, especially if pregnant, immunocompromised, or taking other medications.</span>
                 </div>
               </SectionCard>
             )}
