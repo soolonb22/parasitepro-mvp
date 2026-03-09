@@ -165,7 +165,7 @@ export async function analyzeImage(imageUrl: string, sampleType?: string): Promi
       : ANALYSIS_PROMPT;
 
     const response = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-3-opus-20240229',
+      model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-5',
       max_tokens: 4000,
       messages: [
         {
@@ -292,7 +292,7 @@ export function getSupportedSampleTypes(): string[] {
 export function getAIServiceInfo() {
   return {
     provider: 'Anthropic Claude Vision',
-    model: process.env.ANTHROPIC_MODEL || 'claude-3-opus-20240229',
+    model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-5',
     fallback: process.env.OPENAI_API_KEY ? 'GPT-4o' : 'none',
     status: 'active',
   };
