@@ -47,7 +47,15 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, firstName 
             <ShieldCheck size={16} className="text-yellow-400 mt-0.5 flex-shrink-0" />
             <p className="text-yellow-200 text-xs"><strong>Medical Disclaimer:</strong> This tool is for informational purposes only and is not a substitute for professional medical diagnosis. Always consult a qualified healthcare professional.</p>
           </div>
-          <button onClick={onClose} className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">Get Started →</button>
+          <div className="flex gap-3">
+            <button onClick={onClose} className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors text-sm">Explore First</button>
+            <button
+              onClick={() => { onClose(); window.location.href = '/pricing'; }}
+              className="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+            >
+              <CreditCard size={16} /> Buy Credits →
+            </button>
+          </div>
         </div>
       </div>
     </div>

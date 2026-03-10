@@ -1,5 +1,9 @@
 // Central API base URL helper
-const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Falls back to production Railway URL so the app works without VITE_API_URL env var set.
+// The backend URL is public — not a secret.
+const _BASE =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:5000' : 'https://parasitepro-mvp-production-b051.up.railway.app');
 export const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 // Stripe publishable key — intentionally public, safe to commit.

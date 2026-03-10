@@ -167,7 +167,7 @@ const UploadPage = () => {
             <div>
               <p className="font-semibold text-sm mb-1" style={{ color: '#EF4444' }}>No Credits Available</p>
               <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>Each analysis costs 1 credit. Purchase credits to continue.</p>
-              <button onClick={() => navigate('/settings')} className="pp-btn-primary" style={{ padding: '7px 14px', fontSize: '12px' }}>Purchase Credits</button>
+              <button onClick={() => navigate('/pricing')} className="pp-btn-primary" style={{ padding: '7px 14px', fontSize: '12px' }}>Buy Credits →</button>
             </div>
           </div>
         )}
