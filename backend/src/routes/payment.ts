@@ -13,9 +13,9 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.notworms.com';
 
 // Credit bundles — live Stripe price IDs (AUD)
 const BUNDLES: Record<string, { credits: number; priceId: string; label: string; aud: number; popular?: boolean }> = {
-  bundle_5:  { credits: 5,  priceId: 'price_1T8gC0KP9uxdve7jWtDs8iTn', label: '5 Credits',  aud: 1999 },
-  bundle_10: { credits: 10, priceId: 'price_1T8gC4KP9uxdve7jolsajyEt', label: '10 Credits', aud: 3499, popular: true },
-  bundle_25: { credits: 25, priceId: 'price_1T8gC7KP9uxdve7jpjJJctrr', label: '25 Credits', aud: 7499 },
+  bundle_5:  { credits: 5,  priceId: 'price_1T9ZvVI3iOfYVCAUk9F9LnbV', label: '5 Credits',  aud: 1999 },
+  bundle_10: { credits: 10, priceId: 'price_1T9ZvVI3iOfYVCAUKy6XHMnR', label: '10 Credits', aud: 3499, popular: true },
+  bundle_25: { credits: 25, priceId: 'price_1T9ZvWI3iOfYVCAUarVuV29g', label: '25 Credits', aud: 7499 },
 };
 
 // ── GET /api/payment/pricing ──────────────────────────────────────────────────
