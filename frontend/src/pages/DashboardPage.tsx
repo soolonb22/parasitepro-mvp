@@ -11,6 +11,10 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import WelcomeModal from '../components/WelcomeModal';
 import ReferralSection from '../components/ReferralSection';
+import ParasiteInfoWidget from '../components/ParasiteInfoWidget';
+import AustraliaRiskMap from '../components/AustraliaRiskMap';
+import SymptomChecker from '../components/SymptomChecker';
+import LiveStatsTicker from '../components/LiveStatsTicker';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -121,6 +125,11 @@ const DashboardPage = () => {
             </h1>
             <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Your specimen analysis history</p>
           </div>
+        </div>
+
+        {/* Live Stats Ticker */}
+        <div className="mb-6 animate-slide-up">
+          <LiveStatsTicker />
         </div>
 
         {/* Stats */}
@@ -304,9 +313,24 @@ const DashboardPage = () => {
               </div>
             </div>
 
+            {/* Symptom Checker */}
+            <div className="animate-slide-up delay-300">
+              <SymptomChecker />
+            </div>
+
+            {/* Australia Risk Map */}
+            <div className="animate-slide-up delay-400">
+              <AustraliaRiskMap />
+            </div>
+
+            {/* Interactive parasite intelligence widget */}
+            <div className="animate-slide-up delay-500">
+              <ParasiteInfoWidget />
+            </div>
+
             {/* Referral */}
             {user && (
-              <div className="animate-slide-up delay-300">
+              <div className="animate-slide-up delay-600">
                 <ReferralSection userId={user.id} referralCount={0} creditsEarned={0} />
               </div>
             )}

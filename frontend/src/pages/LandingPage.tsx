@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import {
   Microscope, Upload, Zap, Shield, ArrowRight, CheckCircle,
-  MapPin, Clock, Star, ChevronDown, Eye, Bug
+  MapPin, Clock, Star, ChevronDown, Eye
 } from 'lucide-react';
+import LiveStatsTicker from '../components/LiveStatsTicker';
+import AustraliaRiskMap from '../components/AustraliaRiskMap';
+import SymptomChecker from '../components/SymptomChecker';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -153,69 +156,128 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* HERO */}
-      <section ref={heroRef} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '100px 24px 60px', overflow: 'hidden' }} className="grid-overlay">
-        <div className="noise-overlay" />
-        {/* Radial amber glow */}
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(217,119,6,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      {/* HERO — full-bleed ad image with content overlay */}
+      <section ref={heroRef} style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'stretch', overflow: 'hidden' }}>
 
-        {/* Scanning window */}
-        <div style={{ position: 'relative', width: 260, height: 180, marginBottom: 40, borderRadius: 4 }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(30,32,40,0.7)', border: '1px solid rgba(217,119,6,0.2)', borderRadius: 4, overflow: 'hidden' }}>
-            <div className="scan-beam" />
-            {/* Specimen circle */}
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 80, height: 80, borderRadius: '50%', border: '1px solid rgba(217,119,6,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 48, height: 48, borderRadius: '50%', border: '1px dashed rgba(217,119,6,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Bug size={20} style={{ color: 'rgba(217,119,6,0.6)' }} />
+        {/* Full-bleed background image */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url(/hero-ad.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }} />
+
+        {/* Dark gradient overlay — left-heavy for readability */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(105deg, rgba(10,11,13,0.93) 0%, rgba(10,11,13,0.80) 45%, rgba(10,11,13,0.25) 75%, rgba(10,11,13,0.10) 100%)',
+        }} />
+
+        {/* Animated scan line over full hero */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+          <div className="scan-beam" style={{ top: 0 }} />
+        </div>
+
+        {/* Grid overlay */}
+        <div className="grid-overlay noise-overlay" style={{ position: 'absolute', inset: 0 }} />
+
+        {/* Content */}
+        <div style={{
+          position: 'relative', zIndex: 10,
+          display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          padding: 'clamp(80px, 12vw, 120px) clamp(24px, 6vw, 80px)',
+          maxWidth: 700,
+          minHeight: '100vh',
+        }}>
+
+          {/* Source tag */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28 }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--amber)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>NOTWORMS.COM</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>//</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>AI ANALYSIS</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 8 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444', boxShadow: '0 0 8px rgba(239,68,68,0.7)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#EF4444', letterSpacing: '0.12em' }}>LIVE</span>
+            </div>
+          </div>
+
+          {/* Main headline — matches the ad creative */}
+          <h1 style={{
+            fontFamily: 'var(--font-display)', fontWeight: 900,
+            fontSize: 'clamp(42px, 8vw, 80px)', lineHeight: 1.0,
+            letterSpacing: '-0.04em', margin: '0 0 8px',
+            color: 'var(--text-primary)',
+          }}>
+            FOUND SOMETHING
+          </h1>
+          <h1 style={{
+            fontFamily: 'var(--font-display)', fontWeight: 900,
+            fontSize: 'clamp(42px, 8vw, 80px)', lineHeight: 1.0,
+            letterSpacing: '-0.04em', margin: '0 0 24px',
+            color: 'var(--amber)',
+          }}>
+            IN YOUR STOOL?
+          </h1>
+
+          {/* Sub-headline */}
+          <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', color: 'var(--text-secondary)', maxWidth: 480, lineHeight: 1.65, marginBottom: 32, fontWeight: 500 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Clinical AI analysis in 60 seconds.</strong> Upload a photo. Get a structured, confidence-rated parasite assessment — no lab visit required.
+          </p>
+
+          {/* Tick list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 36 }}>
+            {[
+              'Parasite & worm identification',
+              'Urgency level assessment',
+              'Recommended next steps',
+              'Built for Australians',
+            ].map(item => (
+              <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <CheckCircle size={14} style={{ color: 'var(--amber)', flexShrink: 0 }} />
+                <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{item}</span>
               </div>
-            </div>
-            {/* Crosshair lines */}
-            <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(217,119,6,0.15)' }} />
-            <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(217,119,6,0.15)' }} />
+            ))}
           </div>
-          <div className="reticle-corner rc-tl" />
-          <div className="reticle-corner rc-tr" />
-          <div className="reticle-corner rc-bl" />
-          <div className="reticle-corner rc-br" />
-          {/* Status dot */}
-          <div style={{ position: 'absolute', bottom: -14, left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div className="glow-dot" />
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--amber)', letterSpacing: '0.1em' }}>SCANNING</span>
+
+          {/* CTA group */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 36 }}>
+            <button onClick={() => navigate('/signup')} className="cta-btn" style={{ fontSize: 15, padding: '14px 28px', letterSpacing: '0.02em' }}>
+              ANALYSE FREE <ArrowRight size={16} />
+            </button>
+            <button onClick={() => navigate('/login')} className="cta-btn-ghost" style={{ fontSize: 14 }}>
+              Sign in
+            </button>
+          </div>
+
+          {/* Disclaimer & trust */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              {['No credit card required', 'Australian-built', 'Privacy-first'].map(t => (
+                <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  <CheckCircle size={11} style={{ color: '#10B981' }} /> {t}
+                </div>
+              ))}
+            </div>
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              notworms.com | AI-assisted reference only. Not medical diagnosis.
+            </p>
           </div>
         </div>
 
-        <div className="section-label" style={{ marginTop: 20 }}>AI Parasite Identification · Australia</div>
-
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(36px, 7vw, 72px)', textAlign: 'center', lineHeight: 1.05, letterSpacing: '-0.03em', maxWidth: 760, marginBottom: 20, color: 'var(--text-primary)' }}>
-          We don't flinch.<br /><span className="amber-text">We find out.</span>
-        </h1>
-
-        <p style={{ fontSize: 18, color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 520, lineHeight: 1.65, marginBottom: 36 }}>
-          Upload a photo of any suspicious specimen. ParasitePro's clinical AI returns a structured, confidence-rated assessment in under 30 seconds.
-        </p>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 48 }}>
-          <button onClick={() => navigate('/signup')} className="cta-btn">
-            Analyse a specimen free <ArrowRight size={16} />
-          </button>
-          <button onClick={() => navigate('/login')} className="cta-btn-ghost">
-            Sign in
-          </button>
+        {/* Right-side reticle decoration (desktop only) */}
+        <div style={{ position: 'absolute', right: '5%', top: '50%', transform: 'translateY(-50%)', opacity: 0.25, pointerEvents: 'none' }}>
+          <div style={{ width: 180, height: 180, borderRadius: '50%', border: '1px solid var(--amber)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 100, height: 100, borderRadius: '50%', border: '1px dashed rgba(217,119,6,0.6)' }} />
+            <div style={{ position: 'absolute', left: 0, right: 0, height: 1, background: 'rgba(217,119,6,0.5)' }} />
+            <div style={{ position: 'absolute', top: 0, bottom: 0, width: 1, left: '50%', background: 'rgba(217,119,6,0.5)' }} />
+          </div>
         </div>
 
-        {/* Trust strip */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
-          {['No credit card required', 'Australian-built', 'Privacy-first'].map(t => (
-            <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-              <CheckCircle size={13} style={{ color: '#10B981' }} /> {t}
-            </div>
-          ))}
-        </div>
-
-        {/* Scroll indicator */}
-        <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', animation: 'bounce 2s infinite', opacity: 0.4 }}>
+        {/* Scroll cue */}
+        <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', opacity: 0.35 }}>
           <style>{`@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }`}</style>
-          <ChevronDown size={20} style={{ color: 'var(--text-muted)' }} />
+          <div style={{ animation: 'bounce 2s infinite' }}><ChevronDown size={20} style={{ color: 'var(--text-muted)' }} /></div>
         </div>
       </section>
 
@@ -336,6 +398,35 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* INTERACTIVE TOOLS SECTION */}
+      <section style={{ maxWidth: 1000, margin: '0 auto', padding: '80px 24px 60px' }}>
+        <div className="reveal" style={{ marginBottom: 48 }}>
+          <div className="section-label">Tools & Intelligence</div>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(26px, 4vw, 40px)', letterSpacing: '-0.02em', maxWidth: 500 }}>
+            Know before you panic
+          </h2>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 12, maxWidth: 480, lineHeight: 1.65 }}>
+            Use our free tools to get a preliminary sense of what you might be dealing with — before you submit an image.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+          {/* Symptom Checker */}
+          <div className="reveal reveal-d1">
+            <SymptomChecker />
+          </div>
+          {/* Risk Map */}
+          <div className="reveal reveal-d2">
+            <AustraliaRiskMap />
+          </div>
+        </div>
+
+        {/* Live stats */}
+        <div className="reveal reveal-d3" style={{ marginTop: 24 }}>
+          <LiveStatsTicker />
         </div>
       </section>
 
