@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
+// Core pages
 import DashboardPage from './pages/DashboardPage';
 import UploadPage from './pages/UploadPage';
 import AnalysisResultsPage from './pages/AnalysisResultsPage';
@@ -15,6 +17,27 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import LandingPage from './pages/LandingPage';
 import PricingPage from './pages/PricingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+
+// Legal & info pages
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
+import DisclaimerPage from './pages/DisclaimerPage';
+import ContactPage from './pages/ContactPage';
+import SampleReportPage from './pages/SampleReportPage';
+
+// SEO pages
+import SeoDogWormsPage from './pages/SeoDogWormsPage';
+import SeoTapewormPage from './pages/SeoTapewormPage';
+import SeoPinwormPage from './pages/SeoPinwormPage';
+import SeoParasiteSymptomsPage from './pages/SeoParasiteSymptomsPage';
+import SeoWormInStoolPage from './pages/SeoWormInStoolPage';
+import SeoNaturalParasiteCleansePage from './pages/SeoNaturalParasiteCleansePage';
+
+// Feature/tool pages
+import FoodDiaryPage from './pages/FoodDiaryPage';
+import TreatmentTrackerPage from './pages/TreatmentTrackerPage';
+import SharedResultsPage from './pages/SharedResultsPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -214,29 +237,56 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Toaster position="top-right" toastOptions={{
-        style: { background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--bg-border)', fontFamily: 'var(--font-heading)', fontSize: '14px' },
-        success: { iconTheme: { primary: '#10B981', secondary: 'var(--bg-elevated)' } },
-        error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
-      }} />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
-        <Route path="/analysis/:id" element={<ProtectedRoute><AnalysisResultsPage /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <Toaster position="top-right" toastOptions={{
+          style: { background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--bg-border)', fontFamily: 'var(--font-heading)', fontSize: '14px' },
+          success: { iconTheme: { primary: '#10B981', secondary: 'var(--bg-elevated)' } },
+          error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
+        }} />
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/sample-report" element={<SampleReportPage />} />
+
+          {/* Legal */}
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/disclaimer" element={<DisclaimerPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+
+          {/* SEO landing pages */}
+          <Route path="/dog-worms" element={<SeoDogWormsPage />} />
+          <Route path="/tapeworm-symptoms" element={<SeoTapewormPage />} />
+          <Route path="/pinworm-treatment" element={<SeoPinwormPage />} />
+          <Route path="/parasite-symptoms" element={<SeoParasiteSymptomsPage />} />
+          <Route path="/worm-in-stool" element={<SeoWormInStoolPage />} />
+          <Route path="/natural-parasite-cleanse" element={<SeoNaturalParasiteCleansePage />} />
+
+          {/* Shared/public result */}
+          <Route path="/results/shared/:token" element={<SharedResultsPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+          {/* Protected */}
+          <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+          <Route path="/analysis/:id" element={<ProtectedRoute><AnalysisResultsPage /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+          <Route path="/food-diary" element={<ProtectedRoute><FoodDiaryPage /></ProtectedRoute>} />
+          <Route path="/treatment-tracker" element={<ProtectedRoute><TreatmentTrackerPage /></ProtectedRoute>} />
+
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 
