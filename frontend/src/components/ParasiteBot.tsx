@@ -540,15 +540,27 @@ export default function ParasiteBot() {
   const handleChipReply = (replyText: string) => {
     sessionStorage.setItem(`para_intro_${user?.id||'guest'}`, '1');
     setPhase('chat');
-    setMessages([{ role:'user', content:replyText, id: ++idRef.current }]);
-    setTimeout(() => { setChatOpen(true); handleSend(replyText, true); }, 700);
+    setChatOpen(true);
+    // Add user message immediately, then send — pass empty history since this is the first message
+    const userMsg: Msg = { role:'user', content:replyText, id: ++idRef.current };
+    setMessages([userMsg]);
+    sendToApi(replyText, []);
   };
 
-  const handleSend = async (text: string, fromChip = false) => {
-    if (!fromChip) setMessages(prev => [...prev, { role:'user', content:text, id: ++idRef.current }]);
+  const handleSend = (text: string) => {
+    const userMsg: Msg = { role:'user', content:text, id: ++idRef.current };
+    setMessages(prev => {
+      const updated = [...prev, userMsg];
+      const history = updated.slice(-12).map(m => ({ role:m.role, content:m.content }));
+      // fire API with fresh history (exclude the message we just added — it goes as `text`)
+      sendToApi(text, history.slice(0, -1));
+      return updated;
+    });
+  };
+
+  const sendToApi = async (text: string, history: {role:string; content:string}[]) => {
     setLoading(true); setMood('thinking');
     try {
-      const history = messages.slice(-12).map(m => ({ role:m.role, content:m.content }));
       const res = await fetch(getApiUrl('/api/chatbot/message'), {
         method:'POST',
         headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${accessToken}` },
