@@ -85,7 +85,7 @@ class SpeechEngine {
     if (!chunks.length) { opts.onDone?.(); return; }
 
     const voice = this.getBestVoice();
-    const baseRate = opts.rate ?? 0.84;
+    const baseRate = opts.rate ?? 0.97;
     const basePitch = opts.basePitch ?? 1.02;
     let i = 0;
 
@@ -280,7 +280,7 @@ function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: strin
       setTimeout(() => { setCard(null); setPhase('question'); }, 350);
       if (!muted) {
         setSpeaking(true); setMood('curious');
-        SpeechEngine.speak(CLOSING_QUESTION, { rate: 0.84, basePitch: 1.06, signal: sig.current, onDone: () => setSpeaking(false) });
+        SpeechEngine.speak(CLOSING_QUESTION, { rate: 0.97, basePitch: 1.06, signal: sig.current, onDone: () => setSpeaking(false) });
       }
       return;
     }
@@ -289,7 +289,7 @@ function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: strin
     setCardIn(false);
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 300);
     if (!muted) {
-      SpeechEngine.speak(line.text, { rate: 0.84, basePitch: 1.02, signal: sig.current,
+      SpeechEngine.speak(line.text, { rate: 0.97, basePitch: 1.02, signal: sig.current,
         onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakLine(idx+1); }, line.pauseAfter ?? 400); }
       });
     } else {
@@ -560,7 +560,7 @@ export default function ParasiteBot() {
       setMessages(prev => [...prev, { role:'assistant', content:reply, id: ++idRef.current }]);
       if (!muted) {
         sigRef.current = { cancelled:false };
-        SpeechEngine.speak(reply, { rate:0.85, basePitch:1.02, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
+        SpeechEngine.speak(reply, { rate:0.97, basePitch:1.02, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
       } else { setTimeout(()=>{ setSpeaking(false); setMood('idle'); }, 500); }
     } catch {
       setLoading(false); setMood('concerned');
