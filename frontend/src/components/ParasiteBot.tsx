@@ -43,13 +43,18 @@ class SpeechEngine {
   static getBestVoice(): SpeechSynthesisVoice | null {
     if (!this.voices.length) this.voices = window.speechSynthesis?.getVoices() || [];
     const pick = (fn: (v: SpeechSynthesisVoice) => boolean) => this.voices.find(fn) ?? null;
+    // Prefer young boy voices first: Junior (macOS), Oliver (UK), Nicky/Ryan (lighter male)
     return (
+      pick(v => /junior/i.test(v.name)) ||
+      pick(v => /oliver/i.test(v.name) && v.lang.startsWith('en')) ||
+      pick(v => /nicky|ryan|liam/i.test(v.name) && v.lang.startsWith('en')) ||
+      pick(v => v.lang === 'en-AU' && /male|guy|boy/i.test(v.name)) ||
       pick(v => v.lang === 'en-AU' && !v.localService) ||
       pick(v => v.lang === 'en-AU') ||
-      pick(v => v.lang.startsWith('en-GB') && /karen|serena|moira|female|woman/i.test(v.name)) ||
+      pick(v => v.lang.startsWith('en-GB') && /male|guy|boy|oliver/i.test(v.name)) ||
+      pick(v => v.lang.startsWith('en-US') && /male|guy|boy/i.test(v.name)) ||
       pick(v => v.lang.startsWith('en-GB')) ||
-      pick(v => v.lang === 'en-US' && /samantha|zoe|ava/i.test(v.name)) ||
-      pick(v => v.lang.startsWith('en-US') && v.name.includes('Female')) ||
+      pick(v => v.lang.startsWith('en-US') && /alex|daniel|fred/i.test(v.name)) ||
       pick(v => v.lang.startsWith('en')) ||
       null
     );
@@ -85,8 +90,8 @@ class SpeechEngine {
     if (!chunks.length) { opts.onDone?.(); return; }
 
     const voice = this.getBestVoice();
-    const baseRate = opts.rate ?? 0.97;
-    const basePitch = opts.basePitch ?? 1.02;
+    const baseRate = opts.rate ?? 1.38;
+    const basePitch = opts.basePitch ?? 1.55;
     let i = 0;
 
     const next = () => {
@@ -95,9 +100,9 @@ class SpeechEngine {
       const utt = new SpeechSynthesisUtterance(chunk);
       const isQ = chunk.trim().endsWith('?');
       const isE = chunk.trim().endsWith('!');
-      utt.rate   = baseRate + (Math.random() * 0.06 - 0.03) + (isQ ? 0.02 : 0);
-      utt.pitch  = basePitch + (Math.random() * 0.08 - 0.04) + (isQ ? 0.09 : 0) + (isE ? 0.05 : 0);
-      utt.volume = 0.92;
+      utt.rate   = baseRate + (Math.random() * 0.08 - 0.04) + (isQ ? 0.04 : 0) + (isE ? 0.06 : 0);
+      utt.pitch  = basePitch + (Math.random() * 0.10 - 0.05) + (isQ ? 0.14 : 0) + (isE ? 0.12 : 0);
+      utt.volume = 0.95;
       if (voice) utt.voice = voice;
       const pause = isQ ? 380 : isE ? 260 : 200;
       utt.onend  = () => { i++; if (opts.signal?.cancelled) { opts.onDone?.(); return; } setTimeout(next, pause); };
@@ -280,7 +285,7 @@ function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: strin
       setTimeout(() => { setCard(null); setPhase('question'); }, 350);
       if (!muted) {
         setSpeaking(true); setMood('curious');
-        SpeechEngine.speak(CLOSING_QUESTION, { rate: 0.97, basePitch: 1.06, signal: sig.current, onDone: () => setSpeaking(false) });
+        SpeechEngine.speak(CLOSING_QUESTION, { rate: 1.38, basePitch: 1.62, signal: sig.current, onDone: () => setSpeaking(false) });
       }
       return;
     }
@@ -289,7 +294,7 @@ function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: strin
     setCardIn(false);
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 300);
     if (!muted) {
-      SpeechEngine.speak(line.text, { rate: 0.97, basePitch: 1.02, signal: sig.current,
+      SpeechEngine.speak(line.text, { rate: 1.38, basePitch: 1.55, signal: sig.current,
         onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakLine(idx+1); }, line.pauseAfter ?? 400); }
       });
     } else {
@@ -572,7 +577,7 @@ export default function ParasiteBot() {
       setMessages(prev => [...prev, { role:'assistant', content:reply, id: ++idRef.current }]);
       if (!muted) {
         sigRef.current = { cancelled:false };
-        SpeechEngine.speak(reply, { rate:0.97, basePitch:1.02, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
+        SpeechEngine.speak(reply, { rate:1.38, basePitch:1.55, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
       } else { setTimeout(()=>{ setSpeaking(false); setMood('idle'); }, 500); }
     } catch {
       setLoading(false); setMood('concerned');
