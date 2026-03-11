@@ -96,7 +96,7 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
       .map((c) => (c as Anthropic.TextBlock).text)
       .join('');
 
-    res.json({ reply });
+    res.json({ message: reply });
   } catch (err: any) {
     console.error('Chatbot error:', err);
     res.status(500).json({ error: 'Failed to get response from PARA' });
