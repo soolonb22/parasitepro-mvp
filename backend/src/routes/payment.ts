@@ -120,6 +120,50 @@ router.post('/webhook', express.raw({ type: 'application/json' }),
 
         console.log(`✅ Webhook: ${credits} credits granted → user ${userId}`);
 
+        // ── Notify Fallon of new purchase ─────────────────────────
+        if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+          try {
+            const buyerRow = await pool.query('SELECT email, first_name, last_name FROM users WHERE id = $1', [userId]);
+            const buyer = buyerRow.rows[0];
+            const buyerName = buyer ? `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || buyer.email : userId;
+            const buyerEmail = buyer?.email || 'unknown';
+            const amountAud = ((session.amount_total || 0) / 100).toFixed(2);
+            const nodemailer = await import('nodemailer');
+            const transporter = nodemailer.default.createTransport({
+              host: process.env.SMTP_HOST,
+              port: parseInt(process.env.SMTP_PORT || '587'),
+              secure: process.env.SMTP_SECURE === 'true',
+              auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+            });
+            await transporter.sendMail({
+              from: process.env.SMTP_FROM || 'ParasitePro <noreply@notworms.com>',
+              to: 'importantalerts26@gmail.com',
+              subject: `💰 New Purchase — $${amountAud} AUD (${credits} credits)`,
+              html: `
+                <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0E0F11;color:#F5F0E8;border-radius:12px;">
+                  <h2 style="color:#D97706;margin:0 0 4px 0;">💰 New Purchase on ParasitePro!</h2>
+                  <p style="color:#6B7280;font-size:13px;margin:0 0 24px 0;">notworms.com</p>
+                  <table style="width:100%;border-collapse:collapse;">
+                    <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Customer</td>
+                        <td style="padding:10px 0;border-bottom:1px solid #1F2937;font-weight:600;">${buyerName}</td></tr>
+                    <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Email</td>
+                        <td style="padding:10px 0;border-bottom:1px solid #1F2937;">${buyerEmail}</td></tr>
+                    <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Amount</td>
+                        <td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#D97706;font-size:20px;font-weight:700;">$${amountAud} AUD</td></tr>
+                    <tr><td style="padding:10px 0;color:#9CA3AF;">Credits</td>
+                        <td style="padding:10px 0;font-weight:600;">${credits} credits</td></tr>
+                  </table>
+                  <a href="https://www.notworms.com/admin" style="display:inline-block;margin-top:24px;background:#D97706;color:#0E0F11;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">View Admin Dashboard →</a>
+                  <p style="margin-top:16px;font-size:12px;color:#4B5563;">Remember: If this is a first-time buyer from your launch offer, message them back with their 2 bonus credits 💛</p>
+                </div>
+              `,
+            });
+            console.log(`📧 Purchase notification sent to Fallon for user ${buyerEmail}`);
+          } catch (emailErr) {
+            console.error('⚠️ Purchase notification email failed (non-fatal):', emailErr);
+          }
+        }
+
       } else {
         console.log('Unhandled event:', event.type);
       }
