@@ -291,4 +291,200 @@ router.get(
   }
 );
 
+// ─── Deep Dive Routes ─────────────────────────────────────────────────────────
+
+// Run migration once on startup to add deep dive columns
+(async () => {
+  try {
+    await pool.query(`
+      ALTER TABLE analyses
+        ADD COLUMN IF NOT EXISTS deep_dive_report JSONB,
+        ADD COLUMN IF NOT EXISTS deep_dive_generated_at TIMESTAMPTZ
+    `);
+  } catch (e) {
+    console.warn('Deep dive migration skipped:', e);
+  }
+})();
+
+/**
+ * GET /api/analysis/:id/deep-dive
+ * Return cached deep dive report (free re-read)
+ */
+router.get(
+  '/:id/deep-dive',
+  authenticateToken,
+  [param('id').isUUID().withMessage('Invalid analysis ID')],
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const userId = req.userId!;
+
+      const result = await pool.query(
+        `SELECT user_id, deep_dive_report, deep_dive_generated_at FROM analyses WHERE id = $1`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        res.status(404).json({ error: 'Analysis not found' });
+        return;
+      }
+      if (result.rows[0].user_id !== userId) {
+        res.status(403).json({ error: 'Unauthorized' });
+        return;
+      }
+      if (!result.rows[0].deep_dive_report) {
+        res.status(404).json({ error: 'No deep dive report generated yet' });
+        return;
+      }
+
+      res.json({
+        report: result.rows[0].deep_dive_report,
+        generatedAt: result.rows[0].deep_dive_generated_at,
+      });
+    } catch (err) {
+      console.error('Deep dive GET error:', err);
+      res.status(500).json({ error: 'Failed to retrieve deep dive report' });
+    }
+  }
+);
+
+/**
+ * POST /api/analysis/:id/deep-dive
+ * Generate deep dive report — costs 1 credit. Cached after first generation.
+ */
+router.post(
+  '/:id/deep-dive',
+  authenticateToken,
+  [param('id').isUUID().withMessage('Invalid analysis ID')],
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    const Anthropic = (await import('@anthropic-ai/sdk')).default;
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    try {
+      const { id } = req.params;
+      const userId = req.userId!;
+
+      // 1. Load analysis + check ownership
+      const analysisResult = await pool.query(
+        `SELECT user_id, deep_dive_report, deep_dive_generated_at,
+                overall_assessment, urgency_level
+         FROM analyses WHERE id = $1`,
+        [id]
+      );
+
+      if (analysisResult.rows.length === 0) {
+        res.status(404).json({ error: 'Analysis not found' });
+        return;
+      }
+      const analysis = analysisResult.rows[0];
+      if (analysis.user_id !== userId) {
+        res.status(403).json({ error: 'Unauthorized' });
+        return;
+      }
+
+      // 2. Return cached if already generated (free re-read)
+      if (analysis.deep_dive_report) {
+        res.json({ report: analysis.deep_dive_report, generatedAt: analysis.deep_dive_generated_at, cached: true });
+        return;
+      }
+
+      // 3. Get detections to know what parasite to research
+      const detectionsResult = await pool.query(
+        `SELECT common_name, scientific_name, confidence_score, parasite_type
+         FROM detections WHERE analysis_id = $1 ORDER BY confidence_score DESC LIMIT 1`,
+        [id]
+      );
+
+      const detection = detectionsResult.rows[0];
+      if (!detection) {
+        res.status(400).json({ error: 'No parasite identified in this analysis — cannot generate deep dive' });
+        return;
+      }
+
+      // 4. Check + deduct credits
+      const userResult = await pool.query(
+        `SELECT image_credits FROM users WHERE id = $1`,
+        [userId]
+      );
+      const credits = userResult.rows[0]?.image_credits ?? 0;
+      if (credits < 1) {
+        res.status(402).json({
+          error: 'Insufficient credits',
+          details: { message: 'You need at least 1 credit to generate a Deep Dive report', creditsRequired: 1, creditsAvailable: credits },
+        });
+        return;
+      }
+      await pool.query(`UPDATE users SET image_credits = image_credits - 1 WHERE id = $1`, [userId]);
+
+      // 5. Generate the report with Claude
+      const parasiteName = detection.common_name || 'Unknown parasite';
+      const scientificName = detection.scientific_name || '';
+
+      const prompt = `You are a clinical parasitology expert. Generate a comprehensive, evidence-based deep dive research report on the following parasite for an Australian user.
+
+PARASITE: ${parasiteName} (${scientificName})
+PARASITE TYPE: ${detection.parasite_type || 'unknown'}
+CLINICAL CONTEXT: ${analysis.overall_assessment || 'No additional context'}
+
+Return ONLY valid JSON with NO markdown, NO backticks, NO preamble. Use this exact structure:
+
+{
+  "parasiteName": "${parasiteName}",
+  "scientificName": "${scientificName}",
+  "overview": "2-3 paragraph overview. What is it, where is it found, how significant is it clinically.",
+  "taxonomy": "Full taxonomic classification: Kingdom, Phylum, Class, Order, Family, Genus, Species.",
+  "lifecycle": "Detailed lifecycle description — definitive host, intermediate hosts, larval stages, how it completes its lifecycle.",
+  "transmission": "How humans become infected. Routes, risk factors, environmental conditions. Include Australian-specific risks.",
+  "symptomsAndProgression": "Symptom onset, acute vs chronic phases, systemic effects, what worsens outcomes.",
+  "diagnosis": "How it is definitively diagnosed — stool ova/parasite exam, serology, imaging, biopsy. What Australian labs typically use.",
+  "treatment": "Treatment categories used (e.g. anthelmintics, antiprotozoals) without specific drug dosages. Mention whether treatment requires a specialist. Note PBS-listed categories where relevant.",
+  "prevention": "Practical prevention steps relevant to Australians — hygiene, travel precautions, food safety, pet treatment.",
+  "australianRelevance": "Is this parasite endemic to Australia or Queensland? Known outbreaks, notifiable disease status, NHMRC guidelines if applicable.",
+  "keyFacts": ["5–8 short bullet-point key facts a patient would find valuable"],
+  "sources": [
+    { "title": "Source title or document name", "organisation": "WHO / CDC / NHMRC / TGA / Queensland Health / PubMed / etc", "year": "Year if known" }
+  ]
+}
+
+Draw on knowledge from WHO, CDC, NHMRC, Queensland Health, TGA, UpToDate, and peer-reviewed literature. Cite 4–6 authoritative sources. Be specific, clinically accurate, and write in plain English accessible to an educated general audience. Do not prescribe specific medication names or dosages.`;
+
+      const response = await anthropic.messages.create({
+        model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-5',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const rawText = response.content
+        .filter((c) => c.type === 'text')
+        .map((c) => (c as any).text)
+        .join('');
+
+      // Parse JSON — strip any accidental backtick fences
+      const cleaned = rawText.replace(/```json|```/g, '').trim();
+      let report: any;
+      try {
+        report = JSON.parse(cleaned);
+      } catch {
+        console.error('Deep dive JSON parse error. Raw:', rawText.slice(0, 500));
+        // Refund credit since generation failed
+        await pool.query(`UPDATE users SET image_credits = image_credits + 1 WHERE id = $1`, [userId]);
+        res.status(500).json({ error: 'Failed to parse deep dive report. Credit refunded.' });
+        return;
+      }
+
+      // 6. Store in DB
+      await pool.query(
+        `UPDATE analyses SET deep_dive_report = $1, deep_dive_generated_at = NOW() WHERE id = $2`,
+        [JSON.stringify(report), id]
+      );
+
+      res.json({ report, cached: false });
+    } catch (err: any) {
+      console.error('Deep dive POST error:', err);
+      res.status(500).json({ error: 'Failed to generate deep dive report' });
+    }
+  }
+);
+
 export default router;
+

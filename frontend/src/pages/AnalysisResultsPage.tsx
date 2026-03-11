@@ -13,6 +13,7 @@ import JournalPromptModal from '../components/JournalPromptModal';
 import VoiceAssistant from '../components/VoiceAssistant';
 import ParasiteProfile from '../components/ParasiteProfile';
 import ParasiteBot from '../components/ParasiteBot';
+import DeepDiveModal from '../components/DeepDiveModal';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -46,6 +47,8 @@ const AnalysisResultsPage = () => {
   const [readingReport, setReadingReport] = useState(false);
   const [journalPromptShown, setJournalPromptShown] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [showDeepDive, setShowDeepDive] = useState(false);
+  const [userCredits, setUserCredits] = useState(0);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -63,10 +66,12 @@ const AnalysisResultsPage = () => {
 
   const fetchAnalysis = async () => {
     try {
-      const response = await axios.get(`${API_URL}/analysis/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const [response, profileRes] = await Promise.all([
+        axios.get(`${API_URL}/analysis/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        axios.get(`${API_URL}/auth/profile`, { headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => null),
+      ]);
       setAnalysis(response.data);
+      if (profileRes?.data?.imageCredits !== undefined) setUserCredits(profileRes.data.imageCredits);
     } catch {
       toast.error('Failed to load analysis');
     } finally {
@@ -509,6 +514,59 @@ const AnalysisResultsPage = () => {
               </SectionCard>
             )}
 
+            {/* ── Deep Dive CTA ─────────────────────────────────────────── */}
+            {analysis.detections?.length > 0 && (
+              <div
+                className="pp-card p-5 relative overflow-hidden"
+                style={{
+                  border: '1px solid rgba(245,158,11,0.3)',
+                  background: 'linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(217,119,6,0.02) 100%)',
+                }}
+              >
+                {/* Decorative glow */}
+                <div
+                  className="absolute top-0 right-0 w-40 h-40 rounded-full pointer-events-none"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)',
+                    transform: 'translate(30%, -30%)',
+                  }}
+                />
+                <div className="relative flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                      style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)' }}
+                    >
+                      <BookOpen size={18} style={{ color: 'var(--amber)' }} />
+                    </div>
+                    <div>
+                      <p className="font-heading font-bold text-sm mb-0.5" style={{ color: 'var(--text-primary)' }}>
+                        Want to know more about{' '}
+                        <span style={{ color: 'var(--amber)' }}>
+                          {analysis.detections[0]?.commonName || 'this parasite'}
+                        </span>
+                        ?
+                      </p>
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
+                        Get a full AI-researched Deep Dive — lifecycle, transmission, treatment categories,
+                        Australian relevance, and cited clinical sources.
+                      </p>
+                      <p className="text-xs mt-1.5 font-mono" style={{ color: 'rgba(245,158,11,0.7)' }}>
+                        1 credit · Generated once, re-read for free
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowDeepDive(true)}
+                    className="pp-btn-primary flex-shrink-0 flex items-center gap-1.5"
+                    style={{ padding: '9px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                  >
+                    <BookOpen size={13} /> Deep Dive
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Feedback */}
             {!feedbackSubmitted ? (
               <div className="pp-card p-5 text-center">
@@ -551,6 +609,17 @@ const AnalysisResultsPage = () => {
 
       {/* ParasiteBot — always available on results page */}
       <ParasiteBot reportData={analysis} />
+
+      {showDeepDive && analysis.detections?.length > 0 && (
+        <DeepDiveModal
+          analysisId={id}
+          parasiteName={analysis.detections[0]?.commonName || 'Unknown Parasite'}
+          scientificName={analysis.detections[0]?.scientificName}
+          userCredits={userCredits}
+          onClose={() => setShowDeepDive(false)}
+          onCreditsUsed={() => setUserCredits(c => Math.max(0, c - 1))}
+        />
+      )}
 
       {showJournalPrompt && (
         <JournalPromptModal
