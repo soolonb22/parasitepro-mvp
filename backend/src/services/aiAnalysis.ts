@@ -148,8 +148,36 @@ Respond with this exact structure:
     }
   ],
   "gpScriptIfDismissed": [
-    "What to say to your doctor if they are dismissive, in plain language (e.g. 'I'd like to request a full stool PCR panel given my travel history to tropical Queensland')"
+    "What to say to your doctor if they are dismissive, in plain language (e.g. 'I\'d like to request a full stool PCR panel given my travel history to tropical Queensland')"
   ],
+  "parasiteProfile": {
+    "commonName": "Common name of the primary identified organism",
+    "scientificName": "Scientific binomial name",
+    "classification": {
+      "kingdom": "Animalia|Chromista|Protozoa|Fungi",
+      "phylum": "e.g. Nematoda, Platyhelminthes, Apicomplexa",
+      "class": "Taxonomic class",
+      "order": "Taxonomic order",
+      "family": "Taxonomic family",
+      "genus": "Genus name",
+      "species": "Species name"
+    },
+    "description": "2-3 sentence educational description of this organism for a layperson",
+    "appearance": "What it looks like — colour, shape, texture",
+    "size": "Typical size range (e.g. 2-8mm adults, eggs 50-60 microns)",
+    "lifecycle": "Brief lifecycle description: how it reproduces, develops, and infects hosts",
+    "transmission": ["How it spreads — list 3-5 common transmission routes"],
+    "geographicDistribution": "Where in the world this organism is found",
+    "australianRelevance": "Specific relevance to Australia, Queensland, or tropical regions if applicable",
+    "symptomsInHumans": ["List of common symptoms this parasite causes in humans"],
+    "symptomsInAnimals": ["Symptoms in pets/livestock if a zoonotic species, else omit"],
+    "incubationPeriod": "How long from exposure to symptoms appearing",
+    "treatmentOverview": "General treatment approach (no specific drugs/doses)",
+    "preventionTips": ["List of 4-6 specific prevention strategies"],
+    "riskGroups": ["Who is most at risk: children, elderly, immunocompromised, travellers, etc."],
+    "funFact": "One surprising or interesting fact about this organism",
+    "dangerLevel": "low|moderate|high|critical"
+  },
   "disclaimerAcknowledged": true
 }
 

@@ -125,7 +125,15 @@ try {
 try {
   adminRouter = require('./routes/admin').default;
   app.use('/api/admin', adminRouter);
-  console.log('✅ Admin routes loaded');
+  console.log("✅ Admin routes loaded");
+} catch (e: any) {
+  console.error('❌ Failed to load admin routes:', e.message);
+}
+
+try {
+  const chatbotRouter = require('./routes/chatbot').default;
+  app.use('/api/chatbot', chatbotRouter);
+  console.log('✅ Chatbot routes loaded');
 } catch (e: any) {
   console.error('❌ Failed to load payment routes:', e.message);
 }

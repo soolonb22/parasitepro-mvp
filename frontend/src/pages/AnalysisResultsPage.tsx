@@ -11,6 +11,8 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import JournalPromptModal from '../components/JournalPromptModal';
 import VoiceAssistant from '../components/VoiceAssistant';
+import ParasiteProfile from '../components/ParasiteProfile';
+import ParasiteBot from '../components/ParasiteBot';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -360,6 +362,21 @@ const AnalysisResultsPage = () => {
               </SectionCard>
             )}
 
+            {/* Parasite Profile */}
+            {analysis.parasiteProfile && (
+              <ParasiteProfile
+                profileData={analysis.parasiteProfile}
+                primaryFinding={analysis.detections?.[0]?.commonName}
+                scientificName={analysis.detections?.[0]?.scientificName}
+              />
+            )}
+            {!analysis.parasiteProfile && analysis.detections?.[0] && (
+              <ParasiteProfile
+                primaryFinding={analysis.detections[0].commonName}
+                scientificName={analysis.detections[0].scientificName}
+              />
+            )}
+
             {/* Differential Diagnoses */}
             {analysis.differentialDiagnoses?.length > 0 && (
               <SectionCard icon={BookOpen} title="Differential Diagnoses">
@@ -531,6 +548,9 @@ const AnalysisResultsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* ParasiteBot — always available on results page */}
+      <ParasiteBot reportData={analysis} />
 
       {showJournalPrompt && (
         <JournalPromptModal

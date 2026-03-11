@@ -11,3 +11,5 @@ export const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 export const STRIPE_PUBLIC_KEY =
   import.meta.env.VITE_STRIPE_PUBLIC_KEY ||
   'pk_live_51SEURXKP9uxdve7jnKzYboXV37u42eKc5uM21TQ15iXhYLUPQi8Jz7b3VR7yJTGtXBj4EMi9DwnV8TNqb1DhDKmH00U4I1qbyF';
+
+export const getApiUrl = (path: string) => `${API_URL}${path.startsWith('/') ? path : '/' + path}`;
