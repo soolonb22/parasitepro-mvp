@@ -1,36 +1,28 @@
 // @ts-nocheck
 /**
- * PARA — ParasitePro AI Assistant
- * A living, talking, autonomous robot character that appears after login,
- * speaks out loud, leads conversations, and reacts with animated expressions.
+ * PARA — ParasitePro AI Assistant v5
+ * ─────────────────────────────────────
+ * • Cinematic full-screen intro that blocks dashboard until dismissed
+ * • Robot flies in from the top with spring physics
+ * • Natural, conversational Australian voice (chunked, varied pace)
+ * • Interactive — robot asks a question; user taps a chip reply
+ * • Smooth fade-out reveals dashboard beneath
+ * • Persistent floating chatbot with mood expressions
  */
+
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Send, Volume2, VolumeX, ChevronDown } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Send, Volume2, VolumeX, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { getApiUrl } from '../api';
 
-/* ─── Types ──────────────────────────────────────────────────────── */
-type Mood = 'idle' | 'talking' | 'thinking' | 'happy' | 'concerned' | 'waving' | 'surprised';
-type Stage = 'entering' | 'intro' | 'health_q' | 'idle' | 'report';
+type Mood = 'idle' | 'talking' | 'thinking' | 'happy' | 'concerned' | 'waving' | 'surprised' | 'curious';
+type Phase = 'hidden' | 'intro' | 'chat';
 type Msg = { role: 'user' | 'assistant'; content: string; id: number };
 
-/* ─── Health Questions ───────────────────────────────────────────── */
-const HQS = [
-  { id: 'location', q: "First up — whereabouts in Australia are you located? 📍", type: 'select',
-    opts: ['Queensland (Tropical North)', 'Queensland (South East)', 'Northern Territory', 'Western Australia (North)', 'Western Australia (South)', 'New South Wales', 'Victoria', 'South Australia', 'Tasmania', 'Outside Australia'] },
-  { id: 'travel', q: "Any travel to tropical or overseas regions in the last 6 months? ✈️", type: 'select',
-    opts: ['Nope, stayed local', 'Domestic tropical (QLD/NT)', 'South-East Asia', 'Africa or Middle East', 'South America', 'Pacific Islands', 'Multiple regions'] },
-  { id: 'pets', q: "Do you have any furry (or scaly) friends at home? 🐾", type: 'select',
-    opts: ['No pets', 'Dogs', 'Cats', 'Dogs & Cats', 'Farm animals', 'Reptiles or exotic pets', 'Other'] },
-  { id: 'symptoms', q: "Any symptoms at the moment? Tap all that apply! 🩺", type: 'multi',
-    opts: ['Abdominal pain', 'Visible worms or eggs', 'Skin rash or lesions', 'Itching (skin or anal area)', 'Unusual fatigue', 'Nausea or vomiting', 'Diarrhoea', 'Unexplained weight loss', 'No symptoms — just checking'] },
-  { id: 'duration', q: "How long have these concerns been going on? ⏱️", type: 'select',
-    opts: ['Just noticed today', 'A few days', '1–2 weeks', '2–4 weeks', 'Over a month', '3+ months', 'No symptoms — preventive check'] },
-  { id: 'occupation', q: "Last one! What best describes your work or daily environment? 💼", type: 'select',
-    opts: ['General public', 'Healthcare worker', 'Childcare / education', 'Agriculture / farming', 'Vet or animal work', 'Outdoor / fieldwork', 'Returning traveller', 'Prefer not to say'] },
-];
-
-/* ─── Speech Engine ──────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════
+   SPEECH ENGINE
+══════════════════════════════════════════════════════════════════ */
 class SpeechEngine {
   private static voices: SpeechSynthesisVoice[] = [];
   private static ready = false;
@@ -38,744 +30,565 @@ class SpeechEngine {
   static init(): Promise<void> {
     return new Promise(resolve => {
       if (typeof window === 'undefined' || !window.speechSynthesis) { resolve(); return; }
-      const load = () => {
-        this.voices = window.speechSynthesis.getVoices();
-        this.ready = this.voices.length > 0;
-        resolve();
+      const tryLoad = () => {
+        const v = window.speechSynthesis.getVoices();
+        if (v.length) { this.voices = v; this.ready = true; resolve(); }
       };
-      if (window.speechSynthesis.getVoices().length > 0) { load(); }
-      else { window.speechSynthesis.onvoiceschanged = load; setTimeout(load, 1000); }
+      window.speechSynthesis.onvoiceschanged = tryLoad;
+      tryLoad();
+      setTimeout(() => { if (!this.ready) { tryLoad(); resolve(); } }, 1500);
     });
   }
 
-  static speak(text: string, opts?: { rate?: number; pitch?: number; onStart?: () => void; onEnd?: () => void }) {
-    if (!window.speechSynthesis) { opts?.onEnd?.(); return; }
+  static getBestVoice(): SpeechSynthesisVoice | null {
+    if (!this.voices.length) this.voices = window.speechSynthesis?.getVoices() || [];
+    const pick = (fn: (v: SpeechSynthesisVoice) => boolean) => this.voices.find(fn) ?? null;
+    return (
+      pick(v => v.lang === 'en-AU' && !v.localService) ||
+      pick(v => v.lang === 'en-AU') ||
+      pick(v => v.lang.startsWith('en-GB') && /karen|serena|moira|female|woman/i.test(v.name)) ||
+      pick(v => v.lang.startsWith('en-GB')) ||
+      pick(v => v.lang === 'en-US' && /samantha|zoe|ava/i.test(v.name)) ||
+      pick(v => v.lang.startsWith('en-US') && v.name.includes('Female')) ||
+      pick(v => v.lang.startsWith('en')) ||
+      null
+    );
+  }
+
+  static speak(
+    text: string,
+    opts: {
+      rate?: number;
+      basePitch?: number;
+      signal?: { cancelled: boolean };
+      onDone?: () => void;
+    } = {}
+  ) {
+    if (!window.speechSynthesis) { opts.onDone?.(); return; }
     window.speechSynthesis.cancel();
-    const clean = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/[*_`#[\]]/g, '').replace(/\n/g, '. ').slice(0, 320);
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.rate = opts?.rate ?? 1.05;
-    utt.pitch = opts?.pitch ?? 1.1;
-    utt.volume = 0.95;
-    const preferred = this.voices.find(v => v.lang === 'en-AU')
-      || this.voices.find(v => v.lang.startsWith('en-GB') && v.name.includes('Female'))
-      || this.voices.find(v => v.lang.startsWith('en-GB'))
-      || this.voices.find(v => v.lang.startsWith('en'));
-    if (preferred) utt.voice = preferred;
-    utt.onstart = () => opts?.onStart?.();
-    utt.onend = () => opts?.onEnd?.();
-    utt.onerror = () => opts?.onEnd?.();
-    window.speechSynthesis.speak(utt);
+
+    const clean = text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/[*_`#\[\]]/g, '')
+      .replace(/\n+/g, '. ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+
+    const rawChunks = clean.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+    const chunks: string[] = [];
+    let buf = '';
+    for (const c of rawChunks) {
+      buf = buf ? buf + ' ' + c : c;
+      if (buf.split(' ').length >= 7 || c.match(/[.!?]$/)) { chunks.push(buf); buf = ''; }
+    }
+    if (buf) chunks.push(buf);
+    if (!chunks.length) { opts.onDone?.(); return; }
+
+    const voice = this.getBestVoice();
+    const baseRate = opts.rate ?? 0.84;
+    const basePitch = opts.basePitch ?? 1.02;
+    let i = 0;
+
+    const next = () => {
+      if (opts.signal?.cancelled || i >= chunks.length) { opts.onDone?.(); return; }
+      const chunk = chunks[i];
+      const utt = new SpeechSynthesisUtterance(chunk);
+      const isQ = chunk.trim().endsWith('?');
+      const isE = chunk.trim().endsWith('!');
+      utt.rate   = baseRate + (Math.random() * 0.06 - 0.03) + (isQ ? 0.02 : 0);
+      utt.pitch  = basePitch + (Math.random() * 0.08 - 0.04) + (isQ ? 0.09 : 0) + (isE ? 0.05 : 0);
+      utt.volume = 0.92;
+      if (voice) utt.voice = voice;
+      const pause = isQ ? 380 : isE ? 260 : 200;
+      utt.onend  = () => { i++; if (opts.signal?.cancelled) { opts.onDone?.(); return; } setTimeout(next, pause); };
+      utt.onerror = () => { i++; setTimeout(next, 80); };
+      window.speechSynthesis.speak(utt);
+    };
+    next();
   }
 
   static cancel() { window.speechSynthesis?.cancel(); }
 }
 
-/* ─── Animated Robot SVG ─────────────────────────────────────────── */
-function Robot({ mood, speaking, waving, size = 1 }: { mood: Mood; speaking: boolean; waving: boolean; size?: number }) {
+/* ══════════════════════════════════════════════════════════════════
+   ROBOT SVG
+══════════════════════════════════════════════════════════════════ */
+function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; size?: number }) {
   const [blink, setBlink] = useState(false);
-  const [mouthOpen, setMouthOpen] = useState(0);
-  const [antennaGlow, setAntennaGlow] = useState(false);
+  const [mouth, setMouth] = useState(0);
+  const [antGlow, setAnt] = useState(false);
+  const [armOff, setArm]  = useState(0);
 
-  // Random blinking
   useEffect(() => {
-    const t = setInterval(() => {
-      setBlink(true);
-      setTimeout(() => setBlink(false), 100 + Math.random() * 60);
-    }, 2000 + Math.random() * 3000);
+    const next = () => {
+      const delay = 2800 + Math.random() * 2200;
+      const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false), 110); next(); }, delay);
+      return t;
+    };
+    const t = next();
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!speaking) { setMouth(0); return; }
+    const t = setInterval(() => setMouth(p => (p + 1) % 5), 130);
+    return () => clearInterval(t);
+  }, [speaking]);
+
+  useEffect(() => {
+    const t = setInterval(() => setAnt(v => !v), 900 + Math.random() * 300);
     return () => clearInterval(t);
   }, []);
 
-  // Mouth animation when speaking
   useEffect(() => {
-    if (!speaking) { setMouthOpen(0); return; }
-    const t = setInterval(() => {
-      setMouthOpen(Math.random() * 10 + 2);
-    }, 120);
-    return () => { clearInterval(t); setMouthOpen(0); };
-  }, [speaking]);
+    if (mood === 'waving' || mood === 'happy') {
+      let dir = 1;
+      const t = setInterval(() => { setArm(prev => prev + dir * 4); dir *= -1; }, 350);
+      return () => clearInterval(t);
+    }
+    setArm(0);
+  }, [mood]);
 
-  // Antenna glow
-  useEffect(() => {
-    const t = setInterval(() => setAntennaGlow(a => !a), speaking ? 300 : 2000);
-    return () => clearInterval(t);
-  }, [speaking]);
+  const eyeH   = blink ? 1.5 : mood === 'surprised' ? 14 : mood === 'happy' ? 8 : mood === 'curious' ? 12 : 10;
+  const eyeY   = mood === 'curious' ? 34 : 35;
+  const eyeC   = mood === 'concerned' ? '#ef4444' : mood === 'happy' ? '#10b981' : mood === 'thinking' ? '#a78bfa' : mood === 'curious' ? '#38bdf8' : '#f59e0b';
+  const ledC   = mood === 'thinking' ? '#a78bfa' : mood === 'happy' ? '#10b981' : mood === 'concerned' ? '#ef4444' : mood === 'curious' ? '#38bdf8' : '#f59e0b';
+  const headBg = mood === 'concerned' ? '#1e3a5f' : mood === 'happy' ? '#0d2a1a' : mood === 'thinking' ? '#1a1a3e' : '#1e293b';
 
-  const s = size;
-  const eyeH = blink ? 1 : (mood === 'happy' ? 6 : mood === 'surprised' ? 12 : 8);
-  const eyeColor = mood === 'concerned' ? '#FF6B6B' : mood === 'happy' ? '#34D399' : mood === 'thinking' ? '#60A5FA' : '#FBBF24';
-  const eyeY = blink ? 27 : (mood === 'surprised' ? 22 : 25);
+  const mouths = [
+    'M 43 108 Q 50 111 57 108',
+    'M 43 107 Q 50 115 57 107',
+    'M 42 107 Q 50 118 58 107',
+    'M 43 108 Q 50 113 57 108',
+    'M 44 109 Q 50 112 56 109',
+  ];
+  const mp = speaking ? mouths[mouth] : (mood === 'concerned' ? 'M 43 110 Q 50 107 57 110' : mouths[0]);
+  const armRot = (mood === 'waving' || mood === 'happy') ? -22 + armOff : 0;
 
   return (
-    <svg width={90 * s} height={160 * s} viewBox="0 0 90 160" style={{ overflow: 'visible', filter: 'drop-shadow(0 8px 24px rgba(217,119,6,0.35))' }}>
-      {/* Antenna */}
-      <line x1="45" y1="14" x2="45" y2="4" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round"/>
-      <circle cx="45" cy="3" r="4" fill={antennaGlow ? '#F59E0B' : '#D97706'}
-        style={{ filter: antennaGlow ? 'drop-shadow(0 0 6px #F59E0B)' : 'none', transition: 'all 0.3s' }}/>
-      {/* Ear left */}
-      <rect x="8" y="22" width="8" height="20" rx="4" fill="#1A1C20" stroke="#D97706" strokeWidth="1.5"/>
-      <rect x="10" y="26" width="4" height="8" rx="2" fill={eyeColor} opacity="0.6"/>
-      {/* Ear right */}
-      <rect x="74" y="22" width="8" height="20" rx="4" fill="#1A1C20" stroke="#D97706" strokeWidth="1.5"/>
-      <rect x="76" y="26" width="4" height="8" rx="2" fill={eyeColor} opacity="0.6"/>
-      {/* HEAD */}
-      <rect x="14" y="12" width="62" height="58" rx="16" fill="#15181E" stroke="#D97706" strokeWidth="2.5"/>
-      {/* Head gloss */}
-      <rect x="16" y="14" width="58" height="20" rx="14" fill="rgba(255,255,255,0.04)"/>
-      {/* Left eye socket */}
-      <rect x="20" y="21" width="20" height="18" rx="6" fill="#0A0C10" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Right eye socket */}
-      <rect x="50" y="21" width="20" height="18" rx="6" fill="#0A0C10" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Left eye pupil */}
-      <rect
-        x={mood === 'thinking' ? 22 : 24}
-        y={eyeY}
-        width={mood === 'thinking' ? 12 : 8}
-        height={eyeH}
-        rx="3"
-        fill={eyeColor}
-        style={{ filter: `drop-shadow(0 0 4px ${eyeColor})`, transition: 'all 0.08s ease' }}
-      />
-      {/* Right eye pupil */}
-      <rect
-        x={mood === 'thinking' ? 52 : 54}
-        y={eyeY}
-        width={mood === 'thinking' ? 12 : 8}
-        height={eyeH}
-        rx="3"
-        fill={eyeColor}
-        style={{ filter: `drop-shadow(0 0 4px ${eyeColor})`, transition: 'all 0.08s ease' }}
-      />
-      {/* Eye shines */}
-      {!blink && <>
-        <circle cx={mood === 'thinking' ? 27 : 27} cy={eyeY + 1} r="2" fill="rgba(255,255,255,0.55)"/>
-        <circle cx={mood === 'thinking' ? 57 : 57} cy={eyeY + 1} r="2" fill="rgba(255,255,255,0.55)"/>
+    <svg width={100 * size} height={162 * size} viewBox="0 0 100 162"
+      style={{ overflow:'visible', filter:`drop-shadow(0 0 ${speaking?22:10}px ${eyeC}60)`, transition:'filter 0.3s' }}>
+      <line x1="50" y1="10" x2="50" y2="23" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="50" cy="7" r="5.5" fill={antGlow ? ledC : '#1e293b'}
+        style={{ filter:antGlow?`drop-shadow(0 0 8px ${ledC})`:'none', transition:'fill 0.4s, filter 0.4s' }} />
+      <rect x="24" y="22" width="52" height="50" rx="11" fill={headBg} stroke="#334155" strokeWidth="1.5"
+        style={{ transition:'fill 0.4s' }} />
+      <rect x="15" y="33" width="11" height="22" rx="5" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+      <circle cx="20.5" cy="44" r="3.5" fill={ledC} opacity="0.9" style={{ filter:`drop-shadow(0 0 5px ${ledC})`, transition:'fill 0.4s' }} />
+      <rect x="74" y="33" width="11" height="22" rx="5" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+      <circle cx="79.5" cy="44" r="3.5" fill={ledC} opacity="0.9" style={{ filter:`drop-shadow(0 0 5px ${ledC})`, transition:'fill 0.4s' }} />
+      <rect x="31" y={eyeY} width="15" height={eyeH} rx="3.5" fill={eyeC}
+        style={{ filter:`drop-shadow(0 0 8px ${eyeC})`, transition:'height 0.08s, fill 0.3s' }} />
+      <rect x="54" y={eyeY} width="15" height={eyeH} rx="3.5" fill={eyeC}
+        style={{ filter:`drop-shadow(0 0 8px ${eyeC})`, transition:'height 0.08s, fill 0.3s' }} />
+      {!blink && eyeH > 3 && <>
+        <circle cx="37" cy={eyeY+2} r="2.5" fill="white" opacity="0.75" />
+        <circle cx="60" cy={eyeY+2} r="2.5" fill="white" opacity="0.75" />
       </>}
-      {/* Cheek blush (happy) */}
-      {(mood === 'happy' || mood === 'waving') && <>
-        <ellipse cx="22" cy="46" rx="6" ry="4" fill="#FF6B6B" opacity="0.2"/>
-        <ellipse cx="68" cy="46" rx="6" ry="4" fill="#FF6B6B" opacity="0.2"/>
-      </>}
-      {/* Mouth housing */}
-      <rect x="22" y="42" width="46" height="22" rx="8" fill="#0A0C10" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Mouth expression */}
-      {mood === 'happy' && !speaking &&
-        <path d="M30 56 Q45 66 60 56" stroke="#34D399" strokeWidth="3" fill="none" strokeLinecap="round"
-          style={{ filter: 'drop-shadow(0 0 4px #34D399)' }}/>}
-      {mood === 'concerned' && !speaking &&
-        <path d="M30 60 Q45 52 60 60" stroke="#FF6B6B" strokeWidth="3" fill="none" strokeLinecap="round"/>}
-      {mood === 'thinking' && !speaking &&
-        <path d="M32 54 Q42 52 58 56" stroke="#60A5FA" strokeWidth="2.5" fill="none" strokeLinecap="round"/>}
-      {(mood === 'idle' || mood === 'waving') && !speaking &&
-        <rect x="32" y="51" width="26" height="5" rx="2.5" fill="#D97706" opacity="0.5"/>}
-      {mood === 'surprised' && !speaking &&
-        <ellipse cx="45" cy="54" rx="8" ry="7" fill="#FBBF24" opacity="0.8"/>}
-      {speaking && (
-        <ellipse cx="45" cy="54" rx="10" ry={Math.max(mouthOpen, 2)}
-          fill="#F59E0B" opacity="0.9"
-          style={{ filter: 'drop-shadow(0 0 5px #F59E0B)', transition: 'ry 0.1s' }}/>
-      )}
-      {/* Thinking dots */}
-      {mood === 'thinking' && [0,1,2].map(i => (
-        <circle key={i} cx={62 + i * 6} cy={24 - i * 5} r={2.5 - i * 0.5} fill="#60A5FA"
-          opacity={0.9 - i * 0.25}
-          style={{ animation: `para-dot 1s ${i * 0.18}s ease-in-out infinite` }}/>
+      {mood === 'thinking' && [0,1,2].map((k,i) => (
+        <circle key={k} cx={36+i*14} cy="57" r="3.5" fill="#a78bfa"
+          opacity={0.2+0.7*((mouth+i)%3===0?1:0)} style={{ transition:'opacity 0.18s' }} />
       ))}
-
-      {/* BODY */}
-      {/* Left arm */}
-      <rect
-        x="2" y="80" width="14" height="38" rx="7"
-        fill="#15181E" stroke="#D97706" strokeWidth="1.5"
-        style={{
-          transformOrigin: '9px 80px',
-          animation: waving ? 'para-wave 0.45s ease-in-out infinite alternate' : 'none',
-        }}
-      />
-      {/* Left hand */}
-      <circle cx="9" cy="120" r="5.5" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Right arm */}
-      <rect x="74" y="80" width="14" height="38" rx="7" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Right hand */}
-      <circle cx="81" cy="120" r="5.5" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Torso */}
-      <rect x="16" y="72" width="58" height="68" rx="14" fill="#15181E" stroke="#D97706" strokeWidth="2"/>
-      {/* Chest panel */}
-      <rect x="24" y="80" width="42" height="38" rx="9" fill="#0A0C10" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Status LEDs */}
-      <circle cx="34" cy="95" r="6" fill={speaking ? '#F59E0B' : '#1F2937'}
-        style={{ filter: speaking ? 'drop-shadow(0 0 6px #F59E0B)' : 'none',
-          animation: speaking ? 'para-glow 0.3s ease-in-out infinite alternate' : 'none', transition: 'all 0.2s' }}/>
-      <circle cx="45" cy="95" r="6"
-        fill={mood === 'thinking' ? '#60A5FA' : mood === 'happy' ? '#34D399' : '#1F2937'}
-        style={{ filter: (mood === 'thinking' || mood === 'happy') ? `drop-shadow(0 0 6px ${mood === 'thinking' ? '#60A5FA' : '#34D399'})` : 'none', transition: 'all 0.2s' }}/>
-      <circle cx="56" cy="95" r="6"
-        fill={mood === 'concerned' ? '#FF6B6B' : '#1F2937'}
-        style={{ filter: mood === 'concerned' ? 'drop-shadow(0 0 6px #FF6B6B)' : 'none', transition: 'all 0.2s' }}/>
-      {/* Chest display bar */}
-      <rect x="24" y="108" width="42" height="6" rx="3" fill="#0A0C10"/>
-      <rect x="25" y="109" width={speaking ? 38 : mood === 'thinking' ? 20 : 6} height="4" rx="2"
-        fill="#D97706" style={{ transition: 'width 0.5s ease' }}/>
-      {/* Waist */}
-      <rect x="16" y="136" width="58" height="10" rx="4" fill="#D97706" opacity="0.12"/>
-      <circle cx="45" cy="141" r="5" fill="#D97706" opacity="0.4"/>
-      {/* Legs */}
-      <rect x="22" y="144" width="18" height="10" rx="5" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
-      <rect x="50" y="144" width="18" height="10" rx="5" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
-      {/* Feet */}
-      <ellipse cx="31" cy="155" rx="10" ry="5" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
-      <ellipse cx="59" cy="155" rx="10" ry="5" fill="#15181E" stroke="#D97706" strokeWidth="1.5"/>
+      {mood === 'curious' && <path d="M 31 32 Q 38 29 46 32" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" />}
+      <path d={mp} fill="none" stroke={speaking?eyeC:'#64748b'} strokeWidth={speaking?3:2.2} strokeLinecap="round"
+        style={{ filter:speaking?`drop-shadow(0 0 6px ${eyeC})`:'none', transition:'stroke 0.2s' }} />
+      {(mood==='happy'||mood==='waving') && <>
+        <ellipse cx="29" cy="59" rx="5.5" ry="3.5" fill="#f87171" opacity="0.38" />
+        <ellipse cx="71" cy="59" rx="5.5" ry="3.5" fill="#f87171" opacity="0.38" />
+      </>}
+      <rect x="26" y="76" width="48" height="48" rx="9" fill="#0f172a" stroke="#334155" strokeWidth="1.5" />
+      {[0,1,2].map(i => (
+        <circle key={i} cx={34+i*16} cy="90" r="5"
+          fill={i===mouth%3?ledC:'#1e293b'}
+          style={{ filter:i===mouth%3?`drop-shadow(0 0 6px ${ledC})`:'none', transition:'fill 0.14s' }} />
+      ))}
+      <rect x="32" y="100" width="36" height="16" rx="5" fill="#1e293b" stroke="#334155" strokeWidth="1" />
+      {[40,50,60].map(x => (
+        <line key={x} x1={x} y1="103" x2={x} y2="113" stroke={x===50?ledC:'#334155'} strokeWidth="1.2" opacity={x===50?0.6:1} />
+      ))}
+      <g style={{ transformOrigin:'18px 78px', transform:`rotate(${armRot}deg)`, transition:'transform 0.32s ease-in-out' }}>
+        <rect x="10" y="78" width="16" height="34" rx="7" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+        <circle cx="18" cy="116" r="6.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+      </g>
+      <rect x="74" y="78" width="16" height="34" rx="7" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+      <circle cx="82" cy="116" r="6.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+      <rect x="30" y="124" width="15" height="26" rx="6" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+      <rect x="55" y="124" width="15" height="26" rx="6" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+      <ellipse cx="37.5" cy="151" rx="10" ry="5.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
+      <ellipse cx="62.5" cy="151" rx="10" ry="5.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2" />
     </svg>
   );
 }
 
-/* ─── Typewriter ─────────────────────────────────────────────────── */
-function useTypewriter(text: string, speed = 20) {
-  const [shown, setShown] = useState('');
-  const [done, setDone] = useState(false);
-  const ref = useRef<any>();
+/* ══════════════════════════════════════════════════════════════════
+   INTRO SCRIPT
+══════════════════════════════════════════════════════════════════ */
+type ScriptLine = { text: string; mood: Mood; card?: { icon: string; title: string; desc: string } | null; pauseAfter?: number; };
+
+const buildScript = (name: string): ScriptLine[] => [
+  { text: `Hey ${name}! G'day — I'm PARA, short for Parasite Analysis and Response Assistant. Really happy you're here.`, mood: 'waving', card: null, pauseAfter: 500 },
+  { text: `So — what is ParasitePro exactly? Think of it as a clinical second opinion that fits in your pocket. You upload a photo of whatever's worrying you, and our AI gives you a detailed report in about sixty seconds.`, mood: 'talking', card: { icon: '🔬', title: 'AI-Powered Clinical Analysis', desc: 'Results in ~60 seconds — from your phone' }, pauseAfter: 400 },
+  { text: `We're talking stool samples, skin rashes, mysterious bites, bug tracks under the skin — anything you'd normally wait weeks to get a specialist to look at. We analyse it right now.`, mood: 'curious', card: { icon: '📸', title: 'Any Sample Type', desc: 'Stool · Skin · Environmental · Microscopy · Blood smear' }, pauseAfter: 350 },
+  { text: `The report you get back is proper clinical stuff — not just a guess. It tells you what it most likely is, how urgent it is, and exactly what to do next. Whether that's heading to the GP or just keeping an eye on it.`, mood: 'thinking', card: { icon: '📋', title: 'Full Structured Report', desc: 'Diagnosis · Confidence · Urgency rating · Next steps' }, pauseAfter: 350 },
+  { text: `Built right here in Australia, by the way. So the recommendations are tailored to our tropical climate, our local critters, and our healthcare system. No generic overseas advice.`, mood: 'happy', card: { icon: '🇦🇺', title: 'Made for Australians', desc: 'Tropical species · Australian GP referral pathways' }, pauseAfter: 400 },
+  { text: `I'll be right here in the corner if you need me. Ask me anything — your results, what to do next, or if something looks a bit off and you're not sure where to start.`, mood: 'happy', card: null, pauseAfter: 300 },
+];
+
+const CLOSING_QUESTION = "One quick thing before we get into it — what brings you to ParasitePro today?";
+
+const QUICK_CHIPS = [
+  { label: "🪱  I think I might have worms",   reply: "I think I might have parasites or worms" },
+  { label: "🐾  Worried about my pet",          reply: "I'm worried my pet might have worms or parasites" },
+  { label: "✈️  Just back from travelling",      reply: "I just got back from overseas travel and want to check if I picked something up" },
+  { label: "🩹  Strange rash or skin thing",     reply: "I have a strange rash or skin condition I want identified" },
+  { label: "🔍  Just exploring the app",        reply: "I'm just exploring the app to see how it works" },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   INTRO SCREEN
+══════════════════════════════════════════════════════════════════ */
+function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: string; muted: boolean; onDone: () => void; onChipReply: (r: string) => void; }) {
+  const script = buildScript(userName);
+  const [lineIdx, setLineIdx]   = useState(0);
+  const [mood, setMood]         = useState<Mood>('waving');
+  const [speaking, setSpeaking] = useState(false);
+  const [robotY, setRobotY]     = useState(-240);
+  const [overlayIn, setOverlay] = useState(false);
+  const [card, setCard]         = useState<ScriptLine['card']>(null);
+  const [cardIn, setCardIn]     = useState(false);
+  const [phase, setPhase]       = useState<'intro'|'question'>('intro');
+  const [skippable, setSkip]    = useState(false);
+  const [exitAnim, setExit]     = useState(false);
+  const sig = useRef({ cancelled: false });
+
   useEffect(() => {
-    setShown(''); setDone(false);
-    if (!text) return;
-    let i = 0;
-    ref.current = setInterval(() => {
-      i++;
-      setShown(text.slice(0, i));
-      if (i >= text.length) { clearInterval(ref.current); setDone(true); }
-    }, speed);
-    return () => clearInterval(ref.current);
-  }, [text, speed]);
-  return { shown, done };
-}
+    SpeechEngine.init();
+    setTimeout(() => setOverlay(true), 40);
+    setTimeout(() => setRobotY(-80), 200);
+    setTimeout(() => setRobotY(8),  460);
+    setTimeout(() => setRobotY(-12),660);
+    setTimeout(() => setRobotY(0),  840);
+    setTimeout(() => setSkip(true), 3200);
+    setTimeout(() => speakLine(0),  980);
+    return () => { sig.current.cancelled = true; SpeechEngine.cancel(); };
+  }, []);
 
-/* ─── Speech Bubble ──────────────────────────────────────────────── */
-function Bubble({ text, onDone }: { text: string; onDone?: () => void }) {
-  const { shown, done } = useTypewriter(text, 18);
-  useEffect(() => { if (done) onDone?.(); }, [done]);
-  const html = shown.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
-  return (
-    <div style={{
-      position: 'relative',
-      background: 'rgba(16, 18, 22, 0.97)',
-      border: '2px solid rgba(217,119,6,0.6)',
-      borderRadius: '20px 20px 20px 4px',
-      padding: '14px 18px',
-      maxWidth: 280,
-      fontSize: 14,
-      lineHeight: 1.65,
-      color: '#F1F0EE',
-      fontFamily: "'DM Sans', sans-serif",
-      boxShadow: '0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(217,119,6,0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
-      backdropFilter: 'blur(20px)',
-      animation: 'para-bubble-in 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-    }}>
-      <span dangerouslySetInnerHTML={{ __html: html }}/>
-      {!done && <span style={{ animation: 'para-cursor 0.6s step-end infinite', marginLeft: 2, color: '#D97706' }}>▊</span>}
-      {/* Tail */}
-      <div style={{
-        position: 'absolute', bottom: -12, left: 18,
-        borderLeft: '12px solid transparent',
-        borderRight: '6px solid transparent',
-        borderTop: '12px solid rgba(217,119,6,0.6)',
-      }}/>
-      <div style={{
-        position: 'absolute', bottom: -9, left: 20,
-        borderLeft: '10px solid transparent',
-        borderRight: '5px solid transparent',
-        borderTop: '10px solid rgba(16, 18, 22, 0.97)',
-      }}/>
-    </div>
-  );
-}
+  const speakLine = useCallback((idx: number) => {
+    if (sig.current.cancelled) return;
+    if (idx >= script.length) {
+      setLineIdx(-1); setSpeaking(false); setCardIn(false);
+      setTimeout(() => { setCard(null); setPhase('question'); }, 350);
+      if (!muted) {
+        setSpeaking(true); setMood('curious');
+        SpeechEngine.speak(CLOSING_QUESTION, { rate: 0.84, basePitch: 1.06, signal: sig.current, onDone: () => setSpeaking(false) });
+      }
+      return;
+    }
+    const line = script[idx];
+    setLineIdx(idx); setMood(line.mood); setSpeaking(true);
+    setCardIn(false);
+    setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 300);
+    if (!muted) {
+      SpeechEngine.speak(line.text, { rate: 0.84, basePitch: 1.02, signal: sig.current,
+        onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakLine(idx+1); }, line.pauseAfter ?? 400); }
+      });
+    } else {
+      setTimeout(() => { if (!sig.current.cancelled) speakLine(idx+1); }, Math.max(2800, line.text.length * 32));
+    }
+  }, [muted, script]);
 
-/* ─── Chat Panel ─────────────────────────────────────────────────── */
-function ChatPanel({
-  messages, loading, stage, qIndex, multiSel, setMultiSel,
-  onAnswer, onStartQs, onSkipQs, input, setInput, onSend, onClose, muted, onToggleMute, speaking
-}: any) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, loading]);
+  const triggerExit = () => { setExit(true); setTimeout(onDone, 520); };
+  const skip = () => { sig.current.cancelled = true; SpeechEngine.cancel(); triggerExit(); };
+  const handleChip = (chip: typeof QUICK_CHIPS[0]) => { sig.current.cancelled = true; SpeechEngine.cancel(); onChipReply(chip.reply); triggerExit(); };
 
-  const currentQ = stage === 'health_q' ? HQS[qIndex] : null;
-  const showInput = stage === 'idle' || stage === 'report';
+  const currentText = lineIdx === -1 ? CLOSING_QUESTION : (script[lineIdx]?.text ?? '');
 
   return (
-    <div style={{
-      width: 330, background: 'rgba(10,11,14,0.98)',
-      border: '2px solid rgba(217,119,6,0.3)',
-      borderRadius: 22,
-      boxShadow: '0 28px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(217,119,6,0.06)',
-      overflow: 'hidden', backdropFilter: 'blur(24px)',
-      animation: 'para-panel-in 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-      display: 'flex', flexDirection: 'column',
-      maxHeight: 480,
-    }}>
-      {/* Header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '13px 16px',
-        background: 'linear-gradient(90deg, rgba(217,119,6,0.12), rgba(217,119,6,0.04))',
-        borderBottom: '1px solid rgba(217,119,6,0.15)',
-        flexShrink: 0,
-      }}>
-        <div style={{
-          width: 10, height: 10, borderRadius: '50%',
-          background: loading ? '#F59E0B' : speaking ? '#60A5FA' : '#10B981',
-          boxShadow: `0 0 8px ${loading ? '#F59E0B' : speaking ? '#60A5FA' : '#10B981'}`,
-          animation: (loading || speaking) ? 'para-glow 0.5s ease-in-out infinite alternate' : 'none',
-        }}/>
-        <div style={{ flex: 1 }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: '#F5F0E8', fontFamily: "'Syne', sans-serif", letterSpacing: '0.05em' }}>PARA</span>
-          <span style={{ fontSize: 11, marginLeft: 8, color: loading ? '#F59E0B' : speaking ? '#60A5FA' : '#10B981', fontFamily: 'JetBrains Mono, monospace' }}>
-            {loading ? 'thinking…' : speaking ? 'speaking' : 'online'}
-          </span>
+    <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(10,12,16,0.97)', backdropFilter:'blur(18px)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', opacity: exitAnim?0:overlayIn?1:0, transition: exitAnim?'opacity 0.5s ease':'opacity 0.45s ease', userSelect:'none' }}>
+      <div style={{ position:'absolute', top:'28%', left:'50%', transform:'translateX(-50%)', width:600, height:600, borderRadius:'50%', background:'radial-gradient(ellipse, rgba(217,119,6,0.12) 0%, transparent 68%)', pointerEvents:'none' }} />
+
+      {/* Top bar */}
+      <div style={{ position:'absolute', top:0, left:0, right:0, padding:'16px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom:'1px solid rgba(217,119,6,0.1)', zIndex:1 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'#f59e0b', boxShadow:'0 0 10px #f59e0b', animation:'para-pulse 1.8s ease-in-out infinite' }} />
+          <span style={{ color:'#f59e0b', fontFamily:'monospace', fontSize:13, letterSpacing:'0.18em', fontWeight:600 }}>PARASITEPRO · PARA v5</span>
         </div>
-        <button onClick={onToggleMute} style={{ background: 'none', border: 'none', cursor: 'pointer', color: muted ? '#EF4444' : '#6B7280', padding: 4 }}>
-          {muted ? <VolumeX size={14}/> : <Volume2 size={14}/>}
-        </button>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', padding: 4 }}>
-          <ChevronDown size={16}/>
-        </button>
+        {skippable && (
+          <button onClick={skip} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', color:'#9ca3af', borderRadius:8, padding:'6px 14px', fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+            Skip intro ×
+          </button>
+        )}
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '14px 14px 6px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {messages.map((m: Msg) => {
-          const html = m.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
-          return (
-            <div key={m.id} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              <div style={{
-                maxWidth: '84%', padding: '9px 14px',
-                borderRadius: m.role === 'user' ? '16px 16px 3px 16px' : '16px 16px 16px 3px',
-                background: m.role === 'user' ? 'rgba(217,119,6,0.85)' : 'rgba(255,255,255,0.05)',
-                border: m.role === 'assistant' ? '1px solid rgba(217,119,6,0.2)' : 'none',
-                fontSize: 13, color: m.role === 'user' ? '#0A0B0D' : '#E5E7EB',
-                lineHeight: 1.55, fontFamily: "'DM Sans', sans-serif",
-              }} dangerouslySetInnerHTML={{ __html: html }}/>
+      {/* Content */}
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:26, maxWidth:600, padding:'0 24px', position:'relative', zIndex:1, width:'100%' }}>
+
+        {/* Robot flies in */}
+        <div style={{ transform:`translateY(${robotY}px)`, transition: robotY === -240 ? 'none' : 'transform 0.36s cubic-bezier(0.34,1.6,0.64,1)', position:'relative' }}>
+          <div style={{ animation:'para-float 3.4s ease-in-out infinite' }}>
+            <Robot mood={mood} speaking={speaking} size={1.45} />
+          </div>
+          {speaking && <div style={{ position:'absolute', bottom:-4, left:'50%', transform:'translateX(-50%)', width:140, height:24, background:'radial-gradient(ellipse, rgba(245,158,11,0.32) 0%, transparent 70%)', animation:'para-ripple 0.9s ease-in-out infinite' }} />}
+        </div>
+
+        {/* Speech bubble */}
+        <div style={{ position:'relative', background:'rgba(25,35,50,0.88)', border:`1px solid rgba(217,119,6,${speaking?'0.5':'0.25'})`, borderRadius:18, padding:'22px 30px', maxWidth:560, width:'100%', textAlign:'center', backdropFilter:'blur(10px)', boxShadow: speaking?'0 0 36px rgba(217,119,6,0.18)':'0 8px 32px rgba(0,0,0,0.4)', transition:'border-color 0.3s, box-shadow 0.4s', minHeight:80 }}>
+          <div style={{ position:'absolute', top:-11, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'11px solid transparent', borderRight:'11px solid transparent', borderBottom:`11px solid rgba(217,119,6,${speaking?'0.5':'0.25'})` }} />
+          <p style={{ color:'#f1f5f9', fontSize:18, lineHeight:1.72, margin:0, fontWeight:400, letterSpacing:'0.01em' }}>{currentText}</p>
+        </div>
+
+        {/* Feature card */}
+        <div style={{ minHeight:64, width:'100%', maxWidth:460, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          {card && (
+            <div style={{ display:'flex', alignItems:'center', gap:16, background:'rgba(217,119,6,0.08)', border:'1px solid rgba(217,119,6,0.28)', borderRadius:14, padding:'14px 22px', width:'100%', opacity: cardIn?1:0, transform: cardIn?'translateY(0) scale(1)':'translateY(10px) scale(0.97)', transition:'all 0.38s cubic-bezier(0.34,1.3,0.64,1)' }}>
+              <span style={{ fontSize:30 }}>{card.icon}</span>
+              <div>
+                <div style={{ color:'#f59e0b', fontWeight:700, fontSize:14, marginBottom:3 }}>{card.title}</div>
+                <div style={{ color:'#94a3b8', fontSize:13 }}>{card.desc}</div>
+              </div>
             </div>
-          );
-        })}
-        {loading && (
-          <div style={{ display: 'flex', gap: 5, padding: '8px 4px' }}>
-            {[0,1,2].map(i => (
-              <div key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#D97706',
-                animation: `para-dot 1.1s ${i * 0.18}s ease-in-out infinite` }}/>
+          )}
+        </div>
+
+        {/* Chip replies */}
+        {phase === 'question' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:9, width:'100%', maxWidth:460, animation:'para-fadein 0.45s ease forwards', opacity:0 }}>
+            <div style={{ textAlign:'center', color:'#64748b', fontSize:12, marginBottom:2, fontFamily:'monospace', letterSpacing:'0.1em' }}>TAP TO REPLY</div>
+            {QUICK_CHIPS.map(chip => (
+              <button key={chip.label} onClick={() => handleChip(chip)}
+                style={{ background:'rgba(217,119,6,0.07)', border:'1px solid rgba(217,119,6,0.22)', color:'#e5c77a', borderRadius:12, padding:'13px 18px', fontSize:15, cursor:'pointer', textAlign:'left', transition:'all 0.18s', fontFamily:'inherit' }}
+                onMouseEnter={e => { e.currentTarget.style.background='rgba(217,119,6,0.15)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.5)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background='rgba(217,119,6,0.07)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.22)'; }}>
+                {chip.label}
+              </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Options for health Qs */}
-      {!loading && currentQ && (
-        <div style={{ padding: '8px 12px', maxHeight: 200, overflowY: 'auto', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
-          {currentQ.type === 'select' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {currentQ.opts.map((o: string) => (
-                <button key={o} onClick={() => onAnswer(o)}
-                  style={{
-                    textAlign: 'left', padding: '8px 12px', borderRadius: 10, fontSize: 12.5,
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(217,119,6,0.18)',
-                    color: '#D1D5DB', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", transition: 'all 0.12s',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(217,119,6,0.15)'; (e.currentTarget as HTMLElement).style.color = '#F59E0B'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLElement).style.color = '#D1D5DB'; }}
-                >{o}</button>
-              ))}
+      {/* Progress */}
+      {phase === 'intro' && <>
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:3, background:'rgba(217,119,6,0.12)' }}>
+          <div style={{ height:'100%', background:'linear-gradient(90deg,#d97706,#f59e0b)', width:`${Math.max(0,((lineIdx+1)/script.length)*100)}%`, boxShadow:'0 0 10px #f59e0b', transition:'width 0.7s ease' }} />
+        </div>
+        <div style={{ position:'absolute', bottom:14, display:'flex', gap:8 }}>
+          {script.map((_,i) => (
+            <div key={i} style={{ width:i===lineIdx?22:7, height:7, borderRadius:4, background:i<=lineIdx?'#f59e0b':'rgba(217,119,6,0.2)', boxShadow:i===lineIdx?'0 0 8px #f59e0b':'none', transition:'all 0.32s ease' }} />
+          ))}
+        </div>
+      </>}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CHAT PANEL
+══════════════════════════════════════════════════════════════════ */
+function ChatPanel({ open, onClose, messages, onSend, loading }: { open:boolean; onClose:()=>void; messages:Msg[]; onSend:(t:string)=>void; loading:boolean; }) {
+  const [input, setInput] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef  = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior:'smooth' }), 120);
+      setTimeout(() => inputRef.current?.focus(), 220);
+    }
+  }, [open, messages.length]);
+
+  const submit = () => { const t=input.trim(); if(!t||loading)return; setInput(''); onSend(t); };
+
+  const quickReplies = messages.length <= 1
+    ? ['🔬 How does the analysis work?', '💰 How do credits work?', '🚨 When should I see a doctor urgently?', '🐾 Can I use this for my pet?']
+    : messages.length <= 3
+    ? ['📸 How do I take a good photo?', '📍 Common parasites in Queensland?']
+    : [];
+
+  return (
+    <div style={{ position:'fixed', bottom:112, right:20, zIndex:9990, width:360, maxHeight:'72vh', background:'rgba(12,18,30,0.98)', border:'1px solid rgba(217,119,6,0.3)', borderRadius:18, boxShadow:'0 28px 72px rgba(0,0,0,0.7)', display:'flex', flexDirection:'column', transform:open?'translateY(0) scale(1)':'translateY(20px) scale(0.94)', opacity:open?1:0, pointerEvents:open?'all':'none', transition:'all 0.28s cubic-bezier(0.34,1.3,0.64,1)', overflow:'hidden' }}>
+      <div style={{ padding:'12px 16px', borderBottom:'1px solid rgba(217,119,6,0.12)', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(217,119,6,0.04)', flexShrink:0 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'#10b981', boxShadow:'0 0 7px #10b981' }} />
+          <span style={{ color:'#f1f5f9', fontWeight:700, fontSize:14 }}>PARA</span>
+          <span style={{ color:'#475569', fontSize:12 }}>· ParasitePro Assistant</span>
+        </div>
+        <button onClick={onClose} style={{ background:'none', border:'none', color:'#475569', cursor:'pointer', padding:5, borderRadius:7, display:'flex', alignItems:'center' }}>
+          <ChevronDown size={17} />
+        </button>
+      </div>
+
+      <div style={{ flex:1, overflowY:'auto', padding:'12px 13px', display:'flex', flexDirection:'column', gap:10, scrollbarWidth:'thin', scrollbarColor:'rgba(217,119,6,0.2) transparent' }}>
+        {messages.map(m => (
+          <div key={m.id} style={{ display:'flex', justifyContent:m.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6 }}>
+            {m.role==='assistant' && <div style={{ width:22, height:22, borderRadius:'50%', background:'rgba(217,119,6,0.15)', border:'1px solid rgba(217,119,6,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginBottom:2 }}><span style={{ fontSize:11 }}>🤖</span></div>}
+            <div style={{ maxWidth:'83%', padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(217,119,6,0.16)':'rgba(30,41,59,0.9)', border:m.role==='user'?'1px solid rgba(217,119,6,0.3)':'1px solid rgba(255,255,255,0.06)', color:'#f1f5f9', fontSize:14, lineHeight:1.58, whiteSpace:'pre-wrap' }}>
+              {m.content}
             </div>
-          ) : (
-            <div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 8 }}>
-                {currentQ.opts.map((o: string) => (
-                  <button key={o} onClick={() => setMultiSel((p: string[]) => p.includes(o) ? p.filter((x: string) => x !== o) : [...p, o])}
-                    style={{
-                      padding: '5px 10px', borderRadius: 18, fontSize: 12,
-                      background: multiSel.includes(o) ? 'rgba(217,119,6,0.75)' : 'rgba(255,255,255,0.04)',
-                      border: multiSel.includes(o) ? '1px solid #D97706' : '1px solid rgba(255,255,255,0.1)',
-                      color: multiSel.includes(o) ? '#0A0B0D' : '#9CA3AF', cursor: 'pointer', transition: 'all 0.12s',
-                    }}>{o}</button>
-                ))}
-              </div>
-              <button onClick={() => onAnswer(multiSel.length ? multiSel : ['No symptoms'])}
-                style={{ width: '100%', padding: '9px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                  background: '#D97706', color: '#0A0B0D', border: 'none', cursor: 'pointer' }}>
-                Continue →
+          </div>
+        ))}
+        {loading && (
+          <div style={{ display:'flex', alignItems:'center', gap:6, padding:'4px 0' }}>
+            <div style={{ width:22, height:22, borderRadius:'50%', background:'rgba(217,119,6,0.15)', border:'1px solid rgba(217,119,6,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><span style={{ fontSize:11 }}>🤖</span></div>
+            <div style={{ display:'flex', gap:5, padding:'10px 14px', background:'rgba(30,41,59,0.9)', border:'1px solid rgba(255,255,255,0.06)', borderRadius:'16px 16px 16px 4px' }}>
+              {[0,1,2].map(i=><div key={i} style={{ width:7, height:7, borderRadius:'50%', background:'#f59e0b', animation:`para-bounce 1.1s ease-in-out ${i*0.16}s infinite` }} />)}
+            </div>
+          </div>
+        )}
+        {quickReplies.length>0 && !loading && (
+          <div style={{ display:'flex', flexDirection:'column', gap:5, marginTop:2 }}>
+            {quickReplies.map(q=>(
+              <button key={q} onClick={()=>onSend(q)}
+                style={{ background:'rgba(217,119,6,0.07)', border:'1px solid rgba(217,119,6,0.2)', color:'#d4a843', borderRadius:10, padding:'8px 12px', fontSize:13, cursor:'pointer', textAlign:'left', fontFamily:'inherit', transition:'all 0.15s' }}
+                onMouseEnter={e=>{ e.currentTarget.style.background='rgba(217,119,6,0.14)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.4)'; }}
+                onMouseLeave={e=>{ e.currentTarget.style.background='rgba(217,119,6,0.07)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.2)'; }}>
+                {q}
               </button>
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
 
-      {/* Intro CTA */}
-      {!loading && stage === 'intro' && (
-        <div style={{ display: 'flex', gap: 8, padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
-          <button onClick={onStartQs} style={{ flex: 1, padding: '10px', borderRadius: 11, fontSize: 13, fontWeight: 700,
-            background: 'linear-gradient(135deg, #D97706, #F59E0B)', color: '#0A0B0D', border: 'none', cursor: 'pointer' }}>
-            Sure, let's go! 🚀
-          </button>
-          <button onClick={onSkipQs} style={{ padding: '10px 14px', borderRadius: 11, fontSize: 13,
-            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-            color: '#6B7280', cursor: 'pointer' }}>Skip</button>
-        </div>
-      )}
-
-      {/* Text input */}
-      {showInput && (
-        <div style={{ display: 'flex', gap: 8, padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(6,7,9,0.6)', flexShrink: 0 }}>
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(); } }}
-            placeholder="Ask PARA anything…"
-            disabled={loading}
-            style={{
-              flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 12, padding: '9px 13px', color: '#E5E7EB', fontSize: 13,
-              fontFamily: "'DM Sans', sans-serif", outline: 'none',
-            }}
-            onFocus={e => { e.target.style.borderColor = 'rgba(217,119,6,0.55)'; }}
-            onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; }}
-          />
-          <button onClick={onSend} disabled={loading || !input.trim()}
-            style={{
-              width: 42, height: 42, borderRadius: 12, flexShrink: 0, border: 'none',
-              background: input.trim() ? 'linear-gradient(135deg, #D97706, #F59E0B)' : 'rgba(255,255,255,0.05)',
-              color: input.trim() ? '#0A0B0D' : '#4B5563', cursor: input.trim() ? 'pointer' : 'default',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
-            }}>
-            <Send size={16}/>
-          </button>
-        </div>
-      )}
-
-      <div style={{ padding: '4px 14px 10px', fontSize: 10, color: '#2A2E38', textAlign: 'center' }}>
-        ⚠️ AI assistant only — not a medical professional. Always consult your GP.
+      <div style={{ padding:'10px 12px', borderTop:'1px solid rgba(255,255,255,0.05)', display:'flex', gap:8, alignItems:'flex-end', flexShrink:0, background:'rgba(8,14,26,0.7)' }}>
+        <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+          onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();} }}
+          placeholder="Ask PARA anything…" rows={1}
+          style={{ flex:1, background:'rgba(25,38,58,0.9)', border:'1px solid rgba(217,119,6,0.18)', borderRadius:11, color:'#f1f5f9', fontSize:14, padding:'9px 13px', resize:'none', outline:'none', lineHeight:1.45, maxHeight:90, overflow:'auto', fontFamily:'inherit', transition:'border-color 0.2s' }}
+          onFocus={e=>e.target.style.borderColor='rgba(217,119,6,0.45)'}
+          onBlur={e=>e.target.style.borderColor='rgba(217,119,6,0.18)'} />
+        <button onClick={submit} disabled={!input.trim()||loading}
+          style={{ width:38, height:38, borderRadius:10, flexShrink:0, background:input.trim()?'#f59e0b':'rgba(245,158,11,0.14)', border:'none', cursor:input.trim()?'pointer':'default', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', transform:input.trim()?'scale(1.04)':'scale(1)' }}>
+          <Send size={15} color={input.trim()?'#0f172a':'#475569'} />
+        </button>
       </div>
     </div>
   );
 }
 
-/* ─── Main Component ─────────────────────────────────────────────── */
-let msgId = 0;
+/* ══════════════════════════════════════════════════════════════════
+   FLOATING BOT
+══════════════════════════════════════════════════════════════════ */
+function FloatingBot({ mood, speaking, muted, chatOpen, onToggleChat, onToggleMute }: { mood:Mood; speaking:boolean; muted:boolean; chatOpen:boolean; onToggleChat:()=>void; onToggleMute:()=>void; }) {
+  return (
+    <div style={{ position:'fixed', bottom:18, right:18, zIndex:9991, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
+      <button onClick={onToggleMute} title={muted?'Unmute PARA':'Mute PARA'}
+        style={{ width:32, height:32, borderRadius:'50%', background:'rgba(12,22,40,0.95)', border:`1px solid ${muted?'rgba(255,255,255,0.08)':'rgba(217,119,6,0.4)'}`, color:muted?'#475569':'#f59e0b', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
+        {muted?<VolumeX size={13}/>:<Volume2 size={13}/>}
+      </button>
+      <div onClick={onToggleChat} title="Chat with PARA"
+        style={{ cursor:'pointer', position:'relative', animation:chatOpen?'none':'para-float 3.2s ease-in-out infinite', willChange:'transform' }}>
+        {speaking && <div style={{ position:'absolute', inset:-10, borderRadius:'50%', background:'radial-gradient(ellipse, rgba(245,158,11,0.28) 0%, transparent 70%)', animation:'para-ripple 1s ease-in-out infinite', pointerEvents:'none' }} />}
+        {!chatOpen && <div style={{ position:'absolute', top:4, right:4, width:10, height:10, borderRadius:'50%', background:'#10b981', border:'2px solid #0f172a', boxShadow:'0 0 7px #10b981', animation:'para-pulse 2s ease-in-out infinite', zIndex:1 }} />}
+        <Robot mood={mood} speaking={speaking} size={0.72} />
+      </div>
+      {!chatOpen && (
+        <div style={{ background:'rgba(217,119,6,0.12)', border:'1px solid rgba(217,119,6,0.3)', borderRadius:8, padding:'3px 8px', whiteSpace:'nowrap', animation:'para-fadein 0.4s ease' }}>
+          <span style={{ color:'#f59e0b', fontSize:11, fontFamily:'monospace', fontWeight:600 }}>PARA</span>
+        </div>
+      )}
+    </div>
+  );
+}
 
-export default function ParasiteBot({ reportData }: { reportData?: any }) {
-  const { accessToken, isAuthenticated, user } = useAuthStore();
-
-  // Visibility
-  const [visible, setVisible] = useState(false);
+/* ══════════════════════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════════════════════ */
+export default function ParasiteBot() {
+  const { user, isAuthenticated, accessToken } = useAuthStore();
+  const location = useLocation();
+  const [phase, setPhase]       = useState<Phase>('hidden');
   const [chatOpen, setChatOpen] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
-  const [muted, setMuted] = useState(false);
-
-  // Robot state
-  const [mood, setMood] = useState<Mood>('idle');
+  const [mood, setMood]         = useState<Mood>('idle');
   const [speaking, setSpeaking] = useState(false);
-  const [waving, setWaving] = useState(false);
-
-  // Current spoken text shown in bubble
-  const [bubble, setBubble] = useState('');
-  const [bubbleDone, setBubbleDone] = useState(false);
-  const [afterBubble, setAfterBubble] = useState<(() => void) | null>(null);
-
-  // Conversation
-  const [stage, setStage] = useState<Stage>('entering');
+  const [muted, setMuted]       = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [healthCtx, setHealthCtx] = useState<Record<string, any>>({});
-  const [qIndex, setQIndex] = useState(0);
-  const [multiSel, setMultiSel] = useState<string[]>([]);
+  const [loading, setLoading]   = useState(false);
+  const idRef  = useRef(0);
+  const sigRef = useRef({ cancelled: false });
 
-  const speakQueue = useRef<Array<{ text: string; mood: Mood; after?: () => void }>>([]);
-  const isSpeakingRef = useRef(false);
+  const PROTECTED = ['/dashboard','/upload','/analysis','/settings','/food-diary','/treatment-tracker'];
+  const isProtected = PROTECTED.some(p => location.pathname.startsWith(p));
 
-  /* ── Speak queue processor ── */
-  const processQueue = useCallback(() => {
-    if (isSpeakingRef.current || speakQueue.current.length === 0) return;
-    const { text, mood: m, after } = speakQueue.current.shift()!;
-    isSpeakingRef.current = true;
-    setBubble(text);
-    setBubbleDone(false);
-    setMood(m);
-    setAfterBubble(after ? () => after : null);
-    if (!muted) {
-      SpeechEngine.speak(text, {
-        onStart: () => setSpeaking(true),
-        onEnd: () => { setSpeaking(false); isSpeakingRef.current = false; setTimeout(processQueue, 400); },
-      });
+  useEffect(() => { SpeechEngine.init(); }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isProtected) { setPhase('hidden'); return; }
+    const key = `para_intro_${user?.id||'guest'}`;
+    if (!sessionStorage.getItem(key)) {
+      setPhase('intro');
     } else {
-      setSpeaking(false);
-      isSpeakingRef.current = false;
-      setTimeout(processQueue, 80);
+      setPhase('chat');
+      if (!messages.length) {
+        const hr = new Date().getHours();
+        const g = hr<12?'Good morning':hr<17?"G'day":'Good evening';
+        const n = user?.firstName||'there';
+        addBot(`${g}, ${n}! Great to see you back. Ready to run a new analysis, or can I help with something? 🔬`);
+      }
     }
-    addMsg('assistant', text);
-  }, [muted]);
+  }, [isAuthenticated, isProtected, location.pathname]);
 
-  const say = useCallback((text: string, m: Mood = 'talking', after?: () => void) => {
-    speakQueue.current.push({ text, mood: m, after });
-    if (!isSpeakingRef.current) processQueue();
-  }, [processQueue]);
+  const addBot = (content: string) => setMessages(prev => [...prev, { role:'assistant', content, id: ++idRef.current }]);
 
-  const addMsg = (role: 'user' | 'assistant', content: string) => {
-    setMessages(prev => [...prev, { role, content, id: ++msgId }]);
+  const handleIntroDone = () => {
+    sessionStorage.setItem(`para_intro_${user?.id||'guest'}`, '1');
+    setPhase('chat');
+    const n = user?.firstName||'there';
+    setTimeout(() => addBot(`You're all set, ${n}! 🎉 Your dashboard is ready below. Hit "Start New Analysis" when you're ready — or just chat with me here anytime.`), 500);
+    setTimeout(() => setChatOpen(true), 900);
   };
 
-  /* ── Boot ── */
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    SpeechEngine.init().then(() => {
-      setTimeout(() => {
-        setVisible(true);
-        setWaving(true);
-        setTimeout(() => setWaving(false), 3000);
-      }, 800);
-    });
-  }, [isAuthenticated]);
+  const handleChipReply = (replyText: string) => {
+    sessionStorage.setItem(`para_intro_${user?.id||'guest'}`, '1');
+    setPhase('chat');
+    setMessages([{ role:'user', content:replyText, id: ++idRef.current }]);
+    setTimeout(() => { setChatOpen(true); handleSend(replyText, true); }, 700);
+  };
 
-  /* ── Start talking after appearing ── */
-  useEffect(() => {
-    if (!visible) return;
-    const seen = localStorage.getItem('para-intro-done');
-    const savedCtx = localStorage.getItem('para-health-ctx');
-    if (savedCtx) try { setHealthCtx(JSON.parse(savedCtx)); } catch {}
-
-    if (seen) {
-      setStage('idle');
-      const firstName = user?.name?.split(' ')[0] || 'there';
-      setTimeout(() => {
-        if (reportData) {
-          setStage('report');
-          say(`Hey ${firstName}! 👋 Your analysis results just came in. Want me to walk you through what was found?`, 'happy', () => {
-            setTimeout(() => setChatOpen(true), 1200);
-          });
-        } else {
-          say(`Hey ${firstName}! 👋 I'm PARA. Tap me anytime you need help!`, 'waving');
-        }
-      }, 600);
-    } else {
-      setStage('intro');
-      setTimeout(() => {
-        // Auto-open chat after intro
-        setTimeout(() => setChatOpen(true), 2000);
-        say("G'day! 👋 I'm PARA, your ParasitePro assistant!", 'waving', () => {
-          say("I'm here to help you get accurate results and understand your findings.", 'happy', () => {
-            say("Can I ask you a few quick health questions first? It only takes a minute!", 'happy');
-          });
-        });
-      }, 600);
-    }
-  }, [visible]);
-
-  /* ── Bubble done callback ── */
-  const handleBubbleDone = useCallback(() => {
-    setBubbleDone(true);
-    if (afterBubble) { afterBubble(); setAfterBubble(null); }
-  }, [afterBubble]);
-
-  /* ── Health Q flow ── */
-  const startQs = useCallback(() => {
-    setStage('health_q');
-    setQIndex(0);
-    SpeechEngine.cancel();
-    speakQueue.current = [];
-    isSpeakingRef.current = false;
-    setTimeout(() => {
-      say(HQS[0].q, 'talking');
-    }, 200);
-  }, [say]);
-
-  const skipQs = useCallback(() => {
-    localStorage.setItem('para-intro-done', '1');
-    setStage('idle');
-    SpeechEngine.cancel();
-    speakQueue.current = [];
-    isSpeakingRef.current = false;
-    say("No worries! Just ask me anything whenever you need. 😊", 'happy');
-  }, [say]);
-
-  const answerQ = useCallback((answer: string | string[]) => {
-    const val = Array.isArray(answer) ? answer.join(', ') : answer;
-    addMsg('user', val);
-    setMultiSel([]);
-    const updated = { ...healthCtx, [HQS[qIndex].id]: answer };
-    setHealthCtx(updated);
-    const next = qIndex + 1;
-    if (next < HQS.length) {
-      setQIndex(next);
-      setTimeout(() => say(HQS[next].q, 'talking'), 300);
-    } else {
-      localStorage.setItem('para-health-ctx', JSON.stringify(updated));
-      localStorage.setItem('para-intro-done', '1');
-      setStage('idle');
-      say("That's everything! ✅ Your health profile is saved.", 'happy', () => {
-        say("Now head to the Upload page to submit your first sample — or ask me anything!", 'happy');
-      });
-    }
-  }, [healthCtx, qIndex, say]);
-
-  /* ── AI Q&A ── */
-  const sendMessage = useCallback(async () => {
-    const msg = input.trim();
-    if (!msg || loading) return;
-    setInput('');
-    addMsg('user', msg);
-    SpeechEngine.cancel();
-    speakQueue.current = [];
-    isSpeakingRef.current = false;
-    setSpeaking(false);
-    setBubble('');
-    setMood('thinking');
-    setLoading(true);
+  const handleSend = async (text: string, fromChip = false) => {
+    if (!fromChip) setMessages(prev => [...prev, { role:'user', content:text, id: ++idRef.current }]);
+    setLoading(true); setMood('thinking');
     try {
-      const saved = localStorage.getItem('para-health-ctx');
-      const ctx = saved ? JSON.parse(saved) : healthCtx;
-      const wantsReport = /read.*(my)?\s*report|explain.*result|walk.*through|summarise/i.test(msg);
-      const body: any = { message: msg, healthContext: ctx, conversationHistory: messages.slice(-10) };
-      if ((wantsReport || stage === 'report') && reportData) body.reportData = reportData;
-
-      const res = await fetch(getApiUrl('/chatbot/message'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify(body),
+      const history = messages.slice(-12).map(m => ({ role:m.role, content:m.content }));
+      const res = await fetch(getApiUrl('/api/chatbot/message'), {
+        method:'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${accessToken}` },
+        body: JSON.stringify({ message:text, conversationHistory:history }),
       });
       const data = await res.json();
-      const reply = data.reply || "Sorry, I had a glitch! Try again in a moment. 🤖";
-      const m: Mood = /sorry|error|trouble|can't/i.test(reply) ? 'concerned' : 'talking';
-      say(reply, m);
+      const reply = data.message || "Sorry, had a little hiccup there. Try again in a sec?";
+      setLoading(false); setMood('talking'); setSpeaking(true);
+      setMessages(prev => [...prev, { role:'assistant', content:reply, id: ++idRef.current }]);
+      if (!muted) {
+        sigRef.current = { cancelled:false };
+        SpeechEngine.speak(reply, { rate:0.85, basePitch:1.02, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
+      } else { setTimeout(()=>{ setSpeaking(false); setMood('idle'); }, 500); }
     } catch {
-      say("I couldn't connect right now — please check your internet. 📡", 'concerned');
-    } finally {
-      setLoading(false);
+      setLoading(false); setMood('concerned');
+      setMessages(prev => [...prev, { role:'assistant', content:"Couldn't connect just then. Check your connection and try again.", id: ++idRef.current }]);
+      setTimeout(()=>setMood('idle'), 2200);
     }
-  }, [input, loading, healthCtx, messages, stage, reportData, accessToken, say]);
+  };
 
-  const toggleMute = useCallback(() => {
-    setMuted(m => {
-      if (!m) { SpeechEngine.cancel(); setSpeaking(false); }
-      return !m;
-    });
-  }, []);
+  const toggleMute = () => {
+    const nm = !muted; setMuted(nm);
+    if (nm) { sigRef.current.cancelled=true; SpeechEngine.cancel(); setSpeaking(false); }
+  };
 
-  if (!isAuthenticated || !visible || dismissed) return null;
+  if (!isAuthenticated || !isProtected) return null;
 
   return (
     <>
       <style>{`
-        @keyframes para-enter {
-          0%  { transform: translateY(200px) rotate(-8deg) scale(0.6); opacity: 0; }
-          55% { transform: translateY(-14px) rotate(2deg) scale(1.06); opacity: 1; }
-          75% { transform: translateY(6px) rotate(-1deg) scale(0.97); }
-          90% { transform: translateY(-4px) rotate(0.5deg) scale(1.01); }
-          100%{ transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-        }
-        @keyframes para-float {
-          0%,100% { transform: translateY(0px) rotate(0deg); }
-          33%      { transform: translateY(-7px) rotate(0.5deg); }
-          66%      { transform: translateY(-4px) rotate(-0.5deg); }
-        }
-        @keyframes para-glow { from{opacity:0.55} to{opacity:1} }
-        @keyframes para-dot { 0%,100%{transform:translateY(0);opacity:0.3} 50%{transform:translateY(-6px);opacity:1} }
-        @keyframes para-wave { 0%{transform:rotate(-10deg) translateY(-2px)} 100%{transform:rotate(32deg) translateY(-8px)} }
-        @keyframes para-cursor { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes para-bubble-in { from{opacity:0;transform:translateY(8px) scale(0.93)} to{opacity:1;transform:translateY(0) scale(1)} }
-        @keyframes para-panel-in { from{opacity:0;transform:translateY(14px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
-        @keyframes para-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px)} 40%{transform:translateX(4px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
-
-        .para-robot {
-          animation: para-enter 1s cubic-bezier(0.34,1.56,0.64,1) both,
-                     para-float 5s 1.5s ease-in-out infinite;
-          cursor: pointer;
-        }
-        .para-robot:active { transform: scale(0.95) !important; }
+        @keyframes para-float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes para-ripple { 0%,100%{opacity:0.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.2)} }
+        @keyframes para-bounce { 0%,80%,100%{transform:translateY(0);opacity:0.3} 40%{transform:translateY(-8px);opacity:1} }
+        @keyframes para-pulse  { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes para-fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
       `}</style>
 
-      <div style={{
-        position: 'fixed', bottom: 14, right: 14, zIndex: 9999,
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
-        gap: 12, pointerEvents: 'none',
-      }}>
-
-        {/* Chat panel */}
-        {chatOpen && (
-          <div style={{ pointerEvents: 'all' }}>
-            <ChatPanel
-              messages={messages} loading={loading} stage={stage}
-              qIndex={qIndex} multiSel={multiSel} setMultiSel={setMultiSel}
-              onAnswer={answerQ} onStartQs={startQs} onSkipQs={skipQs}
-              input={input} setInput={setInput} onSend={sendMessage}
-              onClose={() => setChatOpen(false)}
-              muted={muted} onToggleMute={toggleMute} speaking={speaking}
-            />
-          </div>
-        )}
-
-        {/* Speech bubble (when chat closed) */}
-        {!chatOpen && bubble && (
-          <div style={{ pointerEvents: 'all', animation: 'para-bubble-in 0.3s ease' }}>
-            <Bubble text={bubble} onDone={handleBubbleDone}/>
-            {/* CTA buttons under bubble */}
-            {bubbleDone && stage === 'intro' && (
-              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                <button onClick={startQs} style={{
-                  flex: 1, padding: '10px', borderRadius: 12, fontSize: 13, fontWeight: 700,
-                  background: 'linear-gradient(135deg, #D97706, #F59E0B)', color: '#0A0B0D', border: 'none', cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(217,119,6,0.4)',
-                }}>Sure! 🚀</button>
-                <button onClick={skipQs} style={{
-                  padding: '10px 14px', borderRadius: 12, fontSize: 13,
-                  background: 'rgba(14,15,17,0.95)', border: '1px solid rgba(255,255,255,0.12)',
-                  color: '#6B7280', cursor: 'pointer',
-                }}>Skip</button>
-              </div>
-            )}
-            {bubbleDone && (stage === 'idle' || stage === 'report') && !chatOpen && (
-              <button onClick={() => setChatOpen(true)} style={{
-                marginTop: 8, width: '100%', padding: '9px', borderRadius: 12,
-                background: 'rgba(217,119,6,0.12)', border: '1.5px solid rgba(217,119,6,0.35)',
-                color: '#F59E0B', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
-              }}>💬 Open chat with PARA</button>
-            )}
-          </div>
-        )}
-
-        {/* Robot + controls */}
-        <div style={{ pointerEvents: 'all', position: 'relative' }}>
-          {/* Top controls */}
-          <div style={{ position: 'absolute', top: -38, right: 0, display: 'flex', gap: 6 }}>
-            <button onClick={toggleMute} title={muted ? 'Unmute PARA' : 'Mute PARA'} style={{
-              width: 28, height: 28, borderRadius: '50%',
-              background: 'rgba(10,11,14,0.95)', border: `1.5px solid ${muted ? 'rgba(239,68,68,0.5)' : 'rgba(217,119,6,0.3)'}`,
-              cursor: 'pointer', color: muted ? '#EF4444' : '#9CA3AF',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
-            }}>{muted ? <VolumeX size={12}/> : <Volume2 size={12}/>}</button>
-            <button onClick={() => setDismissed(true)} title="Hide PARA" style={{
-              width: 28, height: 28, borderRadius: '50%',
-              background: 'rgba(10,11,14,0.95)', border: '1.5px solid rgba(255,255,255,0.1)',
-              cursor: 'pointer', color: '#6B7280',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}><X size={12}/></button>
-          </div>
-
-          {/* THE ROBOT */}
-          <div className="para-robot"
-            onClick={() => setChatOpen(o => !o)}
-            title={chatOpen ? 'Hide chat' : 'Chat with PARA'}
-          >
-            <Robot mood={mood} speaking={speaking} waving={waving}/>
-          </div>
-
-          {/* Name tag */}
-          <div style={{
-            textAlign: 'center', marginTop: 5,
-            fontSize: 10, fontWeight: 800, letterSpacing: '0.22em',
-            color: 'rgba(217,119,6,0.7)',
-            fontFamily: 'JetBrains Mono, monospace',
-            textShadow: '0 0 12px rgba(217,119,6,0.3)',
-          }}>P A R A</div>
-        </div>
-
-      </div>
+      {phase==='intro' && <IntroScreen userName={user?.firstName||'there'} muted={muted} onDone={handleIntroDone} onChipReply={handleChipReply} />}
+      {phase==='chat' && <ChatPanel open={chatOpen} onClose={()=>setChatOpen(false)} messages={messages} onSend={handleSend} loading={loading} />}
+      {phase==='chat' && <FloatingBot mood={mood} speaking={speaking} muted={muted} chatOpen={chatOpen} onToggleChat={()=>setChatOpen(o=>!o)} onToggleMute={toggleMute} />}
     </>
   );
 }
