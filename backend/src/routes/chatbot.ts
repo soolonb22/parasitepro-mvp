@@ -57,14 +57,17 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
   try {
     const { message, healthContext, reportData, conversationHistory = [] } = req.body;
 
-    if (!message) {
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    // Sanitise and cap message length
+    const safeMessage = message.trim().slice(0, 2000);
+
     let systemPrompt = PARA_SYSTEM_PROMPT.replace(
       '{HEALTH_CONTEXT}',
-      healthContext
-        ? `Location: ${healthContext.location || 'Unknown'}, Travel history: ${healthContext.travel || 'None'}, Pets: ${healthContext.pets || 'Unknown'}, Symptoms: ${healthContext.symptoms?.join(', ') || 'None reported'}, Duration: ${healthContext.duration || 'Unknown'}, Occupation: ${healthContext.occupation || 'Unknown'}`
+      healthContext && typeof healthContext === 'object'
+        ? `Location: ${healthContext.location || 'Unknown'}, Travel history: ${healthContext.travel || 'None'}, Pets: ${healthContext.pets || 'Unknown'}, Symptoms: ${Array.isArray(healthContext.symptoms) ? healthContext.symptoms.join(', ') : 'None reported'}, Duration: ${healthContext.duration || 'Unknown'}, Occupation: ${healthContext.occupation || 'Unknown'}`
         : 'Not yet collected.'
     );
 
@@ -75,17 +78,22 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
       );
     }
 
+    // Validate and sanitise conversation history — cap at last 16 messages
+    const safeHistory = Array.isArray(conversationHistory)
+      ? conversationHistory
+          .slice(-16)
+          .filter((m: any) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+          .map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content.slice(0, 4000) }))
+      : [];
+
     const messages: Anthropic.MessageParam[] = [
-      ...conversationHistory.map((m: any) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })),
-      { role: 'user', content: message },
+      ...safeHistory,
+      { role: 'user', content: safeMessage },
     ];
 
     const response = await anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-5',
-      max_tokens: 600,
+      max_tokens: 1000,
       system: systemPrompt,
       messages,
     });
@@ -95,9 +103,22 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
       .map((c) => (c as Anthropic.TextBlock).text)
       .join('');
 
+    if (!reply) {
+      return res.status(500).json({ error: 'Empty response from AI' });
+    }
+
     res.json({ message: reply });
   } catch (err: any) {
-    console.error('Chatbot error:', err);
+    console.error('Chatbot error:', err?.message || err);
+
+    // Distinguish credit/auth errors from general failures
+    if (err?.status === 401 || err?.message?.includes('authentication')) {
+      return res.status(502).json({ error: 'AI service authentication error. Please try again shortly.' });
+    }
+    if (err?.message?.includes('credit') || err?.message?.includes('balance')) {
+      return res.status(402).json({ error: 'AI credits exhausted. Please top up at console.anthropic.com.' });
+    }
+
     res.status(500).json({ error: 'Failed to get response from PARA' });
   }
 });

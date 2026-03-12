@@ -274,9 +274,11 @@ function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: strin
     setTimeout(() => setRobotY(-12),660);
     setTimeout(() => setRobotY(0),  840);
     setTimeout(() => setSkip(true), 3200);
-    setTimeout(() => speakLine(0),  980);
+    setTimeout(() => speakLineRef.current(0), 980);
     return () => { sig.current.cancelled = true; SpeechEngine.cancel(); };
   }, []);
+
+  const speakLineRef = useRef<(idx: number) => void>(() => {});
 
   const speakLine = useCallback((idx: number) => {
     if (sig.current.cancelled) return;
@@ -295,12 +297,15 @@ function IntroScreen({ userName, muted, onDone, onChipReply }: { userName: strin
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 300);
     if (!muted) {
       SpeechEngine.speak(line.text, { rate: 1.38, basePitch: 1.55, signal: sig.current,
-        onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakLine(idx+1); }, line.pauseAfter ?? 400); }
+        onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(idx+1); }, line.pauseAfter ?? 400); }
       });
     } else {
-      setTimeout(() => { if (!sig.current.cancelled) speakLine(idx+1); }, Math.max(2800, line.text.length * 32));
+      setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(idx+1); }, Math.max(2800, line.text.length * 32));
     }
   }, [muted, script]);
+
+  // Keep the ref in sync so the onDone callback always calls the latest version
+  useEffect(() => { speakLineRef.current = speakLine; }, [speakLine]);
 
   const triggerExit = () => { setExit(true); setTimeout(onDone, 520); };
   const skip = () => { sig.current.cancelled = true; SpeechEngine.cancel(); triggerExit(); };
@@ -518,24 +523,28 @@ export default function ParasiteBot() {
 
   useEffect(() => {
     if (!isAuthenticated || !isProtected) { setPhase('hidden'); return; }
-    const key = `para_intro_${user?.id||'guest'}`;
-    if (!sessionStorage.getItem(key)) {
+    const introKey   = `para_intro_${user?.id||'guest'}`;
+    const greetedKey = `para_greeted_${user?.id||'guest'}`;
+    if (!sessionStorage.getItem(introKey)) {
       setPhase('intro');
     } else {
       setPhase('chat');
-      if (!messages.length) {
+      // Only fire the welcome-back message once per browser session (not on every route change)
+      if (!sessionStorage.getItem(greetedKey)) {
+        sessionStorage.setItem(greetedKey, '1');
         const hr = new Date().getHours();
         const g = hr<12?'Good morning':hr<17?"G'day":'Good evening';
         const n = user?.firstName||'there';
         addBot(`${g}, ${n}! Great to see you back. Ready to run a new analysis, or can I help with something? 🔬`);
       }
     }
-  }, [isAuthenticated, isProtected, location.pathname]);
+  }, [isAuthenticated, isProtected]);
 
   const addBot = (content: string) => setMessages(prev => [...prev, { role:'assistant', content, id: ++idRef.current }]);
 
   const handleIntroDone = () => {
     sessionStorage.setItem(`para_intro_${user?.id||'guest'}`, '1');
+    sessionStorage.setItem(`para_greeted_${user?.id||'guest'}`, '1');
     setPhase('chat');
     const n = user?.firstName||'there';
     setTimeout(() => addBot(`You're all set, ${n}! 🎉 Your dashboard is ready below. Hit "Start New Analysis" when you're ready — or just chat with me here anytime.`), 500);
@@ -565,13 +574,37 @@ export default function ParasiteBot() {
 
   const sendToApi = async (text: string, history: {role:string; content:string}[]) => {
     setLoading(true); setMood('thinking');
+    // Read healthContext from sessionStorage (saved during onboarding)
+    let healthContext: any = null;
+    try {
+      const raw = sessionStorage.getItem('para_health_context');
+      if (raw) healthContext = JSON.parse(raw);
+    } catch { /* ignore */ }
+
+    // Always read fresh token from store at call time (avoids stale closure)
+    const token = useAuthStore.getState().accessToken;
+
     try {
       const res = await fetch(getApiUrl('/api/chatbot/message'), {
         method:'POST',
-        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${accessToken}` },
-        body: JSON.stringify({ message:text, conversationHistory:history }),
+        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+        body: JSON.stringify({ message:text, conversationHistory:history, healthContext }),
       });
+
       const data = await res.json();
+
+      if (!res.ok) {
+        const errMsg = res.status === 401
+          ? "Session expired — please refresh the page and log in again."
+          : res.status === 402
+          ? "PARA's AI credits are low. Fallon will top them up soon — try again in a bit!"
+          : data.error || "Something went wrong on my end. Try again in a sec?";
+        setLoading(false); setMood('concerned');
+        setMessages(prev => [...prev, { role:'assistant', content:errMsg, id: ++idRef.current }]);
+        setTimeout(()=>setMood('idle'), 2200);
+        return;
+      }
+
       const reply = data.message || "Sorry, had a little hiccup there. Try again in a sec?";
       setLoading(false); setMood('talking'); setSpeaking(true);
       setMessages(prev => [...prev, { role:'assistant', content:reply, id: ++idRef.current }]);
