@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
@@ -26,7 +26,7 @@ const VerifyEmailPage = () => {
         setMessage(response.data.message);
       } catch (err) {
         setStatus('error');
-        setMessage(err.response?.data?.error || 'Verification failed');
+        setMessage((err as any)?.response?.data?.error || 'Verification failed');
       }
     };
     

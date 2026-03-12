@@ -74,14 +74,14 @@ const SAMPLE_REPORT = {
 export default function SampleReportPage() {
   const [activeSection, setActiveSection] = useState('findings');
 
-  const getConfidenceColor = (confidence) => {
+  const getConfidenceColor = (confidence: number) => {
     if (confidence >= 70) return '#059669';
     if (confidence >= 50) return '#d97706';
     return '#6b7280';
   };
 
-  const getUrgencyStyles = (level) => {
-    const styles = {
+  const getUrgencyStyles = (level: string) => {
+    const styles: Record<string, any> = {
       low: { bg: '#dcfce7', border: '#22c55e', text: '#166534', icon: '✓' },
       moderate: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', icon: '⚠️' },
       high: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', icon: '⚠️' },

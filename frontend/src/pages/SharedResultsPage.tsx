@@ -4,10 +4,16 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
+
+interface SharedData {
+  analysis: any;
+  expiresAt: string;
+  viewCount: number;
+}
 export default function SharedResultsPage() {
   const { token } = useParams();
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState<SharedData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,14 +25,14 @@ export default function SharedResultsPage() {
       const response = await axios.get(`/api/share/view/${token}`);
       setData(response.data);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to load shared result');
+      setError((err as any)?.response?.data?.error || 'Failed to load shared result');
     } finally {
       setLoading(false);
     }
   };
 
-  const getUrgencyColor = (level) => {
-    const colors = {
+  const getUrgencyColor = (level: string): Record<string, string> => {
+    const colors: Record<string, Record<string, string>> = {
       low: { bg: '#dcfce7', border: '#22c55e', text: '#166534' },
       moderate: { bg: '#fef9c3', border: '#eab308', text: '#854d0e' },
       high: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b' },
@@ -64,6 +70,7 @@ export default function SharedResultsPage() {
     );
   }
 
+  if (!data) return null;
   const { analysis, expiresAt, viewCount } = data;
   const urgencyColors = getUrgencyColor(analysis.urgencyLevel);
 
@@ -172,7 +179,7 @@ export default function SharedResultsPage() {
               <div className="card" style={{ marginBottom: '1.5rem' }}>
                 <h3 style={{ fontSize: '1.125rem', marginBottom: '1rem' }}>Differential Diagnoses</h3>
                 <div style={{ display: 'grid', gap: '0.75rem' }}>
-                  {analysis.fullAnalysis.differentialDiagnoses.map((dx, index) => (
+                  {analysis.fullAnalysis.differentialDiagnoses.map((dx: any, index: number) => (
                     <div key={index} style={{
                       padding: '1rem',
                       backgroundColor: '#f9fafb',
@@ -208,7 +215,7 @@ export default function SharedResultsPage() {
                   Natural Treatment Recommendations
                 </h3>
                 <div style={{ display: 'grid', gap: '0.75rem' }}>
-                  {analysis.fullAnalysis.naturalTreatments.map((treatment, index) => (
+                  {analysis.fullAnalysis.naturalTreatments.map((treatment: any, index: number) => (
                     <div key={index} style={{
                       padding: '1rem',
                       backgroundColor: 'white',

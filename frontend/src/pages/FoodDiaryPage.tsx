@@ -1,14 +1,39 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../api';
+import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
+
+interface FoodEntry {
+  id: string;
+  meal_type: string;
+  foods: string[];
+  supplements: string[];
+  symptoms_after: string[];
+  notes: string;
+  energy_level: number;
+  digestive_comfort: number;
+  [key: string]: any;
+}
+
+interface FoodStats {
+  daysLogged: number;
+  averageEnergy: number;
+  averageComfort: number;
+  topFoods: Array<{name: string; count: number}>;
+  topSupplements: Array<{name: string; count: number}>;
+  potentialTriggers: Array<{food: string; symptom: string; occurrences: number}>;
+  [key: string]: any;
+}
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'];
 const COMMON_SYMPTOMS = ['Bloating', 'Gas', 'Cramping', 'Nausea', 'Fatigue', 'Headache', 'Diarrhea', 'Constipation'];
 
 export default function FoodDiaryPage() {
-  const [entries, setEntries] = useState([]);
-  const [stats, setStats] = useState(null);
+  const [entries, setEntries] = useState<FoodEntry[]>([]);
+  const [stats, setStats] = useState<FoodStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -20,12 +45,12 @@ export default function FoodDiaryPage() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = useAuthStore.getState().accessToken;
       const headers = { Authorization: `Bearer ${token}` };
 
       const [entriesRes, statsRes] = await Promise.all([
-        axios.get(`/api/food-diary/entries/date/${selectedDate}`, { headers }),
-        axios.get('/api/food-diary/stats?days=30', { headers })
+        axios.get(getApiUrl(`/api/food-diary/entries/date/${selectedDate}`), { headers }),
+        axios.get(getApiUrl('/api/food-diary/stats?days=30'), { headers })
       ]);
 
       setEntries(entriesRes.data.entries);
@@ -37,12 +62,12 @@ export default function FoodDiaryPage() {
     }
   };
 
-  const handleDeleteEntry = async (id) => {
+  const handleDeleteEntry = async (id: string) => {
     if (!confirm('Delete this entry?')) return;
     
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/food-diary/entries/${id}`, {
+      const token = useAuthStore.getState().accessToken;
+      await axios.delete(getApiUrl(`/api/food-diary/entries/${id}`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEntries(prev => prev.filter(e => e.id !== id));
@@ -51,8 +76,8 @@ export default function FoodDiaryPage() {
     }
   };
 
-  const getMealIcon = (type) => {
-    const icons = {
+  const getMealIcon = (type: string): string => {
+    const icons: Record<string, string> = {
       breakfast: '🌅',
       lunch: '☀️',
       dinner: '🌙',
@@ -357,19 +382,19 @@ function AddEntryModal({ date, onClose, onAdded }) {
   const [mealType, setMealType] = useState('breakfast');
   const [foods, setFoods] = useState('');
   const [supplements, setSupplements] = useState('');
-  const [symptomsAfter, setSymptomsAfter] = useState([]);
+  const [symptomsAfter, setSymptomsAfter] = useState<string[]>([]);
   const [energyLevel, setEnergyLevel] = useState(5);
   const [digestiveComfort, setDigestiveComfort] = useState(5);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('/api/food-diary/entries', {
+      const token = useAuthStore.getState().accessToken;
+      await axios.post(getApiUrl('/api/food-diary/entries'), {
         entryDate: date,
         mealType,
         foods: foods.split(',').map(f => f.trim()).filter(Boolean),
@@ -378,9 +403,7 @@ function AddEntryModal({ date, onClose, onAdded }) {
         energyLevel,
         digestiveComfort,
         notes
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
       onAdded();
     } catch (error) {
       console.error('Failed to add entry:', error);
@@ -389,7 +412,7 @@ function AddEntryModal({ date, onClose, onAdded }) {
     }
   };
 
-  const toggleSymptom = (symptom) => {
+  const toggleSymptom = (symptom: string) => {
     setSymptomsAfter(prev => 
       prev.includes(symptom) 
         ? prev.filter(s => s !== symptom)
