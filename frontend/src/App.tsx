@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import ParasiteBot from './components/ParasiteBot';
+import ParaDox from './components/ParaDox';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 // Core pages
@@ -246,6 +247,7 @@ function App() {
           error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
         }} />
         <ParasiteBot />
+        <ParaDox />
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />

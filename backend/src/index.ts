@@ -135,7 +135,15 @@ try {
   app.use('/api/chatbot', chatbotRouter);
   console.log('✅ Chatbot routes loaded');
 } catch (e: any) {
-  console.error('❌ Failed to load payment routes:', e.message);
+  console.error('❌ Failed to load chatbot routes:', e.message);
+}
+
+try {
+  const paradoxRouter = require('./routes/paradox').default;
+  app.use('/api/paradox', paradoxRouter);
+  console.log('✅ ParaDox routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load paradox routes:', e.message);
 }
 
 // 404 handler
