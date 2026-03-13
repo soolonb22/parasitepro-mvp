@@ -591,12 +591,13 @@ export default function ParasiteBot() {
     const isFirstPageVisit = !sessionStorage.getItem(pageKey);
     if (isFirstPageVisit) sessionStorage.setItem(pageKey, '1');
 
-    // Fire a page-arrival AI message
+    // Fire a page-arrival AI message (no speech — browser blocks auto-play without user gesture)
     sendToApi(
       `[SYSTEM: User just navigated to ${currentPath}. Give a short, warm, page-specific guide greeting. Use their credit balance and name.]`,
       [],
       'PAGE_ARRIVE',
-      isFirstPageVisit
+      isFirstPageVisit,
+      true  // noSpeak — auto-triggered, no user gesture
     );
   }, [isAuthenticated, isProtected, location.pathname]);
 
@@ -615,7 +616,8 @@ export default function ParasiteBot() {
       `[SYSTEM: User just completed onboarding and arrived at the dashboard for the first time. Give them a warm welcome and tell them their first step.]`,
       [],
       'PAGE_ARRIVE',
-      true
+      true,
+      true  // noSpeak
     ), 600);
   };
 
@@ -655,7 +657,8 @@ export default function ParasiteBot() {
     text: string,
     history: {role:string;content:string}[],
     triggerType: string = 'USER_MESSAGE',
-    isFirstVisit: boolean = false
+    isFirstVisit: boolean = false,
+    noSpeak: boolean = false
   ) => {
     setLoading(true);
     setMood('thinking');
@@ -714,7 +717,7 @@ export default function ParasiteBot() {
       setSpeaking(true);
       setMessages(prev => [...prev, { role:'assistant', content:reply, suggestions, id:++idRef.current }]);
 
-      if (!muted) {
+      if (!muted && !noSpeak) {
         sigRef.current = { cancelled:false };
         SpeechEngine.speak(reply, { rate:1.38, basePitch:1.55, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
       } else {
