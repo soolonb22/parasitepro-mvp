@@ -556,31 +556,49 @@ export default function ParasiteBot() {
   const idRef  = useRef(0);
   const sigRef = useRef({ cancelled: false });
 
-  const PROTECTED = ['/dashboard','/upload','/analysis','/settings','/food-diary','/treatment-tracker'];
+  const PROTECTED = ['/dashboard','/upload','/analysis','/settings','/food-diary','/treatment-tracker','/pricing','/encyclopedia','/symptom-journal','/treatment-tracker'];
   const isProtected = PROTECTED.some(p => location.pathname.startsWith(p));
+  const prevPageRef = useRef<string>('');
 
   useEffect(() => { SpeechEngine.init(); }, []);
 
+  // ── Page-arrival guide: fires AI greeting when user navigates to a new protected page ──
   useEffect(() => {
     if (!isAuthenticated || !isProtected) { setPhase('hidden'); return; }
-    const introKey   = `para_intro_${user?.id||'guest'}`;
-    const greetedKey = `para_greeted_${user?.id||'guest'}`;
+
+    const introKey = `para_intro_${user?.id||'guest'}`;
+    const currentPath = location.pathname;
+
     if (!sessionStorage.getItem(introKey)) {
       setPhase('intro');
-    } else {
-      setPhase('chat');
-      if (!sessionStorage.getItem(greetedKey)) {
-        sessionStorage.setItem(greetedKey, '1');
-        const hr = new Date().getHours();
-        const g = hr<12 ? 'Good morning' : hr<17 ? "G'day" : 'Good evening';
-        const n = user?.firstName || 'there';
-        addBot(
-          `${g}, ${n}! Great to see you back. Got something to analyse, or can I help with something? 🔬`,
-          ['Start a new analysis', 'Explain my last result', 'How do credits work?']
-        );
-      }
+      prevPageRef.current = currentPath;
+      return;
     }
-  }, [isAuthenticated, isProtected]);
+
+    setPhase('chat');
+
+    // Only fire a page-arrival message when the page actually changed
+    if (prevPageRef.current === currentPath) return;
+    prevPageRef.current = currentPath;
+
+    // Determine if this is the user's first ever session greeting
+    const greetedKey = `para_greeted_${user?.id||'guest'}`;
+    const isFirstSession = !sessionStorage.getItem(greetedKey);
+    if (isFirstSession) sessionStorage.setItem(greetedKey, '1');
+
+    // Has this page been visited before this session?
+    const pageKey = `para_page_${user?.id||'guest'}_${currentPath.replace(/\//g,'-')}`;
+    const isFirstPageVisit = !sessionStorage.getItem(pageKey);
+    if (isFirstPageVisit) sessionStorage.setItem(pageKey, '1');
+
+    // Fire a page-arrival AI message
+    sendToApi(
+      `[SYSTEM: User just navigated to ${currentPath}. Give a short, warm, page-specific guide greeting. Use their credit balance and name.]`,
+      [],
+      'PAGE_ARRIVE',
+      isFirstPageVisit
+    );
+  }, [isAuthenticated, isProtected, location.pathname]);
 
   const addBot = (content: string, suggestions: string[] = []) =>
     setMessages(prev => [...prev, { role:'assistant', content, suggestions, id: ++idRef.current }]);
@@ -588,37 +606,37 @@ export default function ParasiteBot() {
   const handleIntroDone = () => {
     sessionStorage.setItem(`para_intro_${user?.id||'guest'}`, '1');
     sessionStorage.setItem(`para_greeted_${user?.id||'guest'}`, '1');
+    const pageKey = `para_page_${user?.id||'guest'}_${location.pathname.replace(/\//g,'-')}`;
+    sessionStorage.setItem(pageKey, '1');
     setPhase('chat');
-    const n = user?.firstName || 'there';
-    setTimeout(() => addBot(
-      `You're all set, ${n}! 🎉 Your dashboard is ready below. Whenever you're ready — hit **Start New Analysis** to upload a sample, or just chat with me here.`,
-      ['How do I upload a sample?', 'What sample types work?', 'How do credits work?']
-    ), 500);
-    setTimeout(() => setChatOpen(true), 900);
+    prevPageRef.current = location.pathname;
+    setTimeout(() => setChatOpen(true), 400);
+    setTimeout(() => sendToApi(
+      `[SYSTEM: User just completed onboarding and arrived at the dashboard for the first time. Give them a warm welcome and tell them their first step.]`,
+      [],
+      'PAGE_ARRIVE',
+      true
+    ), 600);
   };
 
   const handleChipReply = (replyText: string) => {
     sessionStorage.setItem(`para_intro_${user?.id||'guest'}`, '1');
     setPhase('chat');
     setChatOpen(true);
+    const isTour = replyText.toLowerCase().includes('tour') || replyText.toLowerCase().includes('show me around');
     const userMsg: Msg = { role:'user', content:replyText, id: ++idRef.current };
     setMessages([userMsg]);
-    // sendToApi outside setMessages — no side effects in state updater
-    sendToApi(replyText, []);
+    sendToApi(replyText, [], isTour ? 'TOUR_START' : 'USER_MESSAGE', false);
   };
 
-  // ✅ Fixed: sendToApi called outside setMessages
   const handleSend = (text: string) => {
+    const isTour = text.toLowerCase().includes('tour') || text.toLowerCase().includes('show me around');
     const userMsg: Msg = { role:'user', content:text, id: ++idRef.current };
-    setMessages(prev => {
-      const updated = [...prev, userMsg];
-      return updated;
-    });
-    // Build history from current messages + new message, send without the new message as history
+    setMessages(prev => [...prev, userMsg]);
     setMessages(current => {
       const history = current.map(m => ({ role: m.role, content: m.content }));
-      sendToApi(text, history.slice(0, -1)); // exclude last (the one we just added)
-      return current; // don't mutate state here
+      sendToApi(text, history.slice(0, -1), isTour ? 'TOUR_START' : 'USER_MESSAGE', false);
+      return current;
     });
   };
 
@@ -629,11 +647,16 @@ export default function ParasiteBot() {
     setMessages([]);
     addBot(
       "Fresh start! What can I help you with? 🔬",
-      ['I think I have worms', 'How do I upload a sample?', 'What are common Queensland parasites?']
+      ['Start a new analysis', 'Show me around the app', 'How do credits work?']
     );
   };
 
-  const sendToApi = async (text: string, history: {role:string;content:string}[]) => {
+  const sendToApi = async (
+    text: string,
+    history: {role:string;content:string}[],
+    triggerType: string = 'USER_MESSAGE',
+    isFirstVisit: boolean = false
+  ) => {
     setLoading(true);
     setMood('thinking');
 
@@ -645,11 +668,27 @@ export default function ParasiteBot() {
 
     const token = useAuthStore.getState().accessToken;
 
+    // Build userState from auth store
+    const currentUser = useAuthStore.getState().user;
+    const userState = {
+      credits: currentUser?.imageCredits ?? 0,
+      imageCredits: currentUser?.imageCredits ?? 0,
+      firstName: currentUser?.firstName || 'there',
+      isFirstVisit,
+    };
+
     try {
       const res = await fetch(getApiUrl('/api/chatbot/message'), {
         method:'POST',
         headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
-        body:JSON.stringify({ message:text, conversationHistory:history, healthContext }),
+        body:JSON.stringify({
+          message: text,
+          conversationHistory: history,
+          healthContext,
+          currentPage: location.pathname,
+          userState,
+          triggerType,
+        }),
       });
 
       const data = await res.json();
