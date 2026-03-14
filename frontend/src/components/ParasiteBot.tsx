@@ -27,7 +27,11 @@ type Msg = { role: 'user' | 'assistant'; content: string; id: number; suggestion
 class SpeechEngine {
   private static voices: SpeechSynthesisVoice[] = [];
   private static ready = false;
+  // Autoplay unlock — browsers block speechSynthesis until a user gesture fires
+  private static unlocked = false;
+  private static pendingAfterUnlock: (() => void) | null = null;
 
+  /** Call once on app load. Registers a one-time gesture listener to unlock speech. */
   static init(): Promise<void> {
     return new Promise(resolve => {
       if (typeof window === 'undefined' || !window.speechSynthesis) { resolve(); return; }
@@ -38,6 +42,28 @@ class SpeechEngine {
       window.speechSynthesis.onvoiceschanged = tryLoad;
       tryLoad();
       setTimeout(() => { if (!this.ready) { tryLoad(); resolve(); } }, 1500);
+
+      // Register unlock listener for autoplay policy
+      const unlock = () => {
+        if (this.unlocked) return;
+        this.unlocked = true;
+        // Fire a zero-volume utterance to warm up the speech synthesis context
+        const warmup = new SpeechSynthesisUtterance('');
+        warmup.volume = 0;
+        window.speechSynthesis.speak(warmup);
+        // Fire any queued speech immediately
+        if (this.pendingAfterUnlock) {
+          const fn = this.pendingAfterUnlock;
+          this.pendingAfterUnlock = null;
+          setTimeout(fn, 120);
+        }
+        document.removeEventListener('click',      unlock, true);
+        document.removeEventListener('touchstart', unlock, true);
+        document.removeEventListener('keydown',    unlock, true);
+      };
+      document.addEventListener('click',      unlock, { capture: true, once: true });
+      document.addEventListener('touchstart', unlock, { capture: true, once: true });
+      document.addEventListener('keydown',    unlock, { capture: true, once: true });
     });
   }
 
@@ -62,6 +88,11 @@ class SpeechEngine {
 
   static speak(text, opts: any = {}) {
     if (!window.speechSynthesis) { opts.onDone?.(); return; }
+    // If speech hasn't been unlocked by a user gesture yet, queue it
+    if (!this.unlocked) {
+      this.pendingAfterUnlock = () => this.speak(text, opts);
+      return;
+    }
     window.speechSynthesis.cancel();
     const clean = text
       .replace(/\*\*(.*?)\*\*/g, '$1')

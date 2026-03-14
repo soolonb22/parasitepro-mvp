@@ -70,15 +70,37 @@ const ONBOARDING_STEPS = [
   },
 ];
 
-// Web Speech API wrapper
+// Web Speech API wrapper — with autoplay unlock
+let _speechUnlocked = false;
+let _pendingSpeech: (() => void) | null = null;
+
+const unlockSpeech = () => {
+  if (_speechUnlocked) return;
+  _speechUnlocked = true;
+  const warmup = new SpeechSynthesisUtterance('');
+  warmup.volume = 0;
+  window.speechSynthesis.speak(warmup);
+  if (_pendingSpeech) { const fn = _pendingSpeech; _pendingSpeech = null; setTimeout(fn, 120); }
+  document.removeEventListener('click',      unlockSpeech, true);
+  document.removeEventListener('touchstart', unlockSpeech, true);
+};
+if (typeof window !== 'undefined') {
+  document.addEventListener('click',      unlockSpeech, { capture: true, once: true });
+  document.addEventListener('touchstart', unlockSpeech, { capture: true, once: true });
+}
+
 const speak = (text: string, onEnd?: () => void): SpeechSynthesisUtterance | null => {
   if (!('speechSynthesis' in window)) return null;
+  // Queue if not yet unlocked by user gesture
+  if (!_speechUnlocked) {
+    _pendingSpeech = () => speak(text, onEnd);
+    return null;
+  }
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   utter.rate = 0.92;
   utter.pitch = 1.0;
   utter.volume = 1.0;
-  // Prefer an Australian/British voice if available
   const voices = window.speechSynthesis.getVoices();
   const preferred = voices.find(v =>
     v.name.includes('Karen') || v.name.includes('Samantha') ||
