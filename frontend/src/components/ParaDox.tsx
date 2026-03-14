@@ -94,6 +94,7 @@ function WormMascot({ mood, size = 48 }: { mood: Mood; size?: number }) {
 
 // ─── Markdown renderer ────────────────────────────────────────────
 function MarkdownText({ text }: { text: string }) {
+  if (!text) return null;
   const lines = text.split('\n');
   const elements: React.ReactNode[] = [];
   let i = 0;
@@ -128,6 +129,7 @@ function MarkdownText({ text }: { text: string }) {
 }
 
 function InlineMarkdown({ text }: { text: string }) {
+  if (!text) return null;
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return (
     <>
@@ -269,7 +271,7 @@ export default function ParaDox() {
       setMood('talking');
       const assistantMsg: Msg = {
         role: 'assistant',
-        content: data.message,
+        content: data.message || '',
         id: msgId + 2,
         suggestions: data.suggestions,
       };
@@ -543,7 +545,7 @@ export default function ParaDox() {
                         marginTop: 7,
                         paddingLeft: 2,
                       }}>
-                        {msg.suggestions.map((s, i) => (
+                        {msg.suggestions.filter(Boolean).map((s, i) => (
                           <button
                             key={i}
                             onClick={() => sendMessage(s)}
