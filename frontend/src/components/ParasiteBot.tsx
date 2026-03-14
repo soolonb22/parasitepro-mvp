@@ -127,6 +127,19 @@ class SpeechEngine {
   }
 
   static cancel() { window.speechSynthesis?.cancel(); }
+
+  /** Request microphone permission. Returns 'granted' | 'denied' | 'unsupported' */
+  static async requestMic(): Promise<'granted' | 'denied' | 'unsupported'> {
+    if (!navigator.mediaDevices?.getUserMedia) return 'unsupported';
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Immediately stop all tracks — we only wanted the permission grant
+      stream.getTracks().forEach(t => t.stop());
+      return 'granted';
+    } catch (err: any) {
+      return 'denied';
+    }
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -273,6 +286,8 @@ function IntroScreen({ userName, muted, onDone }) {
   const [intakeStep, setIntakeStep] = useState(0);
   const [intakeData, setIntakeData] = useState<Record<string,string>>({});
   const [intakePhraseIn, setIntakePhraseIn] = useState(false);
+  const [micStatus, setMicStatus]           = useState<'idle'|'asking'|'granted'|'denied'>('idle');
+  const [showMicPrompt, setShowMicPrompt]   = useState(false);
 
   const sig = useRef({ cancelled: false });
   const speakLineRef = useRef<(idx: number) => void>(() => {});
@@ -334,6 +349,22 @@ function IntroScreen({ userName, muted, onDone }) {
 
   useEffect(() => { speakLineRef.current = speakLine; }, [speakLine]);
 
+  const handleMicRequest = async () => {
+    setShowMicPrompt(false);
+    const result = await SpeechEngine.requestMic();
+    setMicStatus(result);
+    if (result === 'granted') {
+      // Mic granted — speak a quick excited confirmation
+      if (!muted) {
+        SpeechEngine.speak("Awesome! I can hear you now! You can speak your answers if you want!", {
+          rate: 1.38, basePitch: 1.62, signal: sig.current,
+          onDone: () => setSpeaking(false)
+        });
+        setSpeaking(true);
+      }
+    }
+  };
+
   const triggerExit = (data: Record<string,string>) => {
     setExit(true);
     sig.current.cancelled = true;
@@ -349,6 +380,13 @@ function IntroScreen({ userName, muted, onDone }) {
     setIntakeData(newData);
 
     if (q.final) { triggerExit(newData); return; }
+
+    // On the very first intake answer, ask for mic permission
+    // User has just clicked so browser will allow the getUserMedia call
+    if (intakeStep === 0 && micStatus === 'idle') {
+      setShowMicPrompt(true);
+      setMicStatus('asking');
+    }
 
     const next = intakeStep + 1;
     setIntakeStep(next);
@@ -456,6 +494,44 @@ function IntroScreen({ userName, muted, onDone }) {
           </div>
         )}
       </div>
+
+      {/* Microphone permission prompt — friendly overlay before native browser dialog */}
+      {showMicPrompt && (
+        <div style={{ position:'absolute', inset:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(8,12,20,0.85)', backdropFilter:'blur(6px)' }}>
+          <div style={{ background:'rgba(22,32,48,0.98)', border:'1px solid rgba(217,119,6,0.45)', borderRadius:20, padding:'32px 28px', maxWidth:360, textAlign:'center', boxShadow:'0 24px 60px rgba(0,0,0,0.6)' }}>
+            <div style={{ fontSize:44, marginBottom:16 }}>🎙️</div>
+            <h3 style={{ color:'#f59e0b', fontSize:18, fontWeight:700, margin:'0 0 10px' }}>Can I use your mic?</h3>
+            <p style={{ color:'#94a3b8', fontSize:14, lineHeight:1.65, margin:'0 0 24px' }}>
+              So you can speak your answers instead of typing! I just need your microphone permission — it only takes a second.
+            </p>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <button onClick={handleMicRequest}
+                style={{ background:'linear-gradient(135deg,#d97706,#f59e0b)', border:'none', color:'#0f172a', borderRadius:12, padding:'13px 20px', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+                Yes! Enable microphone 🎙️
+              </button>
+              <button onClick={() => { setShowMicPrompt(false); setMicStatus('denied'); }}
+                style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.1)', color:'#64748b', borderRadius:12, padding:'11px 20px', fontSize:13, cursor:'pointer', fontFamily:'inherit' }}>
+                No thanks, I'll type
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mic status indicator — shows briefly after permission granted/denied */}
+      {micStatus === 'granted' && !showMicPrompt && (
+        <div style={{ position:'absolute', top:56, right:20, display:'flex', alignItems:'center', gap:7, background:'rgba(16,185,129,0.15)', border:'1px solid rgba(16,185,129,0.4)', borderRadius:20, padding:'6px 14px', animation:'para-fadein 0.3s ease' }}>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'#10b981', boxShadow:'0 0 7px #10b981' }}/>
+          <span style={{ color:'#10b981', fontSize:12, fontWeight:600 }}>Mic on</span>
+        </div>
+      )}
+      {micStatus === 'denied' && !showMicPrompt && (
+        <div style={{ position:'absolute', top:56, right:20, display:'flex', alignItems:'center', gap:7, background:'rgba(100,116,139,0.15)', border:'1px solid rgba(100,116,139,0.3)', borderRadius:20, padding:'6px 14px', animation:'para-fadein 0.3s ease' }}>
+          <span style={{ color:'#64748b', fontSize:12 }}>⌨️ Typing mode</span>
+        </div>
+      )}
 
       {/* Dot indicators */}
       <div style={{ position:'absolute', bottom:14, display:'flex', gap:7 }}>
