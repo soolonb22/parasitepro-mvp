@@ -663,14 +663,17 @@ export default function ParasiteBot() {
   };
 
   const handleSend = (text: string) => {
-    const isTour = text.toLowerCase().includes('tour') || text.toLowerCase().includes('show me around');
-    const userMsg: Msg = { role:'user', content:text, id: ++idRef.current };
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    const isTour = trimmed.toLowerCase().includes('tour') || trimmed.toLowerCase().includes('show me around');
+    const userMsg: Msg = { role:'user', content:trimmed, id: ++idRef.current };
+    // Capture history BEFORE state update — avoids race condition and side-effects in updater
+    const history = messages
+      .filter(m => !m.content.startsWith('[SYSTEM:'))  // strip internal system triggers
+      .map(m => ({ role: m.role, content: m.content }));
     setMessages(prev => [...prev, userMsg]);
-    setMessages(current => {
-      const history = current.map(m => ({ role: m.role, content: m.content }));
-      sendToApi(text, history.slice(0, -1), isTour ? 'TOUR_START' : 'USER_MESSAGE', false);
-      return current;
-    });
+    // Call API OUTSIDE setMessages — clean, no double-fire in Strict Mode
+    sendToApi(trimmed, history, isTour ? 'TOUR_START' : 'USER_MESSAGE', false);
   };
 
   const handleClear = () => {
@@ -768,6 +771,27 @@ export default function ParasiteBot() {
     if (nm) { sigRef.current.cancelled=true; SpeechEngine.cancel(); setSpeaking(false); }
   };
 
+  // When user opens the chat panel for the first time with no messages, show a local welcome
+  // so they're never greeted with a blank screen
+  const openChat = () => {
+    setChatOpen(o => {
+      const opening = !o;
+      if (opening && messages.length === 0) {
+        // Show a local instant welcome — don't wait for API
+        const name = useAuthStore.getState().user?.firstName || 'there';
+        const credits = useAuthStore.getState().user?.imageCredits ?? 0;
+        const localWelcome = credits > 0
+          ? `Hey ${name}! 👋 I'm PARA — your ParasitePro guide. You've got **${credits} credit${credits !== 1 ? 's' : ''}** ready to go. Ask me anything, or tap a suggestion below!`
+          : `Hey ${name}! 👋 I'm PARA — your ParasitePro guide. You're out of credits right now — head to **Pricing** to top up and I'll help you get your first analysis done!`;
+        addBot(localWelcome, credits > 0
+          ? ['Start a new analysis', 'How do I upload a photo?', 'What can this app detect?']
+          : ['Take me to Pricing', 'How do credits work?', 'Show me a sample report']
+        );
+      }
+      return opening;
+    });
+  };
+
   if (!isAuthenticated || !isProtected) return null;
 
   return (
@@ -782,7 +806,7 @@ export default function ParasiteBot() {
 
       {phase==='intro' && <IntroScreen userName={user?.firstName||'there'} muted={muted} onDone={handleIntroDone} onChipReply={handleChipReply}/>}
       {phase==='chat' && <ChatPanel open={chatOpen} onClose={()=>setChatOpen(false)} messages={messages} onSend={handleSend} onClear={handleClear} loading={loading}/>}
-      {phase==='chat' && <FloatingBot mood={mood} speaking={speaking} muted={muted} chatOpen={chatOpen} onToggleChat={()=>setChatOpen(o=>!o)} onToggleMute={toggleMute}/>}
+      {phase==='chat' && <FloatingBot mood={mood} speaking={speaking} muted={muted} chatOpen={chatOpen} onToggleChat={openChat} onToggleMute={toggleMute}/>}
     </>
   );
 }

@@ -188,6 +188,8 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({ error: 'Message is required' });
     }
+    // Detect internal system triggers — they come from PAGE_ARRIVE, not the user
+    const isSystemTrigger = message.trim().startsWith('[SYSTEM:');
 
     const safeMessage = message.trim().slice(0, 2000);
     const pageName = getPageName(currentPage);
@@ -216,7 +218,12 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
     const safeHistory = Array.isArray(conversationHistory)
       ? conversationHistory
           .slice(-18)
-          .filter((m: any) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+          .filter((m: any) =>
+            m &&
+            (m.role === 'user' || m.role === 'assistant') &&
+            typeof m.content === 'string' &&
+            !m.content.startsWith('[SYSTEM:')  // strip internal page-arrive triggers
+          )
           .map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content.slice(0, 4000) }))
       : [];
 
