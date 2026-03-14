@@ -13,6 +13,7 @@ import WelcomeModal from '../components/WelcomeModal';
 import ReferralSection from '../components/ReferralSection';
 import ParasiteInfoWidget from '../components/ParasiteInfoWidget';
 import AustraliaRiskMap from '../components/AustraliaRiskMap';
+import ParaChatbot from '../components/ParaChatbot';
 import SymptomChecker from '../components/SymptomChecker';
 import LiveStatsTicker from '../components/LiveStatsTicker';
 
@@ -337,6 +338,7 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+    <ParaChatbot page="dashboard" user={useAuthStore.getState().user} />
     </div>
   );
 };

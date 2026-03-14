@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import LiveStatsTicker from '../components/LiveStatsTicker';
 import AustraliaRiskMap from '../components/AustraliaRiskMap';
+import ParaChatbot from '../components/ParaChatbot';
 import SymptomChecker from '../components/SymptomChecker';
 
 const LandingPage = () => {
@@ -497,6 +498,7 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+    <ParaChatbot page="landing" />
     </div>
   );
 };
