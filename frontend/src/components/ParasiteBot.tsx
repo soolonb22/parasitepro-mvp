@@ -79,6 +79,8 @@ class SpeechEngine {
     );
   }
 
+  static clearPending() { this.pendingAfterUnlock = null; }
+
   static speak(text, opts: any = {}) {
     if (!window.speechSynthesis) { opts.onDone?.(); return; }
     if (!this.unlocked) {
@@ -116,6 +118,7 @@ class SpeechEngine {
       utt.volume = 0.95;
       if (voice) utt.voice = voice;
       const pause = isQ ? 380 : isE ? 240 : 180;
+      utt.onstart = () => { if (i === 0) opts.onStart?.(); };
       utt.onend  = () => { i++; if (opts.signal?.cancelled) { opts.onDone?.(); return; } setTimeout(next, pause); };
       utt.onerror = () => { i++; setTimeout(next, 80); };
       window.speechSynthesis.speak(utt);
@@ -306,8 +309,23 @@ function IntroScreen({ userName, muted, onDone }) {
     setCardIn(false);
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 280);
     if (!muted) {
-      SpeechEngine.speak(line.text, { rate: 1.38, basePitch: 1.55, signal: sig.current,
-        onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(idx + 1); }, line.pauseAfter ?? 380); }
+      // Fallback timer: if speech is blocked by autoplay policy, advance visually on a timer
+      // When/if speech actually starts (onStart), cancel the fallback so onDone drives timing
+      const fallbackMs = Math.max(2400, line.text.length * 28);
+      const fallbackTimer = setTimeout(() => {
+        SpeechEngine.clearPending(); // discard stale queued speech
+        setSpeaking(false);
+        if (!sig.current.cancelled) speakLineRef.current(idx + 1);
+      }, fallbackMs);
+
+      SpeechEngine.speak(line.text, {
+        rate: 1.38, basePitch: 1.55, signal: sig.current,
+        onStart: () => clearTimeout(fallbackTimer), // speech started — let onDone drive timing
+        onDone: () => {
+          clearTimeout(fallbackTimer);
+          setSpeaking(false);
+          setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(idx + 1); }, line.pauseAfter ?? 380);
+        }
       });
     } else {
       setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(idx + 1); }, Math.max(2000, line.text.length * 26));
