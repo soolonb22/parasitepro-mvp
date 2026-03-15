@@ -34,7 +34,7 @@ const SAMPLE_TYPES = [
 
 const UploadPage = () => {
   const navigate = useNavigate();
-  const { user, accessToken, updateUser } = useAuthStore();
+  const { user, accessToken, updateUser, refreshUser } = useAuthStore();
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const dropRef = useRef(null);
@@ -85,7 +85,7 @@ const UploadPage = () => {
         headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${accessToken}` },
         onUploadProgress: (e) => setUploadProgress(e.total ? Math.round((e.loaded * 100) / e.total) : 0),
       });
-      if (user) await updateUser({ imageCredits: (user.imageCredits || 0) - 1 });
+      await refreshUser(); // fetch real credit balance from server after analysis
       toast.success('Upload successful! Analysing your specimen…');
       setTimeout(() => navigate(`/analysis/${response.data.analysisId}`), 800);
     } catch (error) {
