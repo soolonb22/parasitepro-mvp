@@ -263,6 +263,12 @@ const LandingPage = () => {
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>
               notworms.com | AI-assisted reference only. Not medical diagnosis.
             </p>
+            {/* Beta pricing urgency — genuine, ACL-compliant */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, padding: '8px 12px', borderRadius: 7, background: 'rgba(217,119,6,0.06)', border: '1px solid rgba(217,119,6,0.18)' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--amber)', letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0 }}>BETA PRICING</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>—</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Prices increase at full launch. Lock in your credits now.</span>
+            </div>
           </div>
         </div>
 
@@ -454,19 +460,22 @@ const LandingPage = () => {
       <section style={{ maxWidth: 1000, margin: '0 auto', padding: '80px 24px' }}>
         <div className="reveal" style={{ textAlign: 'center', padding: '64px 40px', borderRadius: 16, background: 'var(--bg-elevated)', border: '1px solid rgba(217,119,6,0.15)', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 50%, rgba(217,119,6,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
-          <div className="section-label" style={{ marginBottom: 12 }}>Get started · Free</div>
+          <div className="section-label" style={{ marginBottom: 12 }}>Start free · No card required</div>
           <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(28px, 5vw, 52px)', letterSpacing: '-0.03em', marginBottom: 16, lineHeight: 1.1 }}>
-            Stop guessing.<br /><span className="amber-text">Start knowing.</span>
+            The longer you wait,<br /><span className="amber-text">the longer you wonder.</span>
           </h2>
-          <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 420, margin: '0 auto 32px', lineHeight: 1.65 }}>
-            Your first analysis is free. No credit card. No download. Just a clear answer about what you're looking at.
+          <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 460, margin: '0 auto 12px', lineHeight: 1.65 }}>
+            Use code <strong style={{ color: 'var(--amber)', fontFamily: 'var(--font-mono)' }}>BETA3FREE</strong> at signup and get 3 analyses on us. See exactly what ParasitePro can do before you spend a cent.
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 400, margin: '0 auto 28px', fontFamily: 'var(--font-mono)', letterSpacing: '0.02em' }}>
+            We&apos;re in beta — prices will rise at full launch. Your credits never expire.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={() => navigate('/signup')} className="cta-btn" style={{ fontSize: 16, padding: '16px 32px' }}>
-              Analyse free <ArrowRight size={17} />
+              Claim free credits <ArrowRight size={17} />
             </button>
-            <button onClick={() => document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' })} className="cta-btn-ghost" style={{ fontSize: 16, padding: '16px 32px' }}>
-              Learn more
+            <button onClick={() => navigate('/login')} className="cta-btn-ghost" style={{ fontSize: 16, padding: '16px 32px' }}>
+              Sign in
             </button>
           </div>
           <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
