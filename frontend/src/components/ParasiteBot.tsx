@@ -31,36 +31,38 @@ class SpeechEngine {
   private static unlocked = false;
   private static pendingAfterUnlock: (() => void) | null = null;
 
-  static init(): Promise<void> {
-    return new Promise(resolve => {
-      if (typeof window === 'undefined' || !window.speechSynthesis) { resolve(); return; }
-      const tryLoad = () => {
-        const v = window.speechSynthesis.getVoices();
-        if (v.length) { this.voices = v; this.ready = true; resolve(); }
-      };
-      window.speechSynthesis.onvoiceschanged = tryLoad;
-      tryLoad();
-      setTimeout(() => { if (!this.ready) { tryLoad(); resolve(); } }, 1500);
+  /** Load voices. Call on mount. */
+  static init(): void {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const tryLoad = () => {
+      const v = window.speechSynthesis.getVoices();
+      if (v.length) { this.voices = v; this.ready = true; }
+    };
+    window.speechSynthesis.onvoiceschanged = tryLoad;
+    tryLoad();
+    setTimeout(tryLoad, 1000);
+  }
 
-      const unlock = () => {
-        if (this.unlocked) return;
-        this.unlocked = true;
-        const warmup = new SpeechSynthesisUtterance('');
-        warmup.volume = 0;
-        window.speechSynthesis.speak(warmup);
-        if (this.pendingAfterUnlock) {
-          const fn = this.pendingAfterUnlock;
-          this.pendingAfterUnlock = null;
-          setTimeout(fn, 120);
-        }
-        document.removeEventListener('click',      unlock, true);
-        document.removeEventListener('touchstart', unlock, true);
-        document.removeEventListener('keydown',    unlock, true);
-      };
-      document.addEventListener('click',      unlock, { capture: true, once: true });
-      document.addEventListener('touchstart', unlock, { capture: true, once: true });
-      document.addEventListener('keydown',    unlock, { capture: true, once: true });
-    });
+  /**
+   * Call this directly from a user-gesture handler (onClick/onTouchStart).
+   * Plays a silent warmup utterance to unlock the Web Speech API,
+   * then immediately calls onUnlocked so the caller can start real speech.
+   */
+  static unlockAndSpeak(firstText: string, opts: any = {}): void {
+    if (this.unlocked) { this.speak(firstText, opts); return; }
+    // Must be called synchronously inside a user-gesture event handler
+    const warmup = new SpeechSynthesisUtterance('');
+    warmup.volume = 0;
+    warmup.onend = () => {
+      this.unlocked = true;
+      setTimeout(() => this.speak(firstText, opts), 80);
+    };
+    warmup.onerror = () => {
+      this.unlocked = true;
+      setTimeout(() => this.speak(firstText, opts), 80);
+    };
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(warmup);
   }
 
   static getBestVoice(): SpeechSynthesisVoice | null {
@@ -288,19 +290,22 @@ function IntroScreen({ userName, muted, onDone }) {
   const [intakePhraseIn, setIntakePhraseIn] = useState(false);
   const [micStatus, setMicStatus]           = useState<'idle'|'asking'|'granted'|'denied'>('idle');
   const [showMicPrompt, setShowMicPrompt]   = useState(false);
+  const [voiceStarted, setVoiceStarted]     = useState(false);  // true after user taps to unlock speech
 
   const sig = useRef({ cancelled: false });
   const speakLineRef = useRef<(idx: number) => void>(() => {});
 
   useEffect(() => {
-    SpeechEngine.init();
+    SpeechEngine.init();  // just loads voices
     setTimeout(() => setOverlay(true), 40);
     setTimeout(() => setRobotY(-90), 200);
     setTimeout(() => setRobotY(10),  460);
     setTimeout(() => setRobotY(-14), 660);
     setTimeout(() => setRobotY(0),   840);
     setTimeout(() => setSkip(true),  2800);
-    setTimeout(() => speakLineRef.current(0), 1050);
+    // NOTE: speakLine(0) is triggered by the user tapping "Tap to start"
+    // Visual-only fallback starts after 3s if user doesn't tap
+    setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(0); }, 3000);
     return () => { sig.current.cancelled = true; SpeechEngine.cancel(); };
   }, []);
 
@@ -348,6 +353,23 @@ function IntroScreen({ userName, muted, onDone }) {
   }, [muted, script]);
 
   useEffect(() => { speakLineRef.current = speakLine; }, [speakLine]);
+
+  const handleTapToStart = () => {
+    setVoiceStarted(true);
+    sig.current.cancelled = false;
+    // unlockAndSpeak MUST be called synchronously in this onClick handler
+    // so the browser accepts it as a genuine user-gesture speech request
+    SpeechEngine.unlockAndSpeak(script[0].text, {
+      rate: 1.38, basePitch: 1.55, signal: sig.current,
+      onStart: () => { setSpeaking(true); setMood(script[0].mood); },
+      onDone: () => {
+        setSpeaking(false);
+        setTimeout(() => { if (!sig.current.cancelled) speakLineRef.current(1); }, script[0].pauseAfter ?? 380);
+      }
+    });
+    setLineIdx(0); setMood(script[0].mood); setSpeaking(true);
+    setTimeout(() => { setCard(script[0].card ?? null); if (script[0].card) setTimeout(() => setCardIn(true), 60); }, 280);
+  };
 
   const handleMicRequest = async () => {
     setShowMicPrompt(false);
@@ -397,7 +419,7 @@ function IntroScreen({ userName, muted, onDone }) {
       setMood(INTAKE_QUESTIONS[next].mood);
       if (!muted) {
         setSpeaking(true);
-        SpeechEngine.speak(INTAKE_QUESTIONS[next].text, {
+        SpeechEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, {
           rate: 1.38, basePitch: 1.62, signal: sig.current,
           onDone: () => setSpeaking(false)
         });
@@ -494,6 +516,28 @@ function IntroScreen({ userName, muted, onDone }) {
           </div>
         )}
       </div>
+
+      {/* TAP TO START — voice unlock overlay. Shows until user taps. */}
+      {!voiceStarted && robotY === 0 && (
+        <div style={{ position:'absolute', inset:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(8,12,20,0.72)', backdropFilter:'blur(4px)', animation:'para-fadein 0.5s ease' }}>
+          <button
+            onClick={handleTapToStart}
+            style={{
+              display:'flex', flexDirection:'column', alignItems:'center', gap:14,
+              background:'rgba(217,119,6,0.12)', border:'2px solid rgba(217,119,6,0.55)',
+              borderRadius:24, padding:'28px 40px', cursor:'pointer', fontFamily:'inherit',
+              transition:'all 0.18s', userSelect:'none'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(217,119,6,0.22)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.9)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(217,119,6,0.12)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.55)'; }}>
+            <span style={{ fontSize:42 }}>🔊</span>
+            <span style={{ color:'#f59e0b', fontSize:20, fontWeight:700, letterSpacing:'-0.01em' }}>Tap to hear PARA</span>
+            <span style={{ color:'#94a3b8', fontSize:13, textAlign:'center', lineHeight:1.5, maxWidth:220 }}>
+              Tap once to enable voice — PARA will talk you through everything!
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Microphone permission prompt — friendly overlay before native browser dialog */}
       {showMicPrompt && (
@@ -852,7 +896,8 @@ export default function ParasiteBot() {
 
       if (!muted && !noSpeak) {
         sigRef.current = { cancelled: false };
-        SpeechEngine.speak(reply, { rate:1.38, basePitch:1.55, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
+        // Use unlockAndSpeak — safe whether or not voice is already unlocked
+        SpeechEngine.unlockAndSpeak(reply, { rate:1.38, basePitch:1.55, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
       } else {
         setTimeout(() => { setSpeaking(false); setMood('idle'); }, 500);
       }
