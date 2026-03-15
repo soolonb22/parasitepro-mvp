@@ -448,11 +448,19 @@ function IntroScreen({ userName, muted, onDone }) {
           <div style={{ width:8, height:8, borderRadius:'50%', background:'#f59e0b', boxShadow:'0 0 10px #f59e0b', animation:'para-pulse 1.8s ease-in-out infinite' }}/>
           <span style={{ color:'#f59e0b', fontFamily:'monospace', fontSize:12, letterSpacing:'0.18em', fontWeight:600 }}>PARASITEPRO · PARA</span>
         </div>
-        {skippable && (
-          <button onClick={skip} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color:'#9ca3af', borderRadius:8, padding:'5px 13px', fontSize:12, cursor:'pointer', fontFamily:'inherit' }}>
-            Skip ×
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <button
+            onClick={() => { const nm = !muted; if (nm) SpeechEngine.cancel(); }}
+            title={muted ? 'Unmute' : 'Mute'}
+            style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.07)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(217,119,6,0.4)'}`, color:muted?'#475569':'#f59e0b', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
+            {muted ? '🔇' : '🔊'}
           </button>
-        )}
+          {skippable && (
+            <button onClick={skip} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color:'#9ca3af', borderRadius:8, padding:'5px 13px', fontSize:12, cursor:'pointer', fontFamily:'inherit' }}>
+              Skip ×
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -671,11 +679,25 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }) {
                   <span style={{ fontSize:12 }}>🤖</span>
                 </div>
               )}
-              <div style={{ maxWidth:'84%', padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(217,119,6,0.16)':'rgba(30,41,59,0.9)', border:m.role==='user'?'1px solid rgba(217,119,6,0.3)':'1px solid rgba(255,255,255,0.06)' }}>
-                {m.role==='user'
-                  ? <p style={{ color:'#f1f5f9', fontSize:14, lineHeight:1.58, margin:0, whiteSpace:'pre-wrap' }}>{m.content}</p>
-                  : <MarkdownText text={m.content}/>
-                }
+              <div style={{ maxWidth:'84%' }}>
+                <div style={{ padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(217,119,6,0.16)':'rgba(30,41,59,0.9)', border:m.role==='user'?'1px solid rgba(217,119,6,0.3)':'1px solid rgba(255,255,255,0.06)' }}>
+                  {m.role==='user'
+                    ? <p style={{ color:'#f1f5f9', fontSize:14, lineHeight:1.58, margin:0, whiteSpace:'pre-wrap' }}>{m.content}</p>
+                    : <MarkdownText text={m.content}/>
+                  }
+                </div>
+                {m.role==='assistant' && (
+                  <button
+                    onClick={() => {
+                      SpeechEngine.unlockAndSpeak(m.content, { rate:1.38, basePitch:1.55 });
+                    }}
+                    title="Listen to this message"
+                    style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.color='#f59e0b'}
+                    onMouseLeave={e => e.currentTarget.style.color='#475569'}>
+                    🔊
+                  </button>
+                )}
               </div>
             </div>
             {m.role==='assistant' && idx===lastAssistantIdx && !loading && m.suggestions && (
@@ -894,13 +916,9 @@ export default function ParasiteBot() {
       setLoading(false); setMood('talking'); setSpeaking(true);
       setMessages(prev => [...prev, { role:'assistant', content:reply, suggestions, id:++idRef.current }]);
 
-      if (!muted && !noSpeak) {
-        sigRef.current = { cancelled: false };
-        // Use unlockAndSpeak — safe whether or not voice is already unlocked
-        SpeechEngine.unlockAndSpeak(reply, { rate:1.38, basePitch:1.55, signal:sigRef.current, onDone:()=>{ setSpeaking(false); setMood('idle'); } });
-      } else {
-        setTimeout(() => { setSpeaking(false); setMood('idle'); }, 500);
-      }
+      // Voice plays only when user taps the 🔊 button on the message
+      // (auto-play after async API call is blocked by all browsers)
+      setTimeout(() => { setSpeaking(false); setMood('idle'); }, 400);
     } catch {
       setLoading(false); setMood('concerned');
       setMessages(prev => [...prev, { role:'assistant', content:"Couldn't connect just then. Check your connection and try again.", suggestions:['Try again'], id:++idRef.current }]);
