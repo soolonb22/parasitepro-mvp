@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 import axios from 'axios';
-import ParaChatbot from '../components/ParaChatbot';
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
@@ -342,8 +341,7 @@ const SignupPage = () => {
           </p>
         </div>
       </div>
-      <ParaChatbot page="signup" />
-    </div>
+</div>
   );
 };
 
