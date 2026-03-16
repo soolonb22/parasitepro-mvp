@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Block private/app pages from indexing
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /analysis/
+Disallow: /settings
+Disallow: /admin
+Disallow: /login
+Disallow: /signup
+Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /verify-email
+Disallow: /payment-success
+
+Sitemap: https://notworms.com/sitemap.xml
