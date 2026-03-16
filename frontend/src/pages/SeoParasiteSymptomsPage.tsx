@@ -71,11 +71,11 @@ const SeoParasiteSymptomsPage = () => {
         <title>Parasite Symptoms in Humans - Signs of Parasitic Infection | ParasitePro</title>
         <meta name="description" content="Learn about common parasite symptoms in humans including digestive issues, fatigue, skin problems, and more. Educational guide to understanding signs of parasitic infection." />
         <meta name="keywords" content="parasite symptoms, signs of parasites in humans, parasitic infection symptoms, intestinal parasite symptoms, how to know if you have parasites, parasite symptoms in adults" />
-        <link rel="canonical" href="https://parasitepro.com/parasite-symptoms" />
+        <link rel="canonical" href="https://notworms.com/parasite-symptoms" />
         <meta property="og:title" content="Parasite Symptoms in Humans - Signs of Parasitic Infection | ParasitePro" />
         <meta property="og:description" content="Wondering if you have parasites? Learn about common symptoms and signs of parasitic infections in humans." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://parasitepro.com/parasite-symptoms" />
+        <meta property="og:url" content="https://notworms.com/parasite-symptoms" />
         <meta property="og:site_name" content="ParasitePro" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Parasite Symptoms in Humans Guide" />
@@ -431,7 +431,7 @@ const SeoParasiteSymptomsPage = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link 
-                to="/pricing" 
+                to="/signup" 
                 style={{ 
                   backgroundColor: 'white', 
                   color: '#059669', 

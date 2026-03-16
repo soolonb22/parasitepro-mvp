@@ -57,11 +57,11 @@ const SeoPinwormPage = () => {
         <title>Pinworm Pictures & Symptoms - What You Need to Know | ParasitePro</title>
         <meta name="description" content="Learn about pinworm symptoms, what they look like, and how to identify them. Educational guide with supportive information for worried individuals and parents." />
         <meta name="keywords" content="pinworm pictures, pinworm symptoms, what do pinworms look like, pinworm infection, threadworm, enterobius vermicularis, pinworms in stool, pinworm treatment" />
-        <link rel="canonical" href="https://parasitepro.com/pinworm-symptoms" />
+        <link rel="canonical" href="https://notworms.com/pinworm-treatment" />
         <meta property="og:title" content="Pinworm Pictures & Symptoms - Understanding Pinworm Infections | ParasitePro" />
         <meta property="og:description" content="Concerned about pinworms? Get calm, educational information about pinworm symptoms, identification, and what to do next." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://parasitepro.com/pinworm-symptoms" />
+        <meta property="og:url" content="https://notworms.com/pinworm-treatment" />
         <meta property="og:site_name" content="ParasitePro" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Pinworm Pictures & Symptoms Guide" />
@@ -401,7 +401,7 @@ const SeoPinwormPage = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link 
-                to="/pricing" 
+                to="/signup" 
                 style={{ 
                   backgroundColor: 'white', 
                   color: '#7c3aed', 

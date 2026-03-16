@@ -64,11 +64,11 @@ const SeoDogWormsPage = () => {
         <title>Dog Worms - What Pet Owners Need to Know | ParasitePro</title>
         <meta name="description" content="Worried about worms in your dog's stool? Get calm, supportive information about what you might be seeing. Learn common types and when to visit your vet." />
         <meta name="keywords" content="dog worms, worms in dog stool, dog worm pictures, roundworms in dogs, tapeworms in dogs, worms in dog poop, dog parasites, puppy worms, what do dog worms look like" />
-        <link rel="canonical" href="https://parasitepro.com/dog-worms" />
+        <link rel="canonical" href="https://notworms.com/dog-worms" />
         <meta property="og:title" content="Dog Worms - Understanding Worms in Your Dog's Stool | ParasitePro" />
         <meta property="og:description" content="Concerned about something in your dog's stool? Get supportive, educational information about dog worms and AI-powered visual analysis." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://parasitepro.com/dog-worms" />
+        <meta property="og:url" content="https://notworms.com/dog-worms" />
         <meta property="og:site_name" content="ParasitePro" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Dog Worms - What Pet Owners Need to Know" />
@@ -81,11 +81,11 @@ const SeoDogWormsPage = () => {
             "@type": "WebPage",
             "name": "Dog Worms - Identifying Worms in Dog Stool",
             "description": "Educational resource helping pet owners understand worms in dogs with supportive guidance and AI-powered visual analysis",
-            "url": "https://parasitepro.com/dog-worms",
+            "url": "https://notworms.com/dog-worms",
             "publisher": {
               "@type": "Organization",
               "name": "ParasitePro",
-              "url": "https://parasitepro.com"
+              "url": "https://notworms.com"
             },
             "mainEntity": {
               "@type": "FAQPage",
@@ -113,7 +113,7 @@ const SeoDogWormsPage = () => {
             "publisher": {
               "@type": "Organization",
               "name": "ParasitePro",
-              "url": "https://parasitepro.com"
+              "url": "https://notworms.com"
             },
             "datePublished": "2024-01-15",
             "dateModified": new Date().toISOString().split('T')[0]
@@ -439,7 +439,7 @@ const SeoDogWormsPage = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link 
-                to="/pricing" 
+                to="/signup" 
                 style={{ 
                   backgroundColor: 'white', 
                   color: '#0d9488', 

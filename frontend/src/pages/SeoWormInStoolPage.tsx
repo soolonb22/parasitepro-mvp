@@ -57,11 +57,11 @@ const SeoWormInStoolPage = () => {
         <title>Worm in Stool Picture - What You Might Be Seeing | ParasitePro</title>
         <meta name="description" content="Found something in your stool that looks like a worm? Get calm, supportive information about what you might be seeing. Educational AI analysis for peace of mind. No medical advice." />
         <meta name="keywords" content="worm in stool picture, what does a worm look like in stool, worm in poop picture, parasite in stool, stool analysis, intestinal worms pictures, white worm in stool, thin worm in stool" />
-        <link rel="canonical" href="https://parasitepro.com/worm-in-stool-picture" />
+        <link rel="canonical" href="https://notworms.com/worm-in-stool" />
         <meta property="og:title" content="Worm in Stool Picture - Understanding What You See | ParasitePro" />
         <meta property="og:description" content="Concerned about something in your stool? Get calm, educational information and AI-powered visual analysis to help you understand what you might be seeing." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://parasitepro.com/worm-in-stool-picture" />
+        <meta property="og:url" content="https://notworms.com/worm-in-stool" />
         <meta property="og:site_name" content="ParasitePro" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Worm in Stool Picture - What You Might Be Seeing" />
@@ -74,11 +74,11 @@ const SeoWormInStoolPage = () => {
             "@type": "WebPage",
             "name": "Worm in Stool Picture - Understanding What You See",
             "description": "Educational resource helping people understand stool observations with supportive, trauma-informed guidance and AI-powered visual analysis",
-            "url": "https://parasitepro.com/worm-in-stool-picture",
+            "url": "https://notworms.com/worm-in-stool-picture",
             "publisher": {
               "@type": "Organization",
               "name": "ParasitePro",
-              "url": "https://parasitepro.com"
+              "url": "https://notworms.com"
             },
             "mainEntity": {
               "@type": "FAQPage",
@@ -106,7 +106,7 @@ const SeoWormInStoolPage = () => {
             "publisher": {
               "@type": "Organization",
               "name": "ParasitePro",
-              "url": "https://parasitepro.com"
+              "url": "https://notworms.com"
             },
             "datePublished": "2024-01-15",
             "dateModified": new Date().toISOString().split('T')[0]
@@ -428,7 +428,7 @@ const SeoWormInStoolPage = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link 
-                to="/pricing" 
+                to="/signup" 
                 style={{ 
                   backgroundColor: 'white', 
                   color: '#0d9488', 

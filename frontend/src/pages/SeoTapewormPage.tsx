@@ -55,11 +55,11 @@ const SeoTapewormPage = () => {
         <title>Tapeworm in Stool - Pictures, Symptoms & Information | ParasitePro</title>
         <meta name="description" content="Learn what tapeworms look like in stool, common symptoms, causes, and what to do. Educational guide with supportive information about tapeworm infections." />
         <meta name="keywords" content="tapeworm in stool, tapeworm pictures, tapeworm symptoms, what does tapeworm look like, tapeworm in poop, tapeworm infection, tapeworm segments, how to know if you have tapeworm" />
-        <link rel="canonical" href="https://parasitepro.com/tapeworm-in-stool" />
+        <link rel="canonical" href="https://notworms.com/tapeworm-symptoms" />
         <meta property="og:title" content="Tapeworm in Stool - Pictures, Symptoms & Information | ParasitePro" />
         <meta property="og:description" content="Concerned about tapeworms? Get calm, educational information about what they look like, symptoms, and what steps to take." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://parasitepro.com/tapeworm-in-stool" />
+        <meta property="og:url" content="https://notworms.com/tapeworm-symptoms" />
         <meta property="og:site_name" content="ParasitePro" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Tapeworm in Stool Guide" />
@@ -437,7 +437,7 @@ const SeoTapewormPage = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link 
-                to="/pricing" 
+                to="/signup" 
                 style={{ 
                   backgroundColor: 'white', 
                   color: '#0369a1', 

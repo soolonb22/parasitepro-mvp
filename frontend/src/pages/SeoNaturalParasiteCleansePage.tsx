@@ -57,11 +57,11 @@ const SeoNaturalParasiteCleansePage = () => {
         <title>Natural Parasite Cleanse - Holistic Approaches | ParasitePro</title>
         <meta name="description" content="Learn about natural parasite cleanse methods including herbs, foods, and holistic approaches. Educational guide to understanding natural anti-parasitic remedies." />
         <meta name="keywords" content="natural parasite cleanse, parasite cleanse herbs, anti-parasitic foods, holistic parasite treatment, herbal parasite cleanse, natural remedies for parasites, parasite detox" />
-        <link rel="canonical" href="https://parasitepro.com/natural-parasite-cleanse" />
+        <link rel="canonical" href="https://notworms.com/natural-parasite-cleanse" />
         <meta property="og:title" content="Natural Parasite Cleanse - Holistic Approaches | ParasitePro" />
         <meta property="og:description" content="Explore natural and holistic approaches to parasite cleansing including herbs, foods, and traditional remedies." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://parasitepro.com/natural-parasite-cleanse" />
+        <meta property="og:url" content="https://notworms.com/natural-parasite-cleanse" />
         <meta property="og:site_name" content="ParasitePro" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Natural Parasite Cleanse Guide" />
@@ -405,7 +405,7 @@ const SeoNaturalParasiteCleansePage = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link 
-                to="/pricing" 
+                to="/signup" 
                 style={{ 
                   backgroundColor: 'white', 
                   color: '#16a34a', 
