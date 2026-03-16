@@ -783,7 +783,10 @@ function getPageGuidance(path: string, isFirst: boolean, name: string, credits: 
   if (path.startsWith('/analysis/')) return { msg:`Your image is being analysed right now! ⏱️ Our AI is checking **visual patterns** and comparing them against thousands of documented cases. This usually takes under 60 seconds. I'll be here when your results come in!`, suggestions:['What will the report show?','How accurate is the AI?'] };
   if (path.startsWith('/analysis-results') || path.includes('/results')) return { msg:`Your report is ready, ${n}! 🔬 I can help you understand **any section** of it — the confidence score, urgency level, what the findings mean, or next steps. Just ask me. And remember: always take these results to your GP to confirm.`, suggestions:['Explain the confidence score','What does urgency level mean?','Should I see a GP?','What are differential diagnoses?'] };
   if (path === '/pricing') return { msg:`Hey ${n}! Quick explainer on how credits work 💡 **1 credit = 1 full AI analysis**. Credits never expire, so buy whenever you're ready. We're still in beta — prices are lower right now than they'll be at launch. Lock them in while you can!`, suggestions:['What does a credit include?','Is there a free option?','Tell me about beta pricing'] };
-  if (path === '/dashboard') return { msg:`Welcome back, ${n}! 🚀 You've got **${c} credit${c!==1?'s':''} ready to use**. Want to run a new analysis, check past results, or just ask me something?`, suggestions:['Start a new analysis','Take me on a tour','How do credits work?'] };
+  if (path === '/dashboard') {
+    if (c === 0) return { msg:`Hey ${n}! You're out of credits — head to Pricing to top up. Credits never expire so grab a bundle whenever you're ready! 💳`, suggestions:['Take me to Pricing','How much do credits cost?','What does a credit include?'] };
+    return { msg:`Hey ${n}! 👋 You've got **${c} credit${c!==1?'s':''} ready to go**. I can walk you through uploading your first sample, explain what the AI looks for, or answer any questions!`, suggestions:['Walk me through uploading','What can the AI detect?','How do I get the best photo?','How do credits work?'] };
+  }
   return null;
 }
 
@@ -809,7 +812,15 @@ export default function ParasiteBot() {
   const isProtected = PROTECTED.some(p => location.pathname.startsWith(p));
   const introKey = `para_intro_done_${user?.id || 'guest'}`;
 
-  useEffect(() => { SpeechEngine.init(); }, []);
+  useEffect(() => {
+    SpeechEngine.init();
+    // Allow any component to open PARA via custom event
+    const handler = () => {
+      if (phase === 'chat') setChatOpen(true);
+    };
+    window.addEventListener('para:open', handler);
+    return () => window.removeEventListener('para:open', handler);
+  }, [phase]);
 
   useEffect(() => {
     if (!isAuthenticated || !isProtected) { setPhase('hidden'); return; }
@@ -824,7 +835,12 @@ export default function ParasiteBot() {
     if (isFirst) sessionStorage.setItem(pageKey, '1');
     const guidance = getPageGuidance(currentPath, isFirst, user?.firstName || '', user?.imageCredits ?? 0);
     if (guidance) {
-      setTimeout(() => { addBot(guidance.msg, guidance.suggestions); setChatOpen(true); }, 600);
+      // Dashboard always opens chat — it's the home base
+      const shouldAutoOpen = currentPath === '/dashboard' || isFirst;
+      setTimeout(() => {
+        addBot(guidance.msg, guidance.suggestions);
+        if (shouldAutoOpen) setChatOpen(true);
+      }, 700);
       return;
     }
     if (isFirst) sendToApi(`[SYSTEM: User navigated to ${currentPath}. Short warm greeting. Use name.`, [], 'PAGE_ARRIVE', true, false);
