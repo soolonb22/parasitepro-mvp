@@ -155,19 +155,19 @@ function MarkdownText({ text }) {
     const parts = str.split(/(\*\*[^*]+\*\*)/g);
     return parts.map((p, i) =>
       p.startsWith('**') && p.endsWith('**')
-        ? <strong key={i} style={{ color: '#f59e0b', fontWeight: 700 }}>{p.slice(2, -2)}</strong>
+        ? <strong key={i} style={{ color: '#2dd4bf', fontWeight: 700 }}>{p.slice(2, -2)}</strong>
         : p
     );
   };
   for (const line of lines) {
     if (!line.trim()) { elements.push(<div key={key++} style={{ height: '0.5em' }} />); continue; }
     if (/^[-•*]\s/.test(line.trim())) {
-      elements.push(<div key={key++} style={{ display:'flex', gap:'0.4em', alignItems:'flex-start', marginBottom:'0.15em' }}><span style={{ color:'#f59e0b', flexShrink:0, marginTop:'0.12em' }}>•</span><span>{renderInline(line.trim().replace(/^[-•*]\s/, ''))}</span></div>);
+      elements.push(<div key={key++} style={{ display:'flex', gap:'0.4em', alignItems:'flex-start', marginBottom:'0.15em' }}><span style={{ color:'#2dd4bf', flexShrink:0, marginTop:'0.12em' }}>•</span><span>{renderInline(line.trim().replace(/^[-•*]\s/, ''))}</span></div>);
       continue;
     }
     if (/^\d+\.\s/.test(line.trim())) {
       const num = line.trim().match(/^(\d+)\.\s/)[1];
-      elements.push(<div key={key++} style={{ display:'flex', gap:'0.5em', alignItems:'flex-start', marginBottom:'0.15em' }}><span style={{ color:'#f59e0b', flexShrink:0, fontWeight:600, minWidth:'1.2em' }}>{num}.</span><span>{renderInline(line.trim().replace(/^\d+\.\s/, ''))}</span></div>);
+      elements.push(<div key={key++} style={{ display:'flex', gap:'0.5em', alignItems:'flex-start', marginBottom:'0.15em' }}><span style={{ color:'#2dd4bf', flexShrink:0, fontWeight:600, minWidth:'1.2em' }}>{num}.</span><span>{renderInline(line.trim().replace(/^\d+\.\s/, ''))}</span></div>);
       continue;
     }
     elements.push(<p key={key++} style={{ margin:'0 0 0.3em 0', lineHeight:1.62 }}>{renderInline(line)}</p>);
@@ -207,46 +207,74 @@ function Robot({ mood, speaking, size = 1 }) {
     setArm(0);
   }, [mood]);
 
-  const eyeH  = blink ? 1.5 : mood==='surprised'?14 : mood==='happy'?8 : mood==='curious'?12 : 10;
-  const eyeY  = mood==='curious' ? 34 : 35;
-  const eyeC  = mood==='concerned'?'#ef4444' : mood==='happy'?'#10b981' : mood==='thinking'?'#a78bfa' : mood==='curious'?'#38bdf8' : '#f59e0b';
-  const ledC  = mood==='thinking'?'#a78bfa' : mood==='happy'?'#10b981' : mood==='concerned'?'#ef4444' : mood==='curious'?'#38bdf8' : '#f59e0b';
-  const headBg = mood==='concerned'?'#1e3a5f' : mood==='happy'?'#0d2a1a' : mood==='thinking'?'#1a1a3e' : '#1e293b';
-  const mouths = ['M 43 108 Q 50 111 57 108','M 43 107 Q 50 115 57 107','M 42 107 Q 50 118 58 107','M 43 108 Q 50 113 57 108','M 44 109 Q 50 112 56 109'];
-  const mp = speaking ? mouths[mouth] : (mood==='concerned' ? 'M 43 110 Q 50 107 57 110' : mouths[0]);
+  const eyeH  = blink ? 2 : mood==='surprised'?16 : mood==='happy'?10 : mood==='curious'?13 : 12;
+  const eyeY  = mood==='curious' ? 33 : 34;
+  const eyeC  = mood==='concerned'?'#f87171' : mood==='happy'?'#34d399' : mood==='thinking'?'#c4b5fd' : mood==='curious'?'#67e8f9' : '#0d9488';
+  const ledC  = mood==='thinking'?'#c4b5fd' : mood==='happy'?'#34d399' : mood==='concerned'?'#f87171' : mood==='curious'?'#67e8f9' : '#0d9488';
+  const headBg = mood==='concerned'?'#1e3050' : mood==='happy'?'#0d2820' : mood==='thinking'?'#1e1b40' : '#0f2335';
+  const mouths = ['M 41 108 Q 50 114 59 108','M 41 107 Q 50 116 59 107','M 40 107 Q 50 119 60 107','M 41 108 Q 50 114 59 108','M 42 109 Q 50 113 58 109'];
+  const mp = speaking ? mouths[mouth] : (mood==='concerned' ? 'M 42 111 Q 50 107 58 111' : 'M 41 108 Q 50 114 59 108');
   const armRot = (mood==='waving'||mood==='happy') ? -22+armOff : 0;
+  const showCheeks = mood==='happy' || mood==='waving' || mood==='talking' || speaking;
 
   return (
     <svg width={100*size} height={162*size} viewBox="0 0 100 162"
-      style={{ overflow:'visible', filter:`drop-shadow(0 0 ${speaking?22:10}px ${eyeC}60)`, transition:'filter 0.3s' }}>
-      <line x1="50" y1="10" x2="50" y2="23" stroke="#475569" strokeWidth="2.5" strokeLinecap="round"/>
-      <circle cx="50" cy="7" r="5.5" fill={antGlow?ledC:'#1e293b'} style={{ filter:antGlow?`drop-shadow(0 0 8px ${ledC})`:'none', transition:'fill 0.4s,filter 0.4s' }}/>
-      <rect x="24" y="22" width="52" height="50" rx="11" fill={headBg} stroke="#334155" strokeWidth="1.5" style={{ transition:'fill 0.4s' }}/>
-      <rect x="15" y="33" width="11" height="22" rx="5" fill="#0f172a" stroke="#334155" strokeWidth="1"/>
-      <circle cx="20.5" cy="44" r="3.5" fill={ledC} opacity="0.9" style={{ filter:`drop-shadow(0 0 5px ${ledC})`, transition:'fill 0.4s' }}/>
-      <rect x="74" y="33" width="11" height="22" rx="5" fill="#0f172a" stroke="#334155" strokeWidth="1"/>
-      <circle cx="79.5" cy="44" r="3.5" fill={ledC} opacity="0.9" style={{ filter:`drop-shadow(0 0 5px ${ledC})`, transition:'fill 0.4s' }}/>
-      <rect x="31" y={eyeY} width="15" height={eyeH} rx="3.5" fill={eyeC} style={{ filter:`drop-shadow(0 0 8px ${eyeC})`, transition:'height 0.08s,fill 0.3s' }}/>
-      <rect x="54" y={eyeY} width="15" height={eyeH} rx="3.5" fill={eyeC} style={{ filter:`drop-shadow(0 0 8px ${eyeC})`, transition:'height 0.08s,fill 0.3s' }}/>
-      {!blink && eyeH>3 && <><circle cx="37" cy={eyeY+2} r="2.5" fill="white" opacity="0.75"/><circle cx="60" cy={eyeY+2} r="2.5" fill="white" opacity="0.75"/></>}
-      {mood==='thinking' && [0,1,2].map((k,i) => <circle key={k} cx={36+i*14} cy="57" r="3.5" fill="#a78bfa" opacity={0.2+0.7*((mouth+i)%3===0?1:0)} style={{ transition:'opacity 0.18s' }}/>)}
-      {mood==='curious' && <path d="M 31 32 Q 38 29 46 32" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round"/>}
-      <path d={mp} fill="none" stroke={speaking?eyeC:'#64748b'} strokeWidth={speaking?3:2.2} strokeLinecap="round" style={{ filter:speaking?`drop-shadow(0 0 6px ${eyeC})`:'none', transition:'stroke 0.2s' }}/>
-      {(mood==='happy'||mood==='waving') && <><ellipse cx="29" cy="59" rx="5.5" ry="3.5" fill="#f87171" opacity="0.38"/><ellipse cx="71" cy="59" rx="5.5" ry="3.5" fill="#f87171" opacity="0.38"/></>}
-      <rect x="26" y="76" width="48" height="48" rx="9" fill="#0f172a" stroke="#334155" strokeWidth="1.5"/>
-      {[0,1,2].map(i => <circle key={i} cx={34+i*16} cy="90" r="5" fill={i===mouth%3?ledC:'#1e293b'} style={{ filter:i===mouth%3?`drop-shadow(0 0 6px ${ledC})`:'none', transition:'fill 0.14s' }}/>)}
-      <rect x="32" y="100" width="36" height="16" rx="5" fill="#1e293b" stroke="#334155" strokeWidth="1"/>
-      {[40,50,60].map(x => <line key={x} x1={x} y1="103" x2={x} y2="113" stroke={x===50?ledC:'#334155'} strokeWidth="1.2" opacity={x===50?0.6:1}/>)}
-      <g style={{ transformOrigin:'18px 78px', transform:`rotate(${armRot}deg)`, transition:'transform 0.32s ease-in-out' }}>
-        <rect x="10" y="78" width="16" height="34" rx="7" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
-        <circle cx="18" cy="116" r="6.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
+      style={{ overflow:'visible', filter:`drop-shadow(0 0 ${speaking?24:12}px ${eyeC}70)`, transition:'filter 0.3s' }}>
+      {/* Antenna */}
+      <line x1="50" y1="9" x2="50" y2="22" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" opacity="0.7"/>
+      <circle cx="50" cy="6" r="6" fill={antGlow?ledC:'#0a1f2e'} stroke={antGlow?ledC:'rgba(13,148,136,0.3)'} strokeWidth="1.5"
+        style={{ filter:antGlow?`drop-shadow(0 0 10px ${ledC})`:'none', transition:'fill 0.4s,filter 0.4s' }}/>
+      {antGlow && <circle cx="50" cy="6" r="3" fill="white" opacity="0.6"/>}
+      {/* Head — big round friendly */}
+      <rect x="20" y="20" width="60" height="56" rx="20" fill={headBg} stroke="rgba(13,148,136,0.4)" strokeWidth="1.5"
+        style={{ transition:'fill 0.4s', filter:'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}/>
+      <ellipse cx="38" cy="26" rx="14" ry="6" fill="white" opacity="0.04"/>
+      {/* Ear panels */}
+      <rect x="11" y="32" width="10" height="24" rx="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1"/>
+      <circle cx="16" cy="44" r="3.5" fill={ledC} opacity="0.85" style={{ filter:`drop-shadow(0 0 6px ${ledC})`, transition:'fill 0.4s' }}/>
+      <rect x="79" y="32" width="10" height="24" rx="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1"/>
+      <circle cx="84" cy="44" r="3.5" fill={ledC} opacity="0.85" style={{ filter:`drop-shadow(0 0 6px ${ledC})`, transition:'fill 0.4s' }}/>
+      {/* Eyes — big round friendly */}
+      <rect x="28" y={eyeY} width="18" height={eyeH} rx="5" fill={eyeC}
+        style={{ filter:`drop-shadow(0 0 10px ${eyeC})`, transition:'height 0.08s,fill 0.3s' }}/>
+      <rect x="54" y={eyeY} width="18" height={eyeH} rx="5" fill={eyeC}
+        style={{ filter:`drop-shadow(0 0 10px ${eyeC})`, transition:'height 0.08s,fill 0.3s' }}/>
+      {!blink && eyeH>3 && <>
+        <circle cx="34" cy={eyeY+2.5} r="3" fill="white" opacity="0.8"/>
+        <circle cx="60" cy={eyeY+2.5} r="3" fill="white" opacity="0.8"/>
+        <circle cx="35.5" cy={eyeY+1.5} r="1.2" fill="white" opacity="0.6"/>
+        <circle cx="61.5" cy={eyeY+1.5} r="1.2" fill="white" opacity="0.6"/>
+      </>}
+      {mood==='thinking' && [0,1,2].map((k,i) => <circle key={k} cx={35+i*15} cy="57" r="4" fill="#c4b5fd"
+        opacity={0.2+0.8*((mouth+i)%3===0?1:0)} style={{ transition:'opacity 0.18s' }}/>)}
+      {mood==='curious' && <path d="M 28 30 Q 37 26 46 30" fill="none" stroke="#67e8f9" strokeWidth="2.5" strokeLinecap="round"/>}
+      {/* Mouth */}
+      <path d={mp} fill="none" stroke={speaking?eyeC:'rgba(13,148,136,0.6)'}
+        strokeWidth={speaking?3.5:2.5} strokeLinecap="round"
+        style={{ filter:speaking?`drop-shadow(0 0 8px ${eyeC})`:'none', transition:'stroke 0.2s' }}/>
+      {/* Cheeks */}
+      <ellipse cx="27" cy="58" rx="6" ry="4" fill="#f472b6" opacity={showCheeks?0.35:0.12} style={{ transition:'opacity 0.4s' }}/>
+      <ellipse cx="73" cy="58" rx="6" ry="4" fill="#f472b6" opacity={showCheeks?0.35:0.12} style={{ transition:'opacity 0.4s' }}/>
+      {/* Body */}
+      <rect x="24" y="80" width="52" height="46" rx="14" fill="#0a1f2e" stroke="rgba(13,148,136,0.35)" strokeWidth="1.5"/>
+      <rect x="30" y="85" width="40" height="3" rx="1.5" fill="white" opacity="0.04"/>
+      {[0,1,2].map(i => <circle key={i} cx={34+i*16} cy="96" r="5.5"
+        fill={i===mouth%3?ledC:'#0f2335'}
+        style={{ filter:i===mouth%3?`drop-shadow(0 0 7px ${ledC})`:'none', transition:'fill 0.14s' }}/>)}
+      <rect x="30" y="107" width="40" height="13" rx="6" fill="#0f2335" stroke="rgba(13,148,136,0.2)" strokeWidth="1"/>
+      <path d="M 39 110 Q 50 115 61 110" fill="none" stroke={ledC} strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+      {/* Arms */}
+      <g style={{ transformOrigin:'16px 82px', transform:`rotate(${armRot}deg)`, transition:'transform 0.32s ease-in-out' }}>
+        <rect x="8" y="82" width="16" height="32" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
+        <circle cx="16" cy="118" r="7" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
       </g>
-      <rect x="74" y="78" width="16" height="34" rx="7" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
-      <circle cx="82" cy="116" r="6.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
-      <rect x="30" y="124" width="15" height="26" rx="6" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
-      <rect x="55" y="124" width="15" height="26" rx="6" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
-      <ellipse cx="37.5" cy="151" rx="10" ry="5.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
-      <ellipse cx="62.5" cy="151" rx="10" ry="5.5" fill="#0f172a" stroke="#334155" strokeWidth="1.2"/>
+      <rect x="76" y="82" width="16" height="32" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
+      <circle cx="84" cy="118" r="7" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
+      {/* Legs */}
+      <rect x="30" y="126" width="16" height="24" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
+      <rect x="54" y="126" width="16" height="24" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
+      <ellipse cx="38" cy="151" rx="11" ry="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.25)" strokeWidth="1.2"/>
+      <ellipse cx="62" cy="151" rx="11" ry="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.25)" strokeWidth="1.2"/>
     </svg>
   );
 }
@@ -438,15 +466,15 @@ function IntroScreen({ userName, muted, onDone }) {
     : ((script.length + intakeStep + 1) / totalSteps) * 100;
 
   return (
-    <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(8,12,20,0.97)', backdropFilter:'blur(20px)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', opacity:exitAnim?0:overlayIn?1:0, transition:exitAnim?'opacity 0.5s ease':'opacity 0.45s ease', userSelect:'none' }}>
+    <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(6,18,24,0.97)', backdropFilter:'blur(20px)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', opacity:exitAnim?0:overlayIn?1:0, transition:exitAnim?'opacity 0.5s ease':'opacity 0.45s ease', userSelect:'none' }}>
       {/* Ambient glow */}
-      <div style={{ position:'absolute', top:'26%', left:'50%', transform:'translateX(-50%)', width:640, height:640, borderRadius:'50%', background:'radial-gradient(ellipse,rgba(217,119,6,0.10) 0%,transparent 68%)', pointerEvents:'none' }}/>
+      <div style={{ position:'absolute', top:'26%', left:'50%', transform:'translateX(-50%)', width:640, height:640, borderRadius:'50%', background:'radial-gradient(ellipse,rgba(13,148,136,0.18) 0%,transparent 68%)', pointerEvents:'none' }}/>
 
       {/* Header bar */}
       <div style={{ position:'absolute', top:0, left:0, right:0, padding:'14px 22px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom:'1px solid rgba(217,119,6,0.09)', zIndex:1 }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:8, height:8, borderRadius:'50%', background:'#f59e0b', boxShadow:'0 0 10px #f59e0b', animation:'para-pulse 1.8s ease-in-out infinite' }}/>
-          <span style={{ color:'#f59e0b', fontFamily:'monospace', fontSize:12, letterSpacing:'0.18em', fontWeight:600 }}>PARASITEPRO · PARA</span>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'#0d9488', boxShadow:'0 0 10px #0d9488', animation:'para-pulse 1.8s ease-in-out infinite' }}/>
+          <span style={{ color:'#2dd4bf', fontFamily:'monospace', fontSize:12, letterSpacing:'0.18em', fontWeight:600 }}>PARA · Your Guide</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <button
@@ -465,7 +493,7 @@ function IntroScreen({ userName, muted, onDone }) {
 
       {/* Progress bar */}
       <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:'rgba(217,119,6,0.1)' }}>
-        <div style={{ height:'100%', background:'linear-gradient(90deg,#d97706,#f59e0b)', width:`${overallProgress}%`, boxShadow:'0 0 8px #f59e0b', transition:'width 0.7s ease' }}/>
+        <div style={{ height:'100%', background:'linear-gradient(90deg,#0d9488,#2dd4bf)', width:`${overallProgress}%`, boxShadow:'0 0 8px #0d9488', transition:'width 0.7s ease' }}/>
       </div>
 
       {/* Robot + speech bubble */}
@@ -478,8 +506,8 @@ function IntroScreen({ userName, muted, onDone }) {
         </div>
 
         {phase === 'intro' && lineIdx >= 0 && (
-          <div style={{ position:'relative', background:'rgba(22,32,48,0.92)', border:`1px solid rgba(217,119,6,${speaking?'0.5':'0.22'})`, borderRadius:18, padding:'20px 28px', maxWidth:540, width:'100%', textAlign:'center', backdropFilter:'blur(10px)', boxShadow:speaking?'0 0 36px rgba(217,119,6,0.16)':'0 8px 32px rgba(0,0,0,0.4)', transition:'border-color 0.3s,box-shadow 0.4s', minHeight:76 }}>
-            <div style={{ position:'absolute', top:-11, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'11px solid transparent', borderRight:'11px solid transparent', borderBottom:`11px solid rgba(217,119,6,${speaking?'0.5':'0.22'})` }}/>
+          <div style={{ position:'relative', background:'rgba(22,32,48,0.92)', border:`1px solid rgba(13,148,136,${speaking?'0.7':'0.3'})`, borderRadius:18, padding:'20px 28px', maxWidth:540, width:'100%', textAlign:'center', backdropFilter:'blur(10px)', boxShadow:speaking?'0 0 36px rgba(13,148,136,0.25)':'0 8px 32px rgba(0,0,0,0.3)', transition:'border-color 0.3s,box-shadow 0.4s', minHeight:76 }}>
+            <div style={{ position:'absolute', top:-11, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'11px solid transparent', borderRight:'11px solid transparent', borderBottom:`11px solid rgba(13,148,136,${speaking?'0.7':'0.3'})` }}/>
             <p style={{ color:'#f1f5f9', fontSize:17, lineHeight:1.72, margin:0, fontWeight:400 }}>{currentText}</p>
           </div>
         )}
@@ -487,10 +515,10 @@ function IntroScreen({ userName, muted, onDone }) {
         {/* Feature card */}
         <div style={{ minHeight:60, width:'100%', maxWidth:440, display:'flex', alignItems:'center', justifyContent:'center' }}>
           {card && (
-            <div style={{ display:'flex', alignItems:'center', gap:16, background:'rgba(217,119,6,0.07)', border:'1px solid rgba(217,119,6,0.25)', borderRadius:14, padding:'13px 20px', width:'100%', opacity:cardIn?1:0, transform:cardIn?'translateY(0) scale(1)':'translateY(10px) scale(0.96)', transition:'all 0.38s cubic-bezier(0.34,1.3,0.64,1)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:16, background:'rgba(13,148,136,0.08)', border:'1px solid rgba(13,148,136,0.3)', borderRadius:16, padding:'13px 20px', width:'100%', opacity:cardIn?1:0, transform:cardIn?'translateY(0) scale(1)':'translateY(10px) scale(0.96)', transition:'all 0.38s cubic-bezier(0.34,1.3,0.64,1)' }}>
               <span style={{ fontSize:28 }}>{card.icon}</span>
               <div>
-                <div style={{ color:'#f59e0b', fontWeight:700, fontSize:13, marginBottom:2 }}>{card.title}</div>
+                <div style={{ color:'#2dd4bf', fontWeight:700, fontSize:13, marginBottom:2 }}>{card.title}</div>
                 <div style={{ color:'#94a3b8', fontSize:12 }}>{card.desc}</div>
               </div>
             </div>
@@ -501,8 +529,8 @@ function IntroScreen({ userName, muted, onDone }) {
         {phase === 'intake' && (
           <div style={{ width:'100%', maxWidth:480, opacity:intakePhraseIn?1:0, transform:intakePhraseIn?'translateY(0)':'translateY(12px)', transition:'all 0.38s ease', display:'flex', flexDirection:'column', gap:10 }}>
             {/* Intake question text */}
-            <div style={{ background:'rgba(22,32,48,0.92)', border:`1px solid rgba(217,119,6,${speaking?'0.5':'0.22'})`, borderRadius:18, padding:'18px 24px', textAlign:'center', position:'relative', marginBottom:4 }}>
-              <div style={{ position:'absolute', top:-11, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'11px solid transparent', borderRight:'11px solid transparent', borderBottom:`11px solid rgba(217,119,6,${speaking?'0.5':'0.22'})` }}/>
+            <div style={{ background:'rgba(22,32,48,0.92)', border:`1px solid rgba(13,148,136,${speaking?'0.7':'0.3'})`, borderRadius:18, padding:'18px 24px', textAlign:'center', position:'relative', marginBottom:4 }}>
+              <div style={{ position:'absolute', top:-11, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'11px solid transparent', borderRight:'11px solid transparent', borderBottom:`11px solid rgba(13,148,136,${speaking?'0.7':'0.3'})` }}/>
               <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:8 }}>
                 <span style={{ color:'#64748b', fontSize:11, fontFamily:'monospace', letterSpacing:'0.1em' }}>
                   QUESTION {intakeStep + 1} OF {INTAKE_QUESTIONS.length}
@@ -514,9 +542,9 @@ function IntroScreen({ userName, muted, onDone }) {
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
               {INTAKE_QUESTIONS[intakeStep]?.options.map(opt => (
                 <button key={opt} onClick={() => handleIntakeAnswer(opt)}
-                  style={{ background:'rgba(217,119,6,0.07)', border:'1px solid rgba(217,119,6,0.22)', color:'#e5c77a', borderRadius:12, padding:'12px 18px', fontSize:14, cursor:'pointer', textAlign:'left', transition:'all 0.16s', fontFamily:'inherit', lineHeight:1.4 }}
-                  onMouseEnter={e => { e.currentTarget.style.background='rgba(217,119,6,0.16)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.5)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background='rgba(217,119,6,0.07)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.22)'; }}>
+                  style={{ background:'rgba(13,148,136,0.08)', border:'1px solid rgba(13,148,136,0.3)', color:'#5eead4', borderRadius:14, padding:'12px 18px', fontSize:14, cursor:'pointer', textAlign:'left', transition:'all 0.16s', fontFamily:'inherit', lineHeight:1.4 }}
+                  onMouseEnter={e => { e.currentTarget.style.background='rgba(13,148,136,0.20)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.7)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background='rgba(13,148,136,0.08)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.3)'; }}>
                   {opt}
                 </button>
               ))}
@@ -532,14 +560,14 @@ function IntroScreen({ userName, muted, onDone }) {
             onClick={handleTapToStart}
             style={{
               display:'flex', flexDirection:'column', alignItems:'center', gap:14,
-              background:'rgba(217,119,6,0.12)', border:'2px solid rgba(217,119,6,0.55)',
+              background:'rgba(13,148,136,0.12)', border:'2px solid rgba(13,148,136,0.6)',
               borderRadius:24, padding:'28px 40px', cursor:'pointer', fontFamily:'inherit',
               transition:'all 0.18s', userSelect:'none'
             }}
-            onMouseEnter={e => { e.currentTarget.style.background='rgba(217,119,6,0.22)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.9)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background='rgba(217,119,6,0.12)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.55)'; }}>
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(13,148,136,0.22)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.9)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(13,148,136,0.12)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.6)'; }}>
             <span style={{ fontSize:42 }}>🔊</span>
-            <span style={{ color:'#f59e0b', fontSize:20, fontWeight:700, letterSpacing:'-0.01em' }}>Tap to hear PARA</span>
+            <span style={{ color:'#2dd4bf', fontSize:20, fontWeight:700, letterSpacing:'-0.01em' }}>Tap to meet PARA 👋</span>
             <span style={{ color:'#94a3b8', fontSize:13, textAlign:'center', lineHeight:1.5, maxWidth:220 }}>
               Tap once to enable voice — PARA will talk you through everything!
             </span>
@@ -552,13 +580,13 @@ function IntroScreen({ userName, muted, onDone }) {
         <div style={{ position:'absolute', inset:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(8,12,20,0.85)', backdropFilter:'blur(6px)' }}>
           <div style={{ background:'rgba(22,32,48,0.98)', border:'1px solid rgba(217,119,6,0.45)', borderRadius:20, padding:'32px 28px', maxWidth:360, textAlign:'center', boxShadow:'0 24px 60px rgba(0,0,0,0.6)' }}>
             <div style={{ fontSize:44, marginBottom:16 }}>🎙️</div>
-            <h3 style={{ color:'#f59e0b', fontSize:18, fontWeight:700, margin:'0 0 10px' }}>Can I use your mic?</h3>
+            <h3 style={{ color:'#2dd4bf', fontSize:18, fontWeight:700, margin:'0 0 10px' }}>Can I use your mic? 🎙️</h3>
             <p style={{ color:'#94a3b8', fontSize:14, lineHeight:1.65, margin:'0 0 24px' }}>
               So you can speak your answers instead of typing! I just need your microphone permission — it only takes a second.
             </p>
             <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
               <button onClick={handleMicRequest}
-                style={{ background:'linear-gradient(135deg,#d97706,#f59e0b)', border:'none', color:'#0f172a', borderRadius:12, padding:'13px 20px', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.15s' }}
+                style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:12, padding:'13px 20px', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.15s' }}
                 onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
                 onMouseLeave={e => e.currentTarget.style.opacity='1'}>
                 Yes! Enable microphone 🎙️
@@ -589,7 +617,7 @@ function IntroScreen({ userName, muted, onDone }) {
       <div style={{ position:'absolute', bottom:14, display:'flex', gap:7 }}>
         {[...script, ...INTAKE_QUESTIONS].map((_, i) => {
           const current = phase === 'intro' ? lineIdx : script.length + intakeStep;
-          return <div key={i} style={{ width:i===current?20:6, height:6, borderRadius:3, background:i<=current?'#f59e0b':'rgba(217,119,6,0.18)', boxShadow:i===current?'0 0 8px #f59e0b':'none', transition:'all 0.32s ease' }}/>;
+          return <div key={i} style={{ width:i===current?20:6, height:6, borderRadius:3, background:i<=current?'#0d9488':'rgba(13,148,136,0.2)', boxShadow:i===current?'0 0 8px #0d9488':'none', transition:'all 0.32s ease' }}/>;
         })}
       </div>
     </div>
@@ -605,9 +633,9 @@ function SuggestionChips({ suggestions, onSelect, disabled }) {
     <div style={{ display:'flex', flexWrap:'wrap', gap:7, marginTop:8, paddingLeft:31 }}>
       {suggestions.map((s, i) => (
         <button key={i} onClick={() => onSelect(s)}
-          style={{ background:'rgba(217,119,6,0.07)', border:'1px solid rgba(217,119,6,0.25)', color:'#d4a843', borderRadius:20, padding:'5px 13px', fontSize:12.5, cursor:'pointer', fontFamily:'inherit', transition:'all 0.15s', whiteSpace:'nowrap', lineHeight:1.4 }}
-          onMouseEnter={e => { e.currentTarget.style.background='rgba(217,119,6,0.18)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.55)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background='rgba(217,119,6,0.07)'; e.currentTarget.style.borderColor='rgba(217,119,6,0.25)'; }}>
+          style={{ background:'rgba(13,148,136,0.08)', border:'1px solid rgba(13,148,136,0.3)', color:'#5eead4', borderRadius:20, padding:'5px 13px', fontSize:12.5, cursor:'pointer', fontFamily:'inherit', transition:'all 0.15s', whiteSpace:'nowrap', lineHeight:1.4 }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(13,148,136,0.20)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.6)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(13,148,136,0.08)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.3)'; }}>
           {s}
         </button>
       ))}
@@ -648,11 +676,11 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }) {
   const panelWidth = 'min(400px, calc(100vw - 40px))';
 
   return (
-    <div style={{ position:'fixed', bottom:112, right:20, zIndex:9990, width:panelWidth, maxHeight:'76vh', background:'rgba(12,18,30,0.98)', border:'1px solid rgba(217,119,6,0.3)', borderRadius:18, boxShadow:'0 28px 72px rgba(0,0,0,0.7)', display:'flex', flexDirection:'column', transform:open?'translateY(0) scale(1)':'translateY(20px) scale(0.94)', opacity:open?1:0, pointerEvents:open?'all':'none', transition:'all 0.28s cubic-bezier(0.34,1.3,0.64,1)', overflow:'hidden' }}>
-      <div style={{ padding:'12px 16px', borderBottom:'1px solid rgba(217,119,6,0.12)', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(217,119,6,0.04)', flexShrink:0 }}>
+    <div style={{ position:'fixed', bottom:112, right:20, zIndex:9990, width:panelWidth, maxHeight:'76vh', background:'rgba(8,20,28,0.98)', border:'1px solid rgba(13,148,136,0.35)', borderRadius:20, boxShadow:'0 28px 72px rgba(0,0,0,0.7)', display:'flex', flexDirection:'column', transform:open?'translateY(0) scale(1)':'translateY(20px) scale(0.94)', opacity:open?1:0, pointerEvents:open?'all':'none', transition:'all 0.28s cubic-bezier(0.34,1.3,0.64,1)', overflow:'hidden' }}>
+      <div style={{ padding:'12px 16px', borderBottom:'1px solid rgba(13,148,136,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(13,148,136,0.05)', flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', gap:9 }}>
           <div style={{ width:8, height:8, borderRadius:'50%', background:'#10b981', boxShadow:'0 0 7px #10b981' }}/>
-          <span style={{ color:'#f1f5f9', fontWeight:700, fontSize:14 }}>PARA</span>
+          <span style={{ color:'#2dd4bf', fontWeight:700, fontSize:14 }}>PARA 👋</span>
           <span style={{ color:'#475569', fontSize:12 }}>· ParasitePro Guide</span>
         </div>
         <div style={{ display:'flex', gap:4 }}>
@@ -670,17 +698,17 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }) {
         </div>
       </div>
 
-      <div style={{ flex:1, overflowY:'auto', padding:'14px 14px 8px', display:'flex', flexDirection:'column', gap:12, scrollbarWidth:'thin', scrollbarColor:'rgba(217,119,6,0.2) transparent' }}>
+      <div style={{ flex:1, overflowY:'auto', padding:'14px 14px 8px', display:'flex', flexDirection:'column', gap:12, scrollbarWidth:'thin', scrollbarColor:'rgba(13,148,136,0.25) transparent' }}>
         {messages.map((m, idx) => (
           <div key={m.id}>
             <div style={{ display:'flex', justifyContent:m.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:7 }}>
               {m.role==='assistant' && (
-                <div style={{ width:24, height:24, borderRadius:'50%', background:'rgba(217,119,6,0.15)', border:'1px solid rgba(217,119,6,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginBottom:2 }}>
+                <div style={{ width:24, height:24, borderRadius:'50%', background:'rgba(13,148,136,0.15)', border:'1px solid rgba(13,148,136,0.35)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginBottom:2 }}>
                   <span style={{ fontSize:12 }}>🤖</span>
                 </div>
               )}
               <div style={{ maxWidth:'84%' }}>
-                <div style={{ padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(217,119,6,0.16)':'rgba(30,41,59,0.9)', border:m.role==='user'?'1px solid rgba(217,119,6,0.3)':'1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(13,148,136,0.18)':'rgba(15,32,46,0.95)', border:m.role==='user'?'1px solid rgba(13,148,136,0.4)':'1px solid rgba(13,148,136,0.1)' }}>
                   {m.role==='user'
                     ? <p style={{ color:'#f1f5f9', fontSize:14, lineHeight:1.58, margin:0, whiteSpace:'pre-wrap' }}>{m.content}</p>
                     : <MarkdownText text={m.content}/>
@@ -707,12 +735,12 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }) {
         ))}
         {loading && (
           <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-            <div style={{ width:24, height:24, borderRadius:'50%', background:'rgba(217,119,6,0.15)', border:'1px solid rgba(217,119,6,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <div style={{ width:24, height:24, borderRadius:'50%', background:'rgba(13,148,136,0.15)', border:'1px solid rgba(13,148,136,0.35)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               <span style={{ fontSize:12 }}>🤖</span>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 14px', background:'rgba(30,41,59,0.9)', border:'1px solid rgba(255,255,255,0.06)', borderRadius:'16px 16px 16px 4px' }}>
               <div style={{ display:'flex', gap:5 }}>
-                {[0,1,2].map(i => <div key={i} style={{ width:7, height:7, borderRadius:'50%', background:'#f59e0b', animation:`para-bounce 1.1s ease-in-out ${i*0.16}s infinite` }}/>)}
+                {[0,1,2].map(i => <div key={i} style={{ width:7, height:7, borderRadius:'50%', background:'#0d9488', animation:`para-bounce 1.1s ease-in-out ${i*0.16}s infinite` }}/>)}
               </div>
               <span style={{ color:'#64748b', fontSize:12 }}>PARA is thinking…</span>
             </div>
@@ -729,13 +757,13 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }) {
           onKeyDown={e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); submit(); } }}
           placeholder="Ask PARA anything…"
           rows={1}
-          style={{ flex:1, background:'rgba(25,38,58,0.9)', border:'1px solid rgba(217,119,6,0.18)', borderRadius:11, color:'#f1f5f9', fontSize:14, padding:'9px 13px', resize:'none', outline:'none', lineHeight:1.45, overflow:'hidden', fontFamily:'inherit', transition:'border-color 0.2s' }}
-          onFocus={e => e.target.style.borderColor='rgba(217,119,6,0.45)'}
-          onBlur={e => e.target.style.borderColor='rgba(217,119,6,0.18)'}
+          style={{ flex:1, background:'rgba(25,38,58,0.9)', border:'1px solid rgba(13,148,136,0.25)', borderRadius:12, color:'#f1f5f9', fontSize:14, padding:'9px 13px', resize:'none', outline:'none', lineHeight:1.45, overflow:'hidden', fontFamily:'inherit', transition:'border-color 0.2s' }}
+          onFocus={e => e.target.style.borderColor='rgba(13,148,136,0.6)'}
+          onBlur={e => e.target.style.borderColor='rgba(13,148,136,0.25)'}
         />
         <button onClick={submit} disabled={!input.trim()||loading}
-          style={{ width:38, height:38, borderRadius:10, flexShrink:0, background:input.trim()?'#f59e0b':'rgba(245,158,11,0.14)', border:'none', cursor:input.trim()?'pointer':'default', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', transform:input.trim()?'scale(1.04)':'scale(1)' }}>
-          <Send size={15} color={input.trim()?'#0f172a':'#475569'}/>
+          style={{ width:38, height:38, borderRadius:10, flexShrink:0, background:input.trim()?'#0d9488':'rgba(13,148,136,0.12)', border:'none', cursor:input.trim()?'pointer':'default', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', transform:input.trim()?'scale(1.04)':'scale(1)' }}>
+          <Send size={15} color={input.trim()?'white':'#475569'}/>
         </button>
       </div>
     </div>
@@ -749,7 +777,7 @@ function FloatingBot({ mood, speaking, muted, chatOpen, onToggleChat, onToggleMu
   return (
     <div style={{ position:'fixed', bottom:18, right:18, zIndex:9991, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
       <button onClick={onToggleMute} title={muted?'Unmute PARA':'Mute PARA'}
-        style={{ width:32, height:32, borderRadius:'50%', background:'rgba(12,22,40,0.95)', border:`1px solid ${muted?'rgba(255,255,255,0.08)':'rgba(217,119,6,0.4)'}`, color:muted?'#475569':'#f59e0b', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
+        style={{ width:32, height:32, borderRadius:'50%', background:'rgba(12,22,40,0.95)', border:`1px solid ${muted?'rgba(255,255,255,0.08)':'rgba(13,148,136,0.5)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
         {muted ? <VolumeX size={13}/> : <Volume2 size={13}/>}
       </button>
       <div onClick={onToggleChat} title="Chat with PARA"
@@ -759,8 +787,8 @@ function FloatingBot({ mood, speaking, muted, chatOpen, onToggleChat, onToggleMu
         <Robot mood={mood} speaking={speaking} size={0.72}/>
       </div>
       {!chatOpen && (
-        <div style={{ background:'rgba(217,119,6,0.12)', border:'1px solid rgba(217,119,6,0.3)', borderRadius:8, padding:'3px 8px', whiteSpace:'nowrap', animation:'para-fadein 0.4s ease' }}>
-          <span style={{ color:'#f59e0b', fontSize:11, fontFamily:'monospace', fontWeight:600 }}>PARA</span>
+        <div style={{ background:'rgba(13,148,136,0.12)', border:'1px solid rgba(13,148,136,0.35)', borderRadius:10, padding:'4px 10px', whiteSpace:'nowrap', animation:'para-fadein 0.4s ease' }}>
+          <span style={{ color:'#2dd4bf', fontSize:11, fontFamily:'monospace', fontWeight:600 }}>Hi! I'm PARA 👋</span>
         </div>
       )}
     </div>
