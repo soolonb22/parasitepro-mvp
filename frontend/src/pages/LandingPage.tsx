@@ -7,6 +7,7 @@ import {
   MapPin, Clock, Star, ChevronDown, Eye
 } from 'lucide-react';
 import LiveStatsTicker from '../components/LiveStatsTicker';
+import { LandingPARA } from '../components/ParasiteBot';
 import AustraliaRiskMap from '../components/AustraliaRiskMap';
 import SymptomChecker from '../components/SymptomChecker';
 
@@ -506,7 +507,9 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-</div>
+      {/* Stage 1 — PARA landing guide (unauthenticated visitors, once per session) */}
+      <LandingPARA />
+    </div>
   );
 };
 
