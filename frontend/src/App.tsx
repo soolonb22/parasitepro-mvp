@@ -34,6 +34,12 @@ import SeoPinwormPage from './pages/SeoPinwormPage';
 import SeoParasiteSymptomsPage from './pages/SeoParasiteSymptomsPage';
 import SeoWormInStoolPage from './pages/SeoWormInStoolPage';
 import SeoNaturalParasiteCleansePage from './pages/SeoNaturalParasiteCleansePage';
+import SeoQueenslandParasitesPage from './pages/SeoQueenslandParasitesPage';
+import SeoRoundwormPage from './pages/SeoRoundwormPage';
+import SeoBlackSpecksStoolPage from './pages/SeoBlackSpecksStoolPage';
+import SeoCatWormsPage from './pages/SeoCatWormsPage';
+import SeoSkinParasitePage from './pages/SeoSkinParasitePage';
+import SeoGiardiaPage from './pages/SeoGiardiaPage';
 
 // Feature/tool pages
 import FoodDiaryPage from './pages/FoodDiaryPage';
@@ -272,6 +278,12 @@ function App() {
           <Route path="/parasite-symptoms" element={<SeoParasiteSymptomsPage />} />
           <Route path="/worm-in-stool" element={<SeoWormInStoolPage />} />
           <Route path="/natural-parasite-cleanse" element={<SeoNaturalParasiteCleansePage />} />
+          <Route path="/queensland-parasites" element={<SeoQueenslandParasitesPage />} />
+          <Route path="/what-does-roundworm-look-like" element={<SeoRoundwormPage />} />
+          <Route path="/black-specks-in-stool" element={<SeoBlackSpecksStoolPage />} />
+          <Route path="/worms-in-cats-australia" element={<SeoCatWormsPage />} />
+          <Route path="/skin-parasite-identification" element={<SeoSkinParasitePage />} />
+          <Route path="/giardia-symptoms-australia" element={<SeoGiardiaPage />} />
 
           {/* Shared/public result */}
           <Route path="/results/shared/:token" element={<SharedResultsPage />} />
