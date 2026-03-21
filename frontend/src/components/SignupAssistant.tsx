@@ -1,15 +1,8 @@
 // @ts-nocheck
 /**
- * SignupAssistant.tsx — v3
- *
- * Improvements:
- *  1. Avatar bobs + slow 2-3° rotation (CSS keyframes)
- *  2. Voice narration toggle (Web Speech API, prefers en-AU)
- *  3. "Saved ✓" flash animation after each intake answer
- *  4. Summary card + "Looks good — proceed to signup?" after all questions
- *  5. Close (X) button on header
- *  6. Mobile-friendly buttons with hover + active states
- *  7. Avatar image URL slot (falls back to SVG robot)
+ * SignupAssistant.tsx — v4
+ * Backend-ready data handling, full mobile responsiveness,
+ * ARIA live region, improved entrance animation.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -19,13 +12,17 @@ type Mood = 'idle' | 'talking' | 'thinking' | 'happy' | 'concerned' | 'waving' |
 /* ── CSS ─────────────────────────────────────────────────────── */
 const CSS = `
 @keyframes sa-flyin {
-  from { opacity:0; transform:translateY(60px) scale(0.95); }
-  to   { opacity:1; transform:translateY(0)   scale(1);    }
+  from { opacity:0; transform:translateY(40px) scale(0.9); }
+  to   { opacity:1; transform:translateY(0)    scale(1);   }
+}
+@keyframes sa-fadeout {
+  from { opacity:1; transform:scale(1);    }
+  to   { opacity:0; transform:scale(0.92); }
 }
 @keyframes sa-bob {
-  0%,100% { transform: translateY(0px)   rotate(0deg); }
-  25%     { transform: translateY(-5px)  rotate(2deg); }
-  75%     { transform: translateY(-3px)  rotate(-2deg); }
+  0%,100% { transform:translateY(0px)  rotate(0deg);  }
+  25%     { transform:translateY(-5px) rotate(2deg);  }
+  75%     { transform:translateY(-3px) rotate(-2deg); }
 }
 @keyframes sa-fadein {
   from { opacity:0; transform:translateY(6px); }
@@ -36,13 +33,17 @@ const CSS = `
   40%          { opacity:1;   transform:scale(1.2); }
 }
 @keyframes sa-saved {
-  0%   { opacity:0; transform:scale(0.6) translateY(4px); }
+  0%   { opacity:0; transform:scale(0.6) translateY(4px);  }
   40%  { opacity:1; transform:scale(1.1) translateY(-2px); }
-  100% { opacity:0; transform:scale(1)   translateY(-8px); }
+  100% { opacity:0; transform:scale(1)   translateY(-10px);}
 }
 @keyframes sa-summaryin {
   from { opacity:0; transform:scale(0.97) translateY(8px); }
   to   { opacity:1; transform:scale(1)    translateY(0);   }
+}
+@keyframes sa-pulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(13,148,136,0.4); }
+  50%     { box-shadow:0 0 0 6px rgba(13,148,136,0);  }
 }
 .sa-btn {
   padding: 9px 15px;
@@ -56,22 +57,41 @@ const CSS = `
   transition: background 0.15s, transform 0.1s, border-color 0.15s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  white-space: nowrap;
 }
-.sa-btn:hover  { background: rgba(13,148,136,0.28); border-color: rgba(13,148,136,0.7); }
-.sa-btn:active { background: rgba(13,148,136,0.45); transform: scale(0.96); }
+.sa-btn:hover  { background:rgba(13,148,136,0.28); border-color:rgba(13,148,136,0.7); }
+.sa-btn:active { background:rgba(13,148,136,0.45); transform:scale(0.95); }
+.sa-cta {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg,#0d9488,#0891b2);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  animation: sa-pulse 2s ease-in-out infinite;
+}
+.sa-cta:hover  { opacity:0.9; }
+.sa-cta:active { transform:scale(0.98); opacity:1; }
 `;
 
 /* ── Voice engine ────────────────────────────────────────────── */
 function getBestVoice(): SpeechSynthesisVoice | null {
   if (!window.speechSynthesis) return null;
-  const voices = window.speechSynthesis.getVoices();
+  const v = window.speechSynthesis.getVoices();
   return (
-    voices.find(v => /google australian/i.test(v.name)) ||
-    voices.find(v => /karen/i.test(v.name) && v.lang.startsWith('en')) ||
-    voices.find(v => v.lang === 'en-AU') ||
-    voices.find(v => /google uk english female/i.test(v.name)) ||
-    voices.find(v => v.lang.startsWith('en-GB')) ||
-    voices.find(v => v.lang.startsWith('en')) ||
+    v.find(x => /google australian/i.test(x.name)) ||
+    v.find(x => /karen/i.test(x.name) && x.lang.startsWith('en')) ||
+    v.find(x => x.lang === 'en-AU') ||
+    v.find(x => /google uk english female/i.test(x.name)) ||
+    v.find(x => x.lang.startsWith('en-GB')) ||
+    v.find(x => x.lang.startsWith('en')) ||
     null
   );
 }
@@ -79,11 +99,9 @@ function getBestVoice(): SpeechSynthesisVoice | null {
 function speakText(text: string, onDone?: () => void) {
   if (!window.speechSynthesis) { onDone?.(); return; }
   window.speechSynthesis.cancel();
-  const clean = text.replace(/\*\*/g, '').replace(/[🎁👋🚀✦📚]/g, '').trim();
+  const clean = text.replace(/\*\*/g,'').replace(/[🎁👋🚀✦📚✅🎯🔊🔇📋👤🎂📍✈️🔍⏱️]/g,'').trim();
   const utt = new SpeechSynthesisUtterance(clean);
-  utt.rate  = 0.92;
-  utt.pitch = 1.05;
-  utt.volume = 1;
+  utt.rate = 0.92; utt.pitch = 1.05; utt.volume = 1;
   const voice = getBestVoice();
   if (voice) utt.voice = voice;
   utt.onend = () => onDone?.();
@@ -93,28 +111,28 @@ function speakText(text: string, onDone?: () => void) {
 
 /* ── Robot SVG ───────────────────────────────────────────────── */
 function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; size?: number }) {
-  const [blink, setBlink] = useState(false);
-  const [mouth, setMouth] = useState(0);
-  const [antGlow, setAnt] = useState(false);
-  const [armOff, setArm]  = useState(0);
+  const [blink,  setBlink]  = useState(false);
+  const [mouth,  setMouth]  = useState(0);
+  const [antGlow,setAnt]    = useState(false);
+  const [armOff, setArm]    = useState(0);
 
   useEffect(() => {
-    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false), 110); next(); }, 2800 + Math.random()*2200); return t; };
+    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false),110); next(); },2800+Math.random()*2200); return t; };
     const t = next(); return () => clearTimeout(t);
-  }, []);
+  },[]);
   useEffect(() => {
     if (!speaking) { setMouth(0); return; }
-    const t = setInterval(() => setMouth(p => (p+1)%5), 130); return () => clearInterval(t);
-  }, [speaking]);
+    const t = setInterval(() => setMouth(p=>(p+1)%5),130); return () => clearInterval(t);
+  },[speaking]);
   useEffect(() => {
-    const t = setInterval(() => setAnt(v => !v), 900 + Math.random()*300); return () => clearInterval(t);
-  }, []);
+    const t = setInterval(() => setAnt(v=>!v),900+Math.random()*300); return () => clearInterval(t);
+  },[]);
   useEffect(() => {
     if (mood==='waving'||mood==='happy') {
       let dir=1; const t=setInterval(()=>{setArm(p=>p+dir*4);dir*=-1;},350); return()=>clearInterval(t);
     }
     setArm(0);
-  }, [mood]);
+  },[mood]);
 
   const eyeH   = blink?2:mood==='happy'?10:mood==='curious'?13:12;
   const eyeY   = mood==='curious'?33:34;
@@ -164,7 +182,7 @@ function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; si
 }
 
 /* ── Script ──────────────────────────────────────────────────── */
-type Step = { text: string; mood: Mood; options: string[]; final?: boolean };
+type Step = { text: string; mood: Mood; options: string[] };
 
 const INTRO: Step[] = [
   { text: "G'day! I'm PARA, your ParasitePro AI sidekick. Welcome to the app that finally ends those 3am \"is this worms?\" meltdowns. 👋", mood:'waving', options:["Ha! Tell me more"] },
@@ -173,37 +191,36 @@ const INTRO: Step[] = [
   { text: "Beauty! I just need 6 quick details to make your first report way more accurate. Won't take long!", mood:'curious', options:["Fire away 🚀"] },
 ];
 
-const INTAKE_LABELS = ["Who's this for?","Their age?","Where in Australia?","Recent travel or outdoors?","Main concern?","How long?"];
-
 const INTAKE: Step[] = [
-  { text: "Who's this for?", mood:'curious', options:["Myself","My child","My dog","My cat","Other pet"] },
-  { text: "Roughly how old are they?", mood:'thinking', options:["Under 5","5–17","18–40","41–60","60+"] },
-  { text: "Where in Australia? (helps match local parasites)", mood:'curious', options:["QLD","NSW / ACT","VIC / TAS","WA","SA / NT"] },
-  { text: "Any recent travel or bush/beach walks?", mood:'thinking', options:["Yes — overseas","Yes — local bush/beach","No recent travel"] },
-  { text: "Main concern?", mood:'curious', options:["Itching / rash","Tummy issues","Something in stool","Fatigue / brain fog","Not sure"] },
-  { text: "How long has it been going on?", mood:'thinking', options:["Just noticed today","A few days","1–2 weeks","Weeks to months"] },
+  { text: "Who's this for?",                                          mood:'curious',  options:["Myself","My child","My dog","My cat","Other pet"] },
+  { text: "Roughly how old are they?",                               mood:'thinking', options:["Under 5","5–17","18–40","41–60","60+"] },
+  { text: "Where in Australia? (helps match local parasites)",       mood:'curious',  options:["QLD","NSW / ACT","VIC / TAS","WA","SA / NT"] },
+  { text: "Any recent travel or bush/beach walks?",                  mood:'thinking', options:["Yes — overseas","Yes — local bush/beach","No recent travel"] },
+  { text: "Main concern?",                                           mood:'curious',  options:["Itching / rash","Tummy issues","Something in stool","Fatigue / brain fog","Not sure"] },
+  { text: "How long has it been going on?",                          mood:'thinking', options:["Just noticed today","A few days","1–2 weeks","Weeks to months"] },
 ];
 
-const ALL_STEPS = [...INTRO, ...INTAKE];
-
-/* ── Summary labels ──────────────────────────────────────────── */
-const SUMMARY_EMOJI: Record<number,string> = { 0:'👤', 1:'🎂', 2:'📍', 3:'✈️', 4:'🔍', 5:'⏱️' };
+const INTAKE_LABELS = ["Who for","Age","Location","Recent travel","Main concern","Duration"];
+const INTAKE_EMOJI  = ["👤","🎂","📍","✈️","🔍","⏱️"];
+const ALL_STEPS     = [...INTRO, ...INTAKE];
 
 /* ── Main component ──────────────────────────────────────────── */
 export default function SignupAssistant() {
-  const [visible,   setVisible]   = useState(false);
-  const [closed,    setClosed]    = useState(false);
-  const [stepIdx,   setStepIdx]   = useState(0);
-  const [messages,  setMessages]  = useState<{text:string;isUser:boolean;savedKey?:number}[]>([]);
-  const [mood,      setMood]      = useState<Mood>('waving');
-  const [speaking,  setSpeaking]  = useState(false);
-  const [thinking,  setThinking]  = useState(false);
-  const [intake,    setIntake]    = useState<Record<string,string>>({});
+  const [visible,     setVisible]     = useState(false);
+  const [closed,      setClosed]      = useState(false);
+  const [exiting,     setExiting]     = useState(false);
+  const [stepIdx,     setStepIdx]     = useState(0);
+  const [messages,    setMessages]    = useState<{text:string;isUser:boolean;savedKey?:number}[]>([]);
+  const [mood,        setMood]        = useState<Mood>('waving');
+  const [speaking,    setSpeaking]    = useState(false);
+  const [thinking,    setThinking]    = useState(false);
+  const [intake,      setIntake]      = useState<Record<string,string>>({});
   const [showSummary, setShowSummary] = useState(false);
   const [savedFlash,  setSavedFlash]  = useState<number|null>(null);
-  const [voiceOn,   setVoiceOn]   = useState(false);
+  const [voiceOn,     setVoiceOn]     = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const cssRef  = useRef(false);
+  const liveRef = useRef<HTMLDivElement>(null);
 
   // Inject CSS once
   useEffect(() => {
@@ -212,29 +229,36 @@ export default function SignupAssistant() {
     s.textContent = CSS;
     document.head.appendChild(s);
     cssRef.current = true;
-  }, []);
+  },[]);
 
-  // Init voices
+  // Pre-load voices
   useEffect(() => {
     if (window.speechSynthesis) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
-  }, []);
+  },[]);
 
-  // Fly in and start
+  // Fly in and start immediately
   useEffect(() => {
     setVisible(true);
-    deliverStep(0);
+    deliverStep(0, false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  },[]);
 
   // Scroll to bottom
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
-  }, [messages, thinking, showSummary]);
+  },[messages, thinking, showSummary]);
 
-  const deliverStep = useCallback((idx: number, voice = false) => {
+  // Announce to screen readers
+  const announce = useCallback((text: string) => {
+    if (!liveRef.current) return;
+    liveRef.current.textContent = '';
+    setTimeout(() => { if (liveRef.current) liveRef.current.textContent = text; }, 50);
+  },[]);
+
+  const deliverStep = useCallback((idx: number, voice: boolean) => {
     if (idx >= ALL_STEPS.length) return;
     const step = ALL_STEPS[idx];
     setThinking(true);
@@ -246,26 +270,27 @@ export default function SignupAssistant() {
       setMood(step.mood);
       setSpeaking(true);
       setMessages(prev => [...prev, { text: step.text, isUser: false }]);
+      announce(step.text);
       const dur = Math.min(step.text.length * 35, 2500);
       if (voice) speakText(step.text, () => setSpeaking(false));
       else setTimeout(() => setSpeaking(false), dur);
-    }, 600);
-  }, []);
+    }, 650);
+  },[announce]);
 
   function handleOption(option: string) {
     const intakeIndex = stepIdx - INTRO.length;
-    const isIntake = intakeIndex >= 0 && intakeIndex < INTAKE.length;
+    const isIntake    = intakeIndex >= 0 && intakeIndex < INTAKE.length;
 
-    // Save intake data + show "Saved ✓" flash
     if (isIntake) {
       const updated = { ...intake, [intakeIndex]: option };
       setIntake(updated);
       try { sessionStorage.setItem('para_health_context', JSON.stringify(updated)); } catch {}
       setSavedFlash(intakeIndex);
-      setTimeout(() => setSavedFlash(null), 1200);
+      setTimeout(() => setSavedFlash(null), 1300);
     }
 
     setMessages(prev => [...prev, { text: option, isUser: true, savedKey: isIntake ? intakeIndex : undefined }]);
+    announce(`You selected: ${option}`);
 
     const next = stepIdx + 1;
     setStepIdx(next);
@@ -276,11 +301,36 @@ export default function SignupAssistant() {
         setThinking(false);
         setShowSummary(true);
         setMood('happy');
+        setSpeaking(false);
+        announce("All set! Your information has been collected. Review the summary below.");
+        if (voiceOn) speakText("All set! This info will help make your report super accurate. Click below to finish signup.", () => setSpeaking(false));
       }, 500);
       return;
     }
 
     deliverStep(next, voiceOn);
+  }
+
+  function handleComplete() {
+    const collectedData = {
+      who:      intake[0] || '',
+      age:      intake[1] || '',
+      location: intake[2] || '',
+      travel:   intake[3] || '',
+      concern:  intake[4] || '',
+      duration: intake[5] || '',
+      timestamp: new Date().toISOString(),
+    };
+
+    // a) Log for now
+    console.log('[SignupAssistant] Intake complete:', collectedData);
+
+    // b) Dispatch event for backend/signup form to listen to
+    document.dispatchEvent(new CustomEvent('assistant:complete', { detail: collectedData }));
+
+    // c) Fade out + close
+    setExiting(true);
+    setTimeout(() => setClosed(true), 400);
   }
 
   function renderText(text: string) {
@@ -297,177 +347,201 @@ export default function SignupAssistant() {
   if (!visible || closed) return null;
 
   return (
-    <div style={{
-      position:'fixed', bottom:20, right:20,
-      width:'min(370px, calc(100vw - 24px))',
-      background:'#0f172a',
-      borderRadius:20,
-      boxShadow:'0 12px 48px rgba(0,0,0,0.75), 0 0 0 1px rgba(13,148,136,0.25)',
-      overflow:'hidden', zIndex:9999,
-      fontFamily:'system-ui,-apple-system,sans-serif',
-      animation:'sa-flyin 0.5s cubic-bezier(0.34,1.56,0.64,1)',
-    }}>
+    <>
+      {/* ARIA live region — invisible, screen-reader only */}
+      <div
+        ref={liveRef}
+        aria-live="polite"
+        aria-atomic="true"
+        style={{position:'absolute',width:1,height:1,overflow:'hidden',clip:'rect(0,0,0,0)',whiteSpace:'nowrap'}}
+      />
 
-      {/* ── Header ── */}
-      <div style={{
-        background:'linear-gradient(90deg,#0d9488,#0891b2)',
-        padding:'10px 14px',
-        display:'flex', alignItems:'center', gap:10,
-      }}>
-        {/* Avatar with bob+rotate animation */}
-        <div style={{flexShrink:0, animation:'sa-bob 4s ease-in-out infinite'}}>
-          <Robot mood={mood} speaking={speaking} size={0.38}/>
-        </div>
-
-        <div style={{flex:1}}>
-          <div style={{color:'white',fontWeight:700,fontSize:15}}>PARA</div>
-          <div style={{color:'rgba(255,255,255,0.75)',fontSize:11}}>
-            {thinking ? '✦ Thinking...' : '✦ ParasitePro AI Guide'}
-          </div>
-        </div>
-
-        {/* Voice toggle */}
-        <button
-          onClick={() => {
-            const next = !voiceOn;
-            setVoiceOn(next);
-            if (!next) window.speechSynthesis?.cancel();
-          }}
-          title={voiceOn ? 'Turn voice off' : 'Turn voice on'}
-          style={{
-            background: voiceOn ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
-            border: voiceOn ? '1.5px solid rgba(255,255,255,0.6)' : '1.5px solid rgba(255,255,255,0.25)',
-            borderRadius:8, width:32, height:32,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', color:'white', fontSize:15, flexShrink:0,
-            transition:'all 0.2s',
-          }}
-        >{voiceOn ? '🔊' : '🔇'}</button>
-
-        {/* Close button */}
-        <button
-          onClick={() => { window.speechSynthesis?.cancel(); setClosed(true); }}
-          title="Close"
-          style={{
-            background:'rgba(255,255,255,0.1)',
-            border:'1.5px solid rgba(255,255,255,0.25)',
-            borderRadius:8, width:32, height:32,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            cursor:'pointer', color:'white', fontSize:16, flexShrink:0,
-          }}
-        >✕</button>
-      </div>
-
-      {/* ── Chat area ── */}
-      <div ref={chatRef} style={{
-        maxHeight:260, overflowY:'auto',
-        padding:'12px 12px 8px',
-        background:'#1a2332',
-        display:'flex', flexDirection:'column', gap:7,
-        scrollbarWidth:'thin', scrollbarColor:'rgba(13,148,136,0.2) transparent',
-      }}>
-        {messages.map((msg, i) => (
-          <div key={i} style={{position:'relative', alignSelf:msg.isUser?'flex-end':'flex-start', maxWidth:'88%', animation:'sa-fadein 0.25s ease'}}>
-            <div style={{
-              background: msg.isUser ? '#0d9488' : '#2d3f52',
-              color: msg.isUser ? 'white' : '#e0f2fe',
-              padding:'9px 13px',
-              borderRadius: msg.isUser ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-              fontSize:13.5, lineHeight:1.55,
-            }}>
-              {msg.isUser ? msg.text : renderText(msg.text)}
-            </div>
-            {/* Saved ✓ flash */}
-            {msg.isUser && msg.savedKey !== undefined && savedFlash === msg.savedKey && (
-              <span style={{
-                position:'absolute', top:-18, right:4,
-                fontSize:11, color:'#34d399', fontWeight:700,
-                animation:'sa-saved 1.1s ease forwards',
-                pointerEvents:'none', whiteSpace:'nowrap',
-              }}>Saved ✓</span>
-            )}
-          </div>
-        ))}
-
-        {/* Thinking dots */}
-        {thinking && (
-          <div style={{
-            alignSelf:'flex-start', background:'#2d3f52',
-            padding:'11px 16px', borderRadius:'14px 14px 14px 4px',
-            display:'flex', gap:5, alignItems:'center',
-            animation:'sa-fadein 0.2s ease',
-          }}>
-            {[0,0.18,0.36].map((d,i)=>(
-              <span key={i} style={{
-                width:7, height:7, borderRadius:'50%', background:'#0d9488',
-                animation:`sa-dots 1s ${d}s ease-in-out infinite`, display:'inline-block',
-              }}/>
-            ))}
-          </div>
-        )}
-
-        {/* ── Summary card ── */}
-        {showSummary && (
-          <div style={{
-            background:'linear-gradient(135deg,#0d2820,#0a1f2e)',
-            border:'1.5px solid rgba(13,148,136,0.4)',
-            borderRadius:14, padding:'14px 14px 12px',
-            animation:'sa-summaryin 0.4s ease',
-          }}>
-            <p style={{margin:'0 0 10px',fontSize:13,color:'#2dd4bf',fontWeight:700}}>
-              ✅ Here's what I've got:
-            </p>
-            {Object.entries(intake).map(([k,v])=>(
-              <div key={k} style={{display:'flex',gap:8,alignItems:'center',marginBottom:5}}>
-                <span style={{fontSize:15}}>{SUMMARY_EMOJI[Number(k)] || '📋'}</span>
-                <span style={{fontSize:12,color:'#94a3b8'}}>{INTAKE_LABELS[Number(k)]}:</span>
-                <span style={{fontSize:12,color:'#e0f2fe',fontWeight:600}}>{v}</span>
-              </div>
-            ))}
-            <div style={{marginTop:12,padding:'4px 0 0',borderTop:'1px solid rgba(13,148,136,0.2)'}}>
-              <p style={{margin:'0 0 8px',fontSize:12,color:'#94a3b8'}}>
-                This gets saved to personalise your first report. 🎯
-              </p>
-              <p style={{margin:'0 0 4px',fontSize:12,color:'#2dd4bf'}}>
-                Use code <strong style={{fontFamily:'monospace',color:'#fbbf24'}}>BETA3FREE</strong> for 3 free analyses 🎁
-              </p>
-            </div>
-            <button
-              className="sa-btn"
-              onClick={() => setClosed(true)}
-              style={{
-                marginTop:12, width:'100%',
-                background:'linear-gradient(135deg,#0d9488,#0891b2)',
-                color:'white', border:'none', fontWeight:700,
-                fontSize:14, padding:'11px',
-              }}
-            >
-              Looks good — let's sign up! 🚀
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ── Option buttons ── */}
-      {showOptions && (
-        <div style={{
-          padding:'10px 12px 13px',
+      <div
+        role="dialog"
+        aria-label="PARA — ParasitePro signup assistant"
+        aria-modal="false"
+        style={{
+          position:'fixed',
+          bottom:16,
+          right:16,
+          /* responsive: max 370px, never more than 90vw */
+          width:'min(370px, 90vw)',
           background:'#0f172a',
-          borderTop:'1px solid rgba(13,148,136,0.1)',
-          display:'flex', flexWrap:'wrap', gap:7,
-        }}>
-          {currentStep.options.map(opt => (
-            <button key={opt} className="sa-btn" onClick={() => handleOption(opt)}>{opt}</button>
-          ))}
-        </div>
-      )}
+          borderRadius:20,
+          boxShadow:'0 12px 48px rgba(0,0,0,0.75), 0 0 0 1.5px rgba(13,148,136,0.25)',
+          overflow:'hidden',
+          zIndex:9999,
+          fontFamily:'system-ui,-apple-system,sans-serif',
+          animation: exiting
+            ? 'sa-fadeout 0.4s ease forwards'
+            : 'sa-flyin 0.45s cubic-bezier(0.34,1.56,0.64,1)',
+        }}
+      >
 
-      {/* ── Disclaimer ── */}
-      <div style={{padding:'5px 14px',background:'#080c14',borderTop:'1px solid rgba(13,148,136,0.07)'}}>
-        <p style={{margin:0,fontSize:10,color:'#334155',textAlign:'center'}}>
-          📚 Educational only — not medical advice. For health concerns, consult a GP.
-        </p>
+        {/* ── Header ─────────────────────────────────────────── */}
+        <div style={{
+          background:'linear-gradient(90deg,#0d9488,#0891b2)',
+          padding:'10px 12px',
+          display:'flex', alignItems:'center', gap:10,
+        }}>
+          {/* Avatar — bob + rotate via CSS */}
+          <div style={{flexShrink:0, animation:'sa-bob 4s ease-in-out infinite'}}>
+            <Robot mood={mood} speaking={speaking} size={0.36}/>
+          </div>
+
+          <div style={{flex:1, minWidth:0}}>
+            <div style={{color:'white',fontWeight:700,fontSize:15}}>PARA</div>
+            <div style={{color:'rgba(255,255,255,0.75)',fontSize:11,whiteSpace:'nowrap'}}>
+              {thinking ? '✦ Thinking...' : '✦ ParasitePro AI Guide'}
+            </div>
+          </div>
+
+          {/* Voice toggle */}
+          <button
+            onClick={() => { const n=!voiceOn; setVoiceOn(n); if(!n) window.speechSynthesis?.cancel(); }}
+            aria-label={voiceOn ? 'Turn voice narration off' : 'Turn voice narration on'}
+            title={voiceOn ? 'Voice on' : 'Voice off'}
+            style={{
+              background:voiceOn?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.1)',
+              border:voiceOn?'1.5px solid rgba(255,255,255,0.6)':'1.5px solid rgba(255,255,255,0.25)',
+              borderRadius:8, width:32, height:32,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              cursor:'pointer', color:'white', fontSize:15, flexShrink:0,
+              transition:'all 0.2s',
+            }}
+          >{voiceOn ? '🔊' : '🔇'}</button>
+
+          {/* Close */}
+          <button
+            onClick={() => { window.speechSynthesis?.cancel(); setExiting(true); setTimeout(()=>setClosed(true),400); }}
+            aria-label="Close assistant"
+            title="Close"
+            style={{
+              background:'rgba(255,255,255,0.1)',
+              border:'1.5px solid rgba(255,255,255,0.25)',
+              borderRadius:8, width:32, height:32,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              cursor:'pointer', color:'white', fontSize:17, flexShrink:0,
+            }}
+          >✕</button>
+        </div>
+
+        {/* ── Chat area ──────────────────────────────────────── */}
+        <div ref={chatRef} style={{
+          maxHeight:265, overflowY:'auto',
+          padding:'12px 12px 8px',
+          background:'#1a2332',
+          display:'flex', flexDirection:'column', gap:7,
+          scrollbarWidth:'thin', scrollbarColor:'rgba(13,148,136,0.2) transparent',
+        }}>
+          {messages.map((msg,i) => (
+            <div key={i} style={{
+              position:'relative',
+              alignSelf:msg.isUser?'flex-end':'flex-start',
+              maxWidth:'88%',
+              animation:'sa-fadein 0.25s ease',
+            }}>
+              <div style={{
+                background:msg.isUser?'#0d9488':'#2d3f52',
+                color:msg.isUser?'white':'#e0f2fe',
+                padding:'9px 13px',
+                borderRadius:msg.isUser?'14px 14px 4px 14px':'14px 14px 14px 4px',
+                fontSize:13.5, lineHeight:1.55,
+              }}>
+                {msg.isUser ? msg.text : renderText(msg.text)}
+              </div>
+              {/* Saved ✓ float */}
+              {msg.isUser && msg.savedKey !== undefined && savedFlash === msg.savedKey && (
+                <span aria-hidden="true" style={{
+                  position:'absolute', top:-20, right:4,
+                  fontSize:11, color:'#34d399', fontWeight:700,
+                  animation:'sa-saved 1.2s ease forwards',
+                  pointerEvents:'none', whiteSpace:'nowrap',
+                }}>Saved ✓</span>
+              )}
+            </div>
+          ))}
+
+          {/* Thinking dots */}
+          {thinking && (
+            <div style={{
+              alignSelf:'flex-start', background:'#2d3f52',
+              padding:'11px 16px', borderRadius:'14px 14px 14px 4px',
+              display:'flex', gap:5, alignItems:'center',
+              animation:'sa-fadein 0.2s ease',
+            }}>
+              {[0,0.18,0.36].map((d,i)=>(
+                <span key={i} style={{
+                  width:7, height:7, borderRadius:'50%', background:'#0d9488',
+                  animation:`sa-dots 1s ${d}s ease-in-out infinite`, display:'inline-block',
+                }}/>
+              ))}
+            </div>
+          )}
+
+          {/* ── Summary card ────────────────────────────────── */}
+          {showSummary && (
+            <div style={{
+              background:'linear-gradient(135deg,#0d2820,#0a1f2e)',
+              border:'1.5px solid rgba(13,148,136,0.4)',
+              borderRadius:14, padding:'14px',
+              animation:'sa-summaryin 0.4s ease',
+            }}>
+              <p style={{margin:'0 0 4px',fontSize:13.5,color:'#e0f2fe',lineHeight:1.6}}>
+                All set! This info will help make your report super accurate. Click below to finish signup. 🎯
+              </p>
+              <p style={{margin:'0 0 10px',fontSize:12,color:'#94a3b8'}}>Here's what I've saved:</p>
+
+              {/* Answer list */}
+              <div style={{display:'flex',flexDirection:'column',gap:5,marginBottom:12}}>
+                {Object.entries(intake).map(([k,v])=>(
+                  <div key={k} style={{display:'flex',gap:8,alignItems:'center'}}>
+                    <span style={{fontSize:14,flexShrink:0}}>{INTAKE_EMOJI[Number(k)]}</span>
+                    <span style={{fontSize:12,color:'#94a3b8',flexShrink:0}}>{INTAKE_LABELS[Number(k)]}:</span>
+                    <span style={{fontSize:12,color:'#e0f2fe',fontWeight:600}}>{v}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{
+                padding:'10px 0 0',
+                borderTop:'1px solid rgba(13,148,136,0.2)',
+                marginBottom:12,
+              }}>
+                <p style={{margin:'0 0 3px',fontSize:12,color:'#94a3b8'}}>
+                  Use code <strong style={{color:'#fbbf24',fontFamily:'monospace',fontSize:13}}>BETA3FREE</strong> for 3 free analyses 🎁
+                </p>
+              </div>
+
+              {/* CTA */}
+              <button className="sa-cta" onClick={handleComplete}>
+                Continue to Signup →
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── Option buttons ──────────────────────────────────── */}
+        {showOptions && (
+          <div style={{
+            padding:'10px 12px 13px',
+            background:'#0f172a',
+            borderTop:'1px solid rgba(13,148,136,0.1)',
+            display:'flex', flexWrap:'wrap', gap:7,
+          }}>
+            {currentStep.options.map(opt=>(
+              <button key={opt} className="sa-btn" onClick={()=>handleOption(opt)}>{opt}</button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Disclaimer ──────────────────────────────────────── */}
+        <div style={{padding:'5px 14px',background:'#080c14',borderTop:'1px solid rgba(13,148,136,0.07)'}}>
+          <p style={{margin:0,fontSize:10,color:'#334155',textAlign:'center'}}>
+            📚 Educational only — not medical advice. For health concerns, consult a GP.
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
