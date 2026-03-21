@@ -1,41 +1,21 @@
 <!doctype html>
 <html lang="en-AU">
   <head>
-    <!-- ═══════════════════════════════════════════
-         CHARSET & VIEWPORT
-    ═══════════════════════════════════════════ -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <!-- ═══════════════════════════════════════════
-         PRIMARY META (fallbacks — overridden per-page by SEO.tsx)
-    ═══════════════════════════════════════════ -->
     <title>Parasite ID Pro — AI-Powered Parasite Education | notworms.com</title>
-    <meta
-      name="description"
-      content="Upload a photo and get a structured AI-assisted educational report on common parasites. Not a diagnosis — designed to help you get informed before your GP visit. Free first analysis."
-    />
-    <meta name="keywords" content="parasite identification Australia, worms in stool, parasite symptoms, gut health, AI parasite analysis, Queensland parasites, post-travel gut symptoms" />
+    <meta name="description" content="Upload a photo and get a structured AI-assisted educational report on common parasites. Not a diagnosis — designed to help you get informed before your GP visit. First analysis free." />
+    <meta name="keywords" content="parasite identification Australia, worms in stool, parasite symptoms, gut health, AI health education, Queensland parasites, post-travel gut symptoms" />
     <meta name="author" content="ParasitePro" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <meta name="googlebot" content="index, follow" />
-
-    <!-- ═══════════════════════════════════════════
-         CANONICAL (overridden per-page)
-    ═══════════════════════════════════════════ -->
     <link rel="canonical" href="https://notworms.com/" />
 
-    <!-- ═══════════════════════════════════════════
-         OPEN GRAPH — FACEBOOK / META
-    ═══════════════════════════════════════════ -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Parasite ID Pro" />
     <meta property="og:title" content="Parasite ID Pro — AI-Powered Parasite Education" />
-    <meta
-      property="og:description"
-      content="Upload a photo and get a structured AI-assisted educational report on common parasites. Not a diagnosis — designed to help you get informed before your GP visit."
-    />
+    <meta property="og:description" content="Upload a photo and get a structured AI-assisted educational report on common parasites. Not a diagnosis — designed to help you get informed before your GP visit." />
     <meta property="og:url" content="https://notworms.com/" />
     <meta property="og:image" content="https://notworms.com/og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -43,64 +23,35 @@
     <meta property="og:image:alt" content="Parasite ID Pro — AI-powered parasite education for Australians" />
     <meta property="og:locale" content="en_AU" />
 
-    <!-- Facebook App ID (optional — add if you have one) -->
-    <!-- <meta property="fb:app_id" content="YOUR_FB_APP_ID" /> -->
-
-    <!-- ═══════════════════════════════════════════
-         TWITTER / X CARD
-    ═══════════════════════════════════════════ -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@parasitepro" />
     <meta name="twitter:title" content="Parasite ID Pro — AI-Powered Parasite Education" />
-    <meta
-      name="twitter:description"
-      content="Upload a photo and get a structured AI-assisted educational report on common parasites. Free first analysis. notworms.com"
-    />
+    <meta name="twitter:description" content="Upload a photo and get a structured AI-assisted educational report on common parasites. Free first analysis. notworms.com" />
     <meta name="twitter:image" content="https://notworms.com/og-image.png" />
-    <meta name="twitter:image:alt" content="Parasite ID Pro — AI-powered parasite education for Australians" />
 
-    <!-- ═══════════════════════════════════════════
-         THEME & BRAND
-    ═══════════════════════════════════════════ -->
     <meta name="theme-color" content="#0D9488" />
     <meta name="msapplication-TileColor" content="#0D9488" />
-    <meta name="msapplication-navbutton-color" content="#0D9488" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Parasite ID Pro" />
-    <meta name="application-name" content="Parasite ID Pro" />
-
-    <!-- ═══════════════════════════════════════════
-         GEO TARGETING — AUSTRALIA
-    ═══════════════════════════════════════════ -->
     <meta name="geo.region" content="AU" />
     <meta name="geo.placename" content="Australia" />
-    <meta name="ICBM" content="-25.2744, 133.7751" />
 
-    <!-- ═══════════════════════════════════════════
-         FAVICONS & PWA ICONS
-         Replace these files in /public/ with your actual brand assets
-    ═══════════════════════════════════════════ -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0D9488" />
     <link rel="shortcut icon" href="/favicon.ico" />
 
-    <!-- ═══════════════════════════════════════════
-         PRECONNECT — PERFORMANCE
-    ═══════════════════════════════════════════ -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://res.cloudinary.com" />
-    <link rel="dns-prefetch" href="https://api.anthropic.com" />
 
-    <!-- ═══════════════════════════════════════════
-         FACEBOOK PIXEL
-         Place here so it fires on every page before React hydrates
-    ═══════════════════════════════════════════ -->
+    <style>
+      html { background: #0E0F11; }
+      body { margin: 0; }
+      #root { min-height: 100vh; }
+    </style>
+
     <script>
       !function(f,b,e,v,n,t,s)
       {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -113,71 +64,13 @@
       fbq('init', '866160922709662');
       fbq('track', 'PageView');
     </script>
-    <noscript>
-      <img
-        height="1"
-        width="1"
-        style="display:none"
-        src="https://www.facebook.com/tr?id=866160922709662&ev=PageView&noscript=1"
-        alt=""
-      />
-    </noscript>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=866160922709662&ev=PageView&noscript=1" alt="" /></noscript>
 
-    <!-- ═══════════════════════════════════════════
-         GLOBAL JSON-LD — WEBSITE & ORGANISATION
-         (page-specific schemas injected via SEO.tsx)
-    ═══════════════════════════════════════════ -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Parasite ID Pro",
-      "alternateName": ["ParasitePro", "notworms.com"],
-      "url": "https://notworms.com",
-      "description": "AI-powered parasite education platform for Australians. Upload photos for structured educational reports — not a diagnosis.",
-      "inLanguage": "en-AU",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://notworms.com/encyclopedia?q={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "ParasitePro",
-      "url": "https://notworms.com",
-      "logo": "https://notworms.com/logo.png",
-      "sameAs": [
-        "https://parasitepro.com",
-        "https://www.facebook.com/parasitepro"
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "availableLanguage": "English",
-        "areaServed": "AU"
-      },
-      "areaServed": {
-        "@type": "Country",
-        "name": "Australia"
-      },
-      "foundingLocation": {
-        "@type": "Place",
-        "name": "Mackay, Queensland, Australia"
-      }
-    }
-    </script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Parasite ID Pro","alternateName":["ParasitePro","notworms.com"],"url":"https://notworms.com","description":"AI-powered parasite education platform for Australians. Upload photos for structured educational reports — not a diagnosis.","inLanguage":"en-AU","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://notworms.com/encyclopedia?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"ParasitePro","url":"https://notworms.com","logo":"https://notworms.com/logo.png","sameAs":["https://parasitepro.com"],"contactPoint":{"@type":"ContactPoint","contactType":"customer support","availableLanguage":"English","areaServed":"AU"},"areaServed":{"@type":"Country","name":"Australia"},"foundingLocation":{"@type":"Place","name":"Mackay, Queensland, Australia"}}</script>
   </head>
   <body>
     <div id="root"></div>
-    <!-- Vite injects the module script here at build time -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
