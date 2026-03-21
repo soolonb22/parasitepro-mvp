@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, X, RotateCcw, BookOpen, Zap, Microscope, AlignLeft } from 'lucide-react';
-import { getApiUrl } from '../api';
+import { API_URL } from '../api';
 
 type Mood   = 'idle' | 'thinking' | 'talking' | 'happy' | 'surprised' | 'waving' | 'concerned' | 'curious';
 type Depth  = 'simple' | 'medium' | 'deep' | 'visual';
@@ -159,12 +159,6 @@ export default function SignupAssistant() {
     setCssInjected(true);
   }, [cssInjected]);
 
-  // Auto-open after 2.5s
-  useEffect(() => {
-    const t = setTimeout(() => openChat(), 2500);
-    return () => clearTimeout(t);
-  }, []);
-
   // Auto-scroll
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
@@ -180,6 +174,13 @@ export default function SignupAssistant() {
       setTimeout(() => setMood('idle'), 2000);
     }
   }, [messages.length]);
+
+  // Auto-open after 2.5s — defined after openChat so the closure captures it correctly
+  useEffect(() => {
+    const t = setTimeout(() => openChat(), 2500);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -203,7 +204,7 @@ export default function SignupAssistant() {
     const history = messages.filter(m => m.id !== 0).map(m => ({ role: m.role, content: m.content }));
 
     try {
-      const res = await fetch(`${getApiUrl()}/api/paradox/message`, {
+      const res = await fetch(`${API_URL}/paradox/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: content, depth, conversationHistory: history }),
