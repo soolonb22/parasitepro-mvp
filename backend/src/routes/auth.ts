@@ -25,7 +25,7 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
     // Validate promo code and determine starting credits
     const code = promoCode?.trim().toUpperCase();
     const promoCredits = code && PROMO_CODES[code] ? PROMO_CODES[code] : 0;
-    const startingCredits = promoCredits > 0 ? promoCredits : 1; // 1 free credit always on signup
+    const startingCredits = promoCredits > 0 ? promoCredits : 0;
 
     const passwordHash = await bcrypt.hash(password, 12);
 
