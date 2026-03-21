@@ -508,6 +508,7 @@ const LandingPage = () => {
       </footer>
       {/* Stage 1 — PARA landing guide (unauthenticated visitors, once per session) */}
     </div>
+    <LandingPARA />
   );
 };
 

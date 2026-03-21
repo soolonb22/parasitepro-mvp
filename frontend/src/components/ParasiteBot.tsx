@@ -198,81 +198,170 @@ function MarkdownText({ text }: { text: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ROBOT SVG — round, friendly, teal theme
+   PARA AVATAR — cyberpunk teal-skin human, glowing blue eyes,
+   gaming headset, dark hair. Inspired by ParasitePro branding.
 ══════════════════════════════════════════════════════════════ */
 function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; size?: number }) {
-  const [blink, setBlink] = useState(false);
-  const [mouth, setMouth] = useState(0);
-  const [antGlow, setAnt] = useState(false);
-  const [armOff, setArm]  = useState(0);
+  const [blink,  setBlink]  = useState(false);
+  const [mouth,  setMouth]  = useState(0);
+  const [pulse,  setPulse]  = useState(false);
 
+  // Blink every 4-6s
   useEffect(() => {
-    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false), 110); next(); }, 2800 + Math.random() * 2200); return t; };
+    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false), 120); next(); }, 4000 + Math.random() * 2000); return t; };
     const t = next(); return () => clearTimeout(t);
   }, []);
+  // Mouth animate while speaking
   useEffect(() => {
     if (!speaking) { setMouth(0); return; }
-    const t = setInterval(() => setMouth(p => (p + 1) % 5), 130); return () => clearInterval(t);
+    const t = setInterval(() => setMouth(p => (p + 1) % 4), 140); return () => clearInterval(t);
   }, [speaking]);
+  // Headset LED pulse
   useEffect(() => {
-    const t = setInterval(() => setAnt(v => !v), 900 + Math.random() * 300); return () => clearInterval(t);
+    const t = setInterval(() => setPulse(v => !v), 800 + Math.random() * 400); return () => clearInterval(t);
   }, []);
-  useEffect(() => {
-    if (mood === 'waving' || mood === 'happy') {
-      let dir = 1;
-      const t = setInterval(() => { setArm(prev => prev + dir * 4); dir *= -1; }, 350);
-      return () => clearInterval(t);
-    }
-    setArm(0);
-  }, [mood]);
 
-  const eyeH  = blink ? 2 : mood==='surprised'?16 : mood==='happy'?10 : mood==='curious'?13 : 12;
-  const eyeY  = mood==='curious' ? 33 : 34;
-  const eyeC  = mood==='concerned'?'#f87171' : mood==='happy'?'#34d399' : mood==='thinking'?'#c4b5fd' : mood==='curious'?'#67e8f9' : '#0d9488';
-  const ledC  = mood==='thinking'?'#c4b5fd' : mood==='happy'?'#34d399' : mood==='concerned'?'#f87171' : mood==='curious'?'#67e8f9' : '#0d9488';
-  const headBg = mood==='concerned'?'#1e3050' : mood==='happy'?'#0d2820' : mood==='thinking'?'#1e1b40' : '#0f2335';
-  const mouths = ['M 41 108 Q 50 114 59 108','M 41 107 Q 50 116 59 107','M 40 107 Q 50 119 60 107','M 41 108 Q 50 114 59 108','M 42 109 Q 50 113 58 109'];
-  const mp = speaking ? mouths[mouth] : (mood==='concerned' ? 'M 42 111 Q 50 107 58 111' : 'M 41 108 Q 50 114 59 108');
-  const armRot = (mood==='waving'||mood==='happy') ? -22+armOff : 0;
-  const showCheeks = mood==='happy' || mood==='waving' || mood==='talking' || speaking;
+  // Mood-driven colours
+  const eyeGlow  = mood==='concerned'?'#f87171' : mood==='happy'?'#34d399' : mood==='thinking'?'#c4b5fd' : '#60a5fa';
+  const ledColor = mood==='thinking'?'#c4b5fd' : mood==='happy'?'#34d399' : mood==='concerned'?'#f87171' : '#f97316'; // orange headset default
+  const skinBase = mood==='concerned'?'#1a6060' : mood==='happy'?'#0d7070' : '#1a7f7f';
+  const skinMid  = mood==='concerned'?'#226666' : mood==='happy'?'#12887a' : '#228888';
+  const skinHi   = mood==='concerned'?'#2a7a7a' : mood==='happy'?'#18a090' : '#2aa0a0';
+
+  // Mouth paths — rest / open1 / open2 / open3
+  const mouthPaths = [
+    'M 38 78 Q 50 83 62 78',           // closed smile
+    'M 39 78 Q 50 85 61 78',           // slight open
+    'M 40 77 Q 50 88 60 77',           // medium open
+    'M 41 76 Q 50 91 59 76',           // wide open (speaking)
+  ];
+  const mp = speaking ? mouthPaths[mouth] : (mood==='concerned' ? 'M 40 80 Q 50 77 60 80' : mouthPaths[0]);
+
+  const eyeH = blink ? 1 : mood==='surprised' ? 10 : mood==='happy' ? 7 : 8;
 
   return (
-    <svg width={100*size} height={162*size} viewBox="0 0 100 162"
-      style={{ overflow:'visible', filter:`drop-shadow(0 0 ${speaking?24:12}px ${eyeC}70)`, transition:'filter 0.3s' }}>
-      <line x1="50" y1="9" x2="50" y2="22" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" opacity="0.7"/>
-      <circle cx="50" cy="6" r="6" fill={antGlow?ledC:'#0a1f2e'} stroke={antGlow?ledC:'rgba(13,148,136,0.3)'} strokeWidth="1.5"
-        style={{ filter:antGlow?`drop-shadow(0 0 10px ${ledC})`:'none', transition:'fill 0.4s,filter 0.4s' }}/>
-      {antGlow && <circle cx="50" cy="6" r="3" fill="white" opacity="0.6"/>}
-      <rect x="20" y="20" width="60" height="56" rx="20" fill={headBg} stroke="rgba(13,148,136,0.4)" strokeWidth="1.5"
-        style={{ transition:'fill 0.4s', filter:'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}/>
-      <ellipse cx="38" cy="26" rx="14" ry="6" fill="white" opacity="0.04"/>
-      <rect x="11" y="32" width="10" height="24" rx="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1"/>
-      <circle cx="16" cy="44" r="3.5" fill={ledC} opacity="0.85" style={{ filter:`drop-shadow(0 0 6px ${ledC})`, transition:'fill 0.4s' }}/>
-      <rect x="79" y="32" width="10" height="24" rx="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1"/>
-      <circle cx="84" cy="44" r="3.5" fill={ledC} opacity="0.85" style={{ filter:`drop-shadow(0 0 6px ${ledC})`, transition:'fill 0.4s' }}/>
-      <rect x="28" y={eyeY} width="18" height={eyeH} rx="5" fill={eyeC} style={{ filter:`drop-shadow(0 0 10px ${eyeC})`, transition:'height 0.08s,fill 0.3s' }}/>
-      <rect x="54" y={eyeY} width="18" height={eyeH} rx="5" fill={eyeC} style={{ filter:`drop-shadow(0 0 10px ${eyeC})`, transition:'height 0.08s,fill 0.3s' }}/>
-      {!blink && eyeH>3 && <><circle cx="34" cy={eyeY+2.5} r="3" fill="white" opacity="0.8"/><circle cx="60" cy={eyeY+2.5} r="3" fill="white" opacity="0.8"/><circle cx="35.5" cy={eyeY+1.5} r="1.2" fill="white" opacity="0.6"/><circle cx="61.5" cy={eyeY+1.5} r="1.2" fill="white" opacity="0.6"/></>}
-      {mood==='thinking' && [0,1,2].map((k,i) => <circle key={k} cx={35+i*15} cy="57" r="4" fill="#c4b5fd" opacity={0.2+0.8*((mouth+i)%3===0?1:0)} style={{ transition:'opacity 0.18s' }}/>)}
-      {mood==='curious' && <path d="M 28 30 Q 37 26 46 30" fill="none" stroke="#67e8f9" strokeWidth="2.5" strokeLinecap="round"/>}
-      <path d={mp} fill="none" stroke={speaking?eyeC:'rgba(13,148,136,0.6)'} strokeWidth={speaking?3.5:2.5} strokeLinecap="round" style={{ filter:speaking?`drop-shadow(0 0 8px ${eyeC})`:'none', transition:'stroke 0.2s' }}/>
-      <ellipse cx="27" cy="58" rx="6" ry="4" fill="#f472b6" opacity={showCheeks?0.35:0.12} style={{ transition:'opacity 0.4s' }}/>
-      <ellipse cx="73" cy="58" rx="6" ry="4" fill="#f472b6" opacity={showCheeks?0.35:0.12} style={{ transition:'opacity 0.4s' }}/>
-      <rect x="24" y="80" width="52" height="46" rx="14" fill="#0a1f2e" stroke="rgba(13,148,136,0.35)" strokeWidth="1.5"/>
-      <rect x="30" y="85" width="40" height="3" rx="1.5" fill="white" opacity="0.04"/>
-      {[0,1,2].map(i => <circle key={i} cx={34+i*16} cy="96" r="5.5" fill={i===mouth%3?ledC:'#0f2335'} style={{ filter:i===mouth%3?`drop-shadow(0 0 7px ${ledC})`:'none', transition:'fill 0.14s' }}/>)}
-      <rect x="30" y="107" width="40" height="13" rx="6" fill="#0f2335" stroke="rgba(13,148,136,0.2)" strokeWidth="1"/>
-      <path d="M 39 110 Q 50 115 61 110" fill="none" stroke={ledC} strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
-      <g style={{ transformOrigin:'16px 82px', transform:`rotate(${armRot}deg)`, transition:'transform 0.32s ease-in-out' }}>
-        <rect x="8" y="82" width="16" height="32" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
-        <circle cx="16" cy="118" r="7" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
-      </g>
-      <rect x="76" y="82" width="16" height="32" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
-      <circle cx="84" cy="118" r="7" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
-      <rect x="30" y="126" width="16" height="24" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
-      <rect x="54" y="126" width="16" height="24" rx="8" fill="#0a1f2e" stroke="rgba(13,148,136,0.3)" strokeWidth="1.2"/>
-      <ellipse cx="38" cy="151" rx="11" ry="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.25)" strokeWidth="1.2"/>
-      <ellipse cx="62" cy="151" rx="11" ry="6" fill="#0a1f2e" stroke="rgba(13,148,136,0.25)" strokeWidth="1.2"/>
+    <svg width={110*size} height={150*size} viewBox="0 0 110 150"
+      style={{ overflow:'visible', filter:`drop-shadow(0 0 ${speaking?20:10}px ${eyeGlow}60)`, transition:'filter 0.3s' }}>
+
+      {/* ── Neck ── */}
+      <rect x="40" y="112" width="30" height="22" rx="8" fill={skinBase}/>
+      <rect x="44" y="112" width="22" height="14" rx="4" fill={skinMid} opacity="0.6"/>
+
+      {/* ── Shoulders / body ── */}
+      <ellipse cx="55" cy="145" rx="38" ry="14" fill="#0f172a" stroke="rgba(13,148,136,0.3)" strokeWidth="1.5"/>
+      {/* Collar neon line */}
+      <path d="M 20 138 Q 55 128 90 138" fill="none" stroke="#0d9488" strokeWidth="1.5" opacity="0.7"/>
+      {/* Jacket seam */}
+      <line x1="55" y1="128" x2="55" y2="150" stroke="rgba(13,148,136,0.25)" strokeWidth="1"/>
+
+      {/* ── Head shape ── */}
+      <ellipse cx="55" cy="65" rx="34" ry="38" fill={skinBase}
+        style={{ filter:'drop-shadow(0 4px 14px rgba(0,0,0,0.5))' }}/>
+      {/* Face gradient — highlight on forehead */}
+      <ellipse cx="48" cy="48" rx="18" ry="12" fill={skinHi} opacity="0.35"/>
+      {/* Jaw definition */}
+      <ellipse cx="55" cy="95" rx="22" ry="9" fill={skinBase} opacity="0.8"/>
+
+      {/* ── Dark hair ── */}
+      {/* Main hair mass */}
+      <ellipse cx="55" cy="32" rx="33" ry="16" fill="#1a1a2e"/>
+      <ellipse cx="55" cy="28" rx="30" ry="12" fill="#252540"/>
+      {/* Side hair */}
+      <ellipse cx="24" cy="52" rx="10" ry="20" fill="#1a1a2e"/>
+      <ellipse cx="86" cy="52" rx="10" ry="20" fill="#1a1a2e"/>
+      {/* Hair sheen */}
+      <ellipse cx="45" cy="26" rx="12" ry="5" fill="white" opacity="0.08"/>
+      {/* Styled front sweep */}
+      <path d="M 30 35 Q 42 22 62 28 Q 72 30 78 38" fill="#252540" stroke="#1a1a2e" strokeWidth="1"/>
+      <path d="M 35 32 Q 50 18 68 26" fill="none" stroke="#333355" strokeWidth="2" strokeLinecap="round"/>
+
+      {/* ── Eyebrows ── */}
+      <path d="M 32 54 Q 40 50 46 53" fill="none" stroke="#1a1a2e" strokeWidth="3" strokeLinecap="round"
+        style={{ transform: mood==='concerned'?'rotate(5deg)':mood==='curious'?'rotate(-3deg)':'none', transformOrigin:'39px 52px', transition:'transform 0.3s' }}/>
+      <path d="M 64 53 Q 70 50 78 54" fill="none" stroke="#1a1a2e" strokeWidth="3" strokeLinecap="round"
+        style={{ transform: mood==='concerned'?'rotate(-5deg)':mood==='curious'?'rotate(3deg)':'none', transformOrigin:'71px 52px', transition:'transform 0.3s' }}/>
+
+      {/* ── Eyes ── */}
+      {/* Eye sockets */}
+      <ellipse cx="38" cy="62" rx="11" ry={blink?1:eyeH+2} fill="#0a1520" style={{ transition:'ry 0.08s' }}/>
+      <ellipse cx="72" cy="62" rx="11" ry={blink?1:eyeH+2} fill="#0a1520" style={{ transition:'ry 0.08s' }}/>
+      {/* Iris — glowing blue */}
+      {!blink && <>
+        <ellipse cx="38" cy="62" rx="8" ry={eyeH} fill={eyeGlow} opacity="0.9"
+          style={{ filter:`drop-shadow(0 0 8px ${eyeGlow})`, transition:'fill 0.3s,ry 0.08s' }}/>
+        <ellipse cx="72" cy="62" rx="8" ry={eyeH} fill={eyeGlow} opacity="0.9"
+          style={{ filter:`drop-shadow(0 0 8px ${eyeGlow})`, transition:'fill 0.3s,ry 0.08s' }}/>
+        {/* Pupil */}
+        <ellipse cx="38" cy="62" rx="4" ry={Math.max(eyeH-3,1)} fill="#050d18"/>
+        <ellipse cx="72" cy="62" rx="4" ry={Math.max(eyeH-3,1)} fill="#050d18"/>
+        {/* Eye shine */}
+        <circle cx="35" cy="59" r="2.5" fill="white" opacity="0.75"/>
+        <circle cx="69" cy="59" r="2.5" fill="white" opacity="0.75"/>
+        <circle cx="36" cy="58" r="1" fill="white" opacity="0.5"/>
+        <circle cx="70" cy="58" r="1" fill="white" opacity="0.5"/>
+      </>}
+
+      {/* ── Nose ── */}
+      <path d="M 52 68 Q 50 76 47 78 Q 53 80 63 78 Q 60 76 58 68" fill="none"
+        stroke={skinBase} strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+
+      {/* ── Mouth ── */}
+      <path d={mp} fill="none" stroke={speaking?eyeGlow:'#0d4040'}
+        strokeWidth={speaking?3:2.5} strokeLinecap="round"
+        style={{ filter:speaking?`drop-shadow(0 0 6px ${eyeGlow})`:'none', transition:'stroke 0.2s,d 0.08s' }}/>
+      {/* Teeth hint when speaking wide */}
+      {speaking && mouth >= 2 && (
+        <ellipse cx="55" cy="82" rx="7" ry="3" fill="white" opacity="0.8"/>
+      )}
+      {/* Chin dimple */}
+      <circle cx="55" cy="100" r="2" fill={skinBase} opacity="0.4"/>
+
+      {/* ── Ear details ── */}
+      <ellipse cx="21" cy="65" rx="6" ry="9" fill={skinBase} stroke={skinMid} strokeWidth="1"/>
+      <ellipse cx="21" cy="65" rx="3" ry="5" fill={skinMid} opacity="0.5"/>
+      <ellipse cx="89" cy="65" rx="6" ry="9" fill={skinBase} stroke={skinMid} strokeWidth="1"/>
+      <ellipse cx="89" cy="65" rx="3" ry="5" fill={skinMid} opacity="0.5"/>
+
+      {/* ── Gaming headset ── */}
+      {/* Headband arc */}
+      <path d="M 18 58 Q 18 20 55 18 Q 92 20 92 58"
+        fill="none" stroke="#1a1a2e" strokeWidth="8" strokeLinecap="round"/>
+      <path d="M 18 58 Q 18 20 55 18 Q 92 20 92 58"
+        fill="none" stroke="#333355" strokeWidth="5" strokeLinecap="round"/>
+      {/* Headband neon trim */}
+      <path d="M 20 56 Q 20 22 55 20 Q 90 22 90 56"
+        fill="none" stroke={ledColor} strokeWidth="1.5" strokeLinecap="round" opacity="0.6"
+        style={{ filter:`drop-shadow(0 0 4px ${ledColor})` }}/>
+
+      {/* Left ear cup */}
+      <ellipse cx="18" cy="65" rx="9" ry="13" fill="#1a1a2e" stroke="#333355" strokeWidth="1.5"/>
+      <ellipse cx="18" cy="65" rx="6" ry="9" fill="#252540"/>
+      <circle cx="18" cy="65" r="3.5" fill={ledColor} opacity={pulse?0.95:0.5}
+        style={{ filter:pulse?`drop-shadow(0 0 8px ${ledColor})`:'none', transition:'opacity 0.4s,filter 0.4s' }}/>
+
+      {/* Right ear cup */}
+      <ellipse cx="92" cy="65" rx="9" ry="13" fill="#1a1a2e" stroke="#333355" strokeWidth="1.5"/>
+      <ellipse cx="92" cy="65" rx="6" ry="9" fill="#252540"/>
+      {/* Microphone arm */}
+      <path d="M 92 73 Q 100 80 98 90" fill="none" stroke="#333355" strokeWidth="2.5" strokeLinecap="round"/>
+      <ellipse cx="97" cy="92" rx="4" ry="3" fill="#1a1a2e" stroke={ledColor} strokeWidth="1"/>
+      <circle cx="97" cy="92" r="2" fill={ledColor} opacity="0.8"
+        style={{ filter:`drop-shadow(0 0 5px ${ledColor})` }}/>
+
+      {/* ── Thinking indicator ── */}
+      {mood === 'thinking' && [0,1,2].map((i) => (
+        <circle key={i} cx={42+i*13} cy="40" r="3.5" fill="#c4b5fd"
+          opacity={0.2 + 0.8*((mouth+i)%3===0?1:0)}
+          style={{ filter:'drop-shadow(0 0 5px #c4b5fd)', transition:'opacity 0.18s' }}/>
+      ))}
+
+      {/* ── Surprised sparkles ── */}
+      {mood === 'surprised' && <>
+        <circle cx="18" cy="42" r="2.5" fill="#fbbf24" opacity="0.9" style={{ filter:'drop-shadow(0 0 6px #fbbf24)' }}/>
+        <circle cx="92" cy="42" r="2.5" fill="#fbbf24" opacity="0.9" style={{ filter:'drop-shadow(0 0 6px #fbbf24)' }}/>
+        <circle cx="10" cy="55" r="1.5" fill="#f472b6" opacity="0.8"/>
+        <circle cx="100" cy="55" r="1.5" fill="#f472b6" opacity="0.8"/>
+      </>}
     </svg>
   );
 }

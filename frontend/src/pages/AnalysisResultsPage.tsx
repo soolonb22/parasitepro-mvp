@@ -13,6 +13,7 @@ import JournalPromptModal from '../components/JournalPromptModal';
 import VoiceAssistant from '../components/VoiceAssistant';
 import ParasiteProfile from '../components/ParasiteProfile';
 import DeepDiveModal from '../components/DeepDiveModal';
+import ParasiteBot from '../components/ParasiteBot';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -627,6 +628,8 @@ const AnalysisResultsPage = () => {
         />
       )}
     </div>
+      {/* ParasiteBot — contextual help on results page */}
+      <ParasiteBot reportData={analysis} />
   );
 };
 
