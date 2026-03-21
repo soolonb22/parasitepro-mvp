@@ -94,8 +94,8 @@ class SpeechEngine {
       if (opts.signal?.cancelled || i >= chunks.length) { opts.onDone?.(); return; }
       const utt = new SpeechSynthesisUtterance(chunks[i]);
       const isQ = chunks[i].endsWith('?');
-      utt.rate  = (opts.rate  ?? 1.38) + (isQ ? 0.05 : 0);
-      utt.pitch = (opts.pitch ?? 1.58) + (isQ ? 0.16 : 0);
+      utt.rate  = (opts.rate  ?? 0.92) + (isQ ? 0.05 : 0);
+      utt.pitch = (opts.pitch ?? 1.08) + (isQ ? 0.16 : 0);
       utt.volume = 0.95;
       if (voice) utt.voice = voice;
       utt.onstart = () => { if (i === 0) opts.onStart?.(); };
@@ -281,7 +281,7 @@ export function LandingPARA() {
         if (!sig.current.cancelled) speakRef.current(idx + 1);
       }, Math.max(2200, line.text.length * 25));
       SpeechEngine.speak(line.text, {
-        rate: 1.35, pitch: 1.55, signal: sig.current,
+        rate: 0.92, pitch: 1.05, signal: sig.current,
         onStart: () => clearTimeout(fallback),
         onDone: () => { clearTimeout(fallback); setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(idx + 1); }, 400); },
       });
@@ -296,7 +296,7 @@ export function LandingPARA() {
     setVoiceStarted(true);
     sig.current.cancelled = false;
     SpeechEngine.unlockAndSpeak(LANDING_SCRIPT[0].text, {
-      rate: 1.35, pitch: 1.55, signal: sig.current,
+      rate: 0.92, pitch: 1.05, signal: sig.current,
       onStart: () => { setSpeaking(true); setMood(LANDING_SCRIPT[0].mood); },
       onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(1); }, 400); },
     });
@@ -475,7 +475,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     if (idx >= script.length) {
       setLineIdx(-1); setSpeaking(false); setCardIn(false);
       setTimeout(() => { setCard(null); setPhase('intake'); setIntakeIn(true); }, 380);
-      if (!muted) { setSpeaking(true); setMood('curious'); SpeechEngine.speak(INTAKE_QUESTIONS[0].text, { rate:1.38, pitch:1.62, signal:sig.current, onDone:() => setSpeaking(false) }); }
+      if (!muted) { setSpeaking(true); setMood('curious'); SpeechEngine.speak(INTAKE_QUESTIONS[0].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
       return;
     }
     const line = script[idx];
@@ -483,7 +483,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 280);
     if (!muted) {
       const fallback = setTimeout(() => { SpeechEngine.clearPending(); setSpeaking(false); if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2400, line.text.length * 28));
-      SpeechEngine.speak(line.text, { rate:1.38, pitch:1.55, signal:sig.current,
+      SpeechEngine.speak(line.text, { rate:0.92, pitch:1.05, signal:sig.current,
         onStart: () => clearTimeout(fallback),
         onDone: () => { clearTimeout(fallback); setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(idx + 1); }, line.pauseAfter ?? 380); },
       });
@@ -501,7 +501,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
 
   const handleTapToStart = () => {
     setVoiceOk(true); sig.current.cancelled = false;
-    SpeechEngine.unlockAndSpeak(script[0].text, { rate:1.38, pitch:1.55, signal:sig.current,
+    SpeechEngine.unlockAndSpeak(script[0].text, { rate:0.92, pitch:1.05, signal:sig.current,
       onStart: () => { setSpeaking(true); setMood(script[0].mood); },
       onDone:  () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(1); }, script[0].pauseAfter ?? 380); },
     });
@@ -513,7 +513,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     setIntakeStep(next); setIntakeIn(false); setMultiSel([]);
     setTimeout(() => {
       setIntakeIn(true); setMood(INTAKE_QUESTIONS[next].mood);
-      if (!muted) { setSpeaking(true); SpeechEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, { rate:1.38, pitch:1.62, signal:sig.current, onDone:() => setSpeaking(false) }); }
+      if (!muted) { setSpeaking(true); SpeechEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
     }, 320);
     setIntakeData(newData);
   };
@@ -728,7 +728,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
                 <div style={{ padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(13,148,136,0.18)':'rgba(15,32,46,0.95)', border:m.role==='user'?'1px solid rgba(13,148,136,0.4)':'1px solid rgba(13,148,136,0.1)' }}>
                   {m.role==='user' ? <p style={{ color:'#f1f5f9', fontSize:14, lineHeight:1.58, margin:0, whiteSpace:'pre-wrap' }}>{m.content}</p> : <MarkdownText text={m.content}/>}
                 </div>
-                {m.role==='assistant' && <button onClick={() => SpeechEngine.unlockAndSpeak(m.content, { rate:1.38, pitch:1.55 })} title="Listen" style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}>🔊</button>}
+                {m.role==='assistant' && <button onClick={() => SpeechEngine.unlockAndSpeak(m.content, { rate:0.92, pitch:1.05 })} title="Listen" style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}>🔊</button>}
               </div>
             </div>
             {m.role==='assistant' && idx===lastAssistantIdx && !loading && m.suggestions && <SuggestionChips suggestions={m.suggestions} onSelect={onSend} disabled={loading}/>}

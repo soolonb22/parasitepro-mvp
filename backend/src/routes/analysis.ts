@@ -449,7 +449,7 @@ Return ONLY valid JSON with NO markdown, NO backticks, NO preamble. Use this exa
 Draw on knowledge from WHO, CDC, NHMRC, Queensland Health, TGA, UpToDate, and peer-reviewed literature. Cite 4–6 authoritative sources. Be specific, clinically accurate, and write in plain English accessible to an educated general audience. Do not prescribe specific medication names or dosages.`;
 
       const response = await anthropic.messages.create({
-        model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
+        model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
         max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }],
       });

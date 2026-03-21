@@ -198,7 +198,7 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
     ];
 
     const response = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
+      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
       max_tokens: 1400,
       system: systemPrompt,
       messages,
