@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
+import SignupAssistant from '../components/SignupAssistant';
 import axios from 'axios';
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
@@ -342,6 +343,7 @@ const SignupPage = () => {
         </div>
       </div>
 </div>
+    <SignupAssistant />
   );
 };
 

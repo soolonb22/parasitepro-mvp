@@ -12,7 +12,6 @@ import { useAuthStore } from '../store/authStore';
 import JournalPromptModal from '../components/JournalPromptModal';
 import VoiceAssistant from '../components/VoiceAssistant';
 import ParasiteProfile from '../components/ParasiteProfile';
-import ParasiteBot from '../components/ParasiteBot';
 import DeepDiveModal from '../components/DeepDiveModal';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -607,8 +606,6 @@ const AnalysisResultsPage = () => {
         </div>
       </div>
 
-      {/* ParasiteBot — always available on results page */}
-      <ParasiteBot reportData={analysis} />
 
       {showDeepDive && analysis.detections?.length > 0 && (
         <DeepDiveModal

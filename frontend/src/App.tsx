@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
-import ParasiteBot from './components/ParasiteBot';
 import ParaDox from './components/ParaDox';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
@@ -252,7 +251,6 @@ function App() {
           success: { iconTheme: { primary: '#10B981', secondary: 'var(--bg-elevated)' } },
           error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
         }} />
-        <ParasiteBot />
         <ParaDox />
         <Routes>
           {/* Public */}
