@@ -627,9 +627,9 @@ const AnalysisResultsPage = () => {
           onClose={() => setShowJournalPrompt(false)}
         />
       )}
-    </div>
       {/* ParasiteBot — contextual help on results page */}
-      <ParasiteBot reportData={analysis} />
+      <ParasiteBot />
+    </div>
   );
 };
 
