@@ -45,6 +45,15 @@ const CSS = `
   0%,100% { box-shadow:0 0 0 0 rgba(13,148,136,0.4); }
   50%     { box-shadow:0 0 0 6px rgba(13,148,136,0);  }
 }
+@keyframes sa-glow-flash {
+  0%   { filter:brightness(1) drop-shadow(0 0 0px #34d399); }
+  35%  { filter:brightness(1.35) drop-shadow(0 0 18px #34d399); }
+  100% { filter:brightness(1) drop-shadow(0 0 0px #34d399); }
+}
+@keyframes sa-confetti-out {
+  0%   { opacity:1; transform:translate(0,0) rotate(0deg) scale(1); }
+  100% { opacity:0; transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0.4); }
+}
 .sa-btn {
   padding: 9px 15px;
   background: rgba(13,148,136,0.12);
@@ -101,7 +110,7 @@ function speakText(text: string, onDone?: () => void) {
   window.speechSynthesis.cancel();
   const clean = text.replace(/\*\*/g,'').replace(/[🎁👋🚀✦📚✅🎯🔊🔇📋👤🎂📍✈️🔍⏱️]/g,'').trim();
   const utt = new SpeechSynthesisUtterance(clean);
-  utt.rate = 0.92; utt.pitch = 1.05; utt.volume = 1;
+  utt.rate = 1.05; utt.pitch = 0.95; utt.volume = 1;
   const voice = getBestVoice();
   if (voice) utt.voice = voice;
   utt.onend = () => onDone?.();
@@ -117,7 +126,7 @@ function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; si
   const [armOff, setArm]    = useState(0);
 
   useEffect(() => {
-    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false),110); next(); },2800+Math.random()*2200); return t; };
+    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false),110); next(); },4000+Math.random()*2000); return t; };
     const t = next(); return () => clearTimeout(t);
   },[]);
   useEffect(() => {
@@ -181,6 +190,44 @@ function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; si
   );
 }
 
+
+/* ── Confetti burst ──────────────────────────────────────────── */
+const CONFETTI_COLORS = ['#2dd4bf','#34d399','#fbbf24','#f472b6','#60a5fa','#a78bfa'];
+function Confetti() {
+  const particles = Array.from({length:16}, (_,i) => {
+    const angle  = (i / 16) * 360;
+    const dist   = 55 + Math.random() * 45;
+    const cx     = Math.round(Math.cos(angle * Math.PI/180) * dist) + 'px';
+    const cy     = Math.round(Math.sin(angle * Math.PI/180) * dist) + 'px';
+    const cr     = Math.round(Math.random() * 360) + 'deg';
+    const color  = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    const size   = 5 + Math.round(Math.random() * 5);
+    const delay  = (Math.random() * 0.2).toFixed(2) + 's';
+    return (
+      <div key={i} style={{
+        position:'absolute',
+        top:'50%', left:'50%',
+        width:size, height:size,
+        borderRadius: i%3===0 ? '50%' : 2,
+        background:color,
+        // CSS custom properties for the animation endpoint
+        ['--cx' as any]: cx,
+        ['--cy' as any]: cy,
+        ['--cr' as any]: cr,
+        animation:`sa-confetti-out 1.1s ${delay} ease-out forwards`,
+        pointerEvents:'none',
+        marginLeft: -size/2,
+        marginTop:  -size/2,
+      }}/>
+    );
+  });
+  return (
+    <div style={{position:'absolute',inset:0,overflow:'visible',pointerEvents:'none',zIndex:10}}>
+      {particles}
+    </div>
+  );
+}
+
 /* ── Script ──────────────────────────────────────────────────── */
 type Step = { text: string; mood: Mood; options: string[] };
 
@@ -217,7 +264,9 @@ export default function SignupAssistant() {
   const [intake,      setIntake]      = useState<Record<string,string>>({});
   const [showSummary, setShowSummary] = useState(false);
   const [savedFlash,  setSavedFlash]  = useState<number|null>(null);
-  const [voiceOn,     setVoiceOn]     = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [voiceOn,     setVoiceOn]     = useState(true);   // auto-narrate by default
+  const [gestureUnlocked, setGestureUnlocked] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const cssRef  = useRef(false);
   const liveRef = useRef<HTMLDivElement>(null);
@@ -271,6 +320,11 @@ export default function SignupAssistant() {
       setSpeaking(true);
       setMessages(prev => [...prev, { text: step.text, isUser: false }]);
       announce(step.text);
+      // Confetti burst on happy messages
+      if (step.mood === 'happy') {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 1400);
+      }
       const dur = Math.min(step.text.length * 35, 2500);
       if (voice) speakText(step.text, () => setSpeaking(false));
       else setTimeout(() => setSpeaking(false), dur);
@@ -278,6 +332,16 @@ export default function SignupAssistant() {
   },[announce]);
 
   function handleOption(option: string) {
+    // Unlock Web Speech API on first user gesture (browser autoplay policy)
+    if (!gestureUnlocked) {
+      setGestureUnlocked(true);
+      if (window.speechSynthesis) {
+        const warmup = new SpeechSynthesisUtterance('');
+        warmup.volume = 0;
+        window.speechSynthesis.speak(warmup);
+      }
+    }
+
     const intakeIndex = stepIdx - INTRO.length;
     const isIntake    = intakeIndex >= 0 && intakeIndex < INTAKE.length;
 
@@ -384,8 +448,12 @@ export default function SignupAssistant() {
           padding:'10px 12px',
           display:'flex', alignItems:'center', gap:10,
         }}>
-          {/* Avatar — bob + rotate via CSS */}
-          <div style={{flexShrink:0, animation:'sa-bob 4s ease-in-out infinite'}}>
+          {/* Avatar — bob + rotate via CSS, glow on happy, confetti burst */}
+          <div style={{
+            flexShrink:0, position:'relative',
+            animation:`sa-bob 4s ease-in-out infinite${mood==='happy'?', sa-glow-flash 0.9s ease':''}`,
+          }}>
+            {showConfetti && <Confetti/>}
             <Robot mood={mood} speaking={speaking} size={0.36}/>
           </div>
 
