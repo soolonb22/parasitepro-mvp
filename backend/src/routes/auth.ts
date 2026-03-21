@@ -6,9 +6,15 @@ import { generateAccessToken, authenticateToken, AuthRequest } from '../middlewa
 
 const router = express.Router();
 
+// Valid promo codes — add new ones here any time
+const PROMO_CODES: Record<string, number> = {
+  'BETA3FREE': 3,
+  'NOTWORMS3': 3,
+};
+
 router.post('/signup', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, promoCode } = req.body;
 
     const existingUser = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
@@ -16,17 +22,22 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Validate promo code and determine starting credits
+    const code = promoCode?.trim().toUpperCase();
+    const promoCredits = code && PROMO_CODES[code] ? PROMO_CODES[code] : 0;
+    const startingCredits = promoCredits > 0 ? promoCredits : 1; // 1 free credit always on signup
+
     const passwordHash = await bcrypt.hash(password, 12);
 
     const result = await query(
-      'INSERT INTO users (email, password_hash, first_name, last_name, image_credits) VALUES ($1, $2, $3, $4, 0) RETURNING id, email, first_name, last_name, image_credits',
-      [email, passwordHash, firstName || null, lastName || null]
+      'INSERT INTO users (email, password_hash, first_name, last_name, image_credits) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, first_name, last_name, image_credits',
+      [email, passwordHash, firstName || null, lastName || null, startingCredits]
     );
 
     const user = result.rows[0];
     const accessToken = generateAccessToken(user.id, user.email);
 
-    console.log(' User registered:', user.email);
+    console.log(`✅ User registered: ${user.email} | credits: ${user.image_credits}${promoCredits > 0 ? ' (promo: ' + code + ')' : ''}`);
 
     res.status(201).json({
       user: {
@@ -36,7 +47,9 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
         lastName: user.last_name,
         imageCredits: user.image_credits
       },
-      accessToken
+      accessToken,
+      promoApplied: promoCredits > 0,
+      promoCredits,
     });
   } catch (error) {
     console.error('Signup error:', error);

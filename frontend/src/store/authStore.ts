@@ -19,6 +19,7 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (user: User, accessToken: string, refreshToken?: string) => void;
   logout: () => void;
+  signup: (email: string, password: string, firstName: string, lastName: string, promoCode?: string) => Promise<any>;
   updateUser: (updates: Partial<User>) => void;
   setAccessToken: (token: string) => void;
   refreshUser: () => Promise<void>;
@@ -31,6 +32,20 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+
+      signup: async (email, password, firstName, lastName, promoCode) => {
+        const res = await fetch(`${API_URL}/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, firstName, lastName, promoCode }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw { response: { data } };
+        if (data.user && data.accessToken) {
+          set({ user: data.user, accessToken: data.accessToken, refreshToken: null, isAuthenticated: true });
+        }
+        return data;
+      },
 
       login: (user, accessToken, refreshToken) =>
         set({
