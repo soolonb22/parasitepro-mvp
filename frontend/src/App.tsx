@@ -8,6 +8,7 @@ import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 // Core pages
 import DashboardPage from './pages/DashboardPage';
+import ScientificLibraryPage from './pages/ScientificLibraryPage';
 import UploadPage from './pages/UploadPage';
 import AnalysisResultsPage from './pages/AnalysisResultsPage';
 import SettingsPage from './pages/SettingsPage';
@@ -295,6 +296,7 @@ function App() {
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/food-diary" element={<ProtectedRoute><FoodDiaryPage /></ProtectedRoute>} />
+          <Route path="/scientific-library" element={<ScientificLibraryPage />} />
           <Route path="/treatment-tracker" element={<ProtectedRoute><TreatmentTrackerPage /></ProtectedRoute>} />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
