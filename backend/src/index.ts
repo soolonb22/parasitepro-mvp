@@ -71,9 +71,14 @@ const corsOptions: cors.CorsOptions = {
   optionsSuccessStatus: 200,
 };
 
-// Middleware
+// ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(helmet());
 app.use(compression());
+
+// ⚠️ CRITICAL: Stripe webhook needs raw body — MUST be registered BEFORE express.json()
+// express.raw() only matches /api/payment/webhook; all other routes get json() below
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
@@ -125,7 +130,7 @@ try {
 try {
   adminRouter = require('./routes/admin').default;
   app.use('/api/admin', adminRouter);
-  console.log("✅ Admin routes loaded");
+  console.log('✅ Admin routes loaded');
 } catch (e: any) {
   console.error('❌ Failed to load admin routes:', e.message);
 }
@@ -144,6 +149,14 @@ try {
   console.log('✅ ParaDox routes loaded');
 } catch (e: any) {
   console.error('❌ Failed to load paradox routes:', e.message);
+}
+
+try {
+  const encyclopediaRouter = require('./routes/encyclopedia').default;
+  app.use('/api/encyclopedia', encyclopediaRouter);
+  console.log('✅ Encyclopedia routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load encyclopedia routes:', e.message);
 }
 
 // 404 handler

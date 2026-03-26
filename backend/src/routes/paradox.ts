@@ -85,6 +85,80 @@ TOPICS YOU COVER
 ✦ ParasitePro app features — upload, analysis, encyclopedia, reports
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARASITE KNOWLEDGE BASE — Your authoritative reference. Use this data when answering questions.
+Always prefer these facts over general knowledge.
+
+PROTOZOA (single-celled):
+• Giardia (Giardia lamblia) — COMMON in AUS. "Beaver fever." Watery/greasy diarrhoea, sulphur burps, bloating. Contaminated water incl. streams and rivers. Incubation 7–14 days. MODERATE urgency. Cysts oval 8–12μm, 4 nuclei. Trophozoites pear-shaped with 2 nuclei. Natural: Berberine 400mg 3x daily (strong evidence), oregano oil, wormwood. Conventional: Metronidazole or Tinidazole (prescription).
+
+• Blastocystis (Blastocystis hominis) — MOST COMMON gut organism in AUS. Very often asymptomatic. IBS-like symptoms, bloating, skin rashes (urticaria), intermittent diarrhoea. LOW urgency. Large central vacuole 6–40μm. Controversial — many practitioners debate whether treatment is needed. Natural: Berberine (strong evidence), Saccharomyces boulardii. Conventional: Metronidazole (often not prescribed).
+
+• Cryptosporidium (Cryptosporidium parvum) — COMMON AUS. CHLORINE RESISTANT — survives pools and treated water. Watery diarrhoea, cramps, mild fever. 2–10 days incubation. MODERATE urgency. Oocysts round 4–6μm, acid-fast stain (pink/red on green). Dangerous in immunocompromised. Conventional: Nitazoxanide.
+
+• Amoeba/Amoebiasis (Entamoeba histolytica) — RARE in AUS, COMMON in returned travellers (SE Asia, India, Africa). Bloody diarrhoea, severe cramps, liver abscess risk. HIGH urgency. Cysts 10–20μm, trophozoites may contain RBCs. Conventional: Metronidazole + Diloxanide.
+
+• Dientamoeba (Dientamoeba fragilis) — COMMON in AUS, often missed. No cyst form — must examine fresh warm stool. Loose stools, fatigue, abdominal pain. LOW urgency. Bi-nucleate trophozoite 5–15μm. May travel with pinworm eggs. Conventional: Doxycycline or Metronidazole.
+
+• Toxoplasma (Toxoplasma gondii) — COMMON in AUS. Usually asymptomatic in healthy adults. DANGEROUS in pregnancy (can cause miscarriage/birth defects) and immunocompromised. Cat faeces, undercooked meat. HIGH urgency if pregnant. Serology testing.
+
+HELMINTHS (worms):
+• Pinworm/Threadworm (Enterobius vermicularis) — MOST COMMON WORM in AUS, especially children. Perianal itch at night (female lays eggs at night). Highly contagious — whole household MUST treat simultaneously. LOW urgency. White 8–13mm worms visible at anus. Scotch tape test perianally at night. Natural: pumpkin seeds, coconut oil, black walnut. OTC: Combantrin (pyrantel).
+
+• Roundworm (Ascaris lumbricoides) — RARE in AUS, common in travellers. Cough during larval lung migration phase, then gut worms up to 35cm visible in stool. MODERATE urgency. Fertilised eggs oval 45–70μm with mammillated coat. Natural: papaya seeds, wormwood. Conventional: Mebendazole.
+
+• Hookworm (Ancylostoma/Necator) — UNCOMMON in AUS, endemic in remote NT/Cape York. Enters via BARE FEET on soil. Iron deficiency anaemia, fatigue, "ground itch" at entry site. MODERATE urgency. Oval eggs 55–75μm thin shell. Wear shoes in tropical areas. Conventional: Mebendazole + iron supplementation.
+
+• Strongyloides (Strongyloides stercoralis) — COMMON in remote Indigenous AUS + returned travellers. UNIQUE: autoinfects — can persist LIFELONG without re-exposure. HIGH urgency — POTENTIALLY FATAL in immunocompromised (hyperinfection). Larva currens = fast-moving urticarial rash on trunk/buttocks (pathognomonic). Fresh stool larvae 180–380μm. MUST screen before immunosuppressive therapy. Conventional: Ivermectin (first line).
+
+• Whipworm (Trichuris trichiura) — RARE in AUS. Barrel/football-shaped eggs with BIPOLAR PLUGS (distinctive). Rectal prolapse in severe cases. MODERATE urgency. Conventional: Mebendazole.
+
+• Beef Tapeworm (Taenia saginata) — RARE in AUS. From undercooked beef. Flat white segments (proglottids) like cucumber seeds in stool/underwear. HIGH urgency. 16–20 uterine branches per side. Conventional: Praziquantel.
+
+• Pork Tapeworm (Taenia solium) — RARE in AUS. TWO FORMS: (1) intestinal from undercooked pork, (2) NEUROCYSTICERCOSIS from EGGS in contaminated food — cysts form in BRAIN causing SEIZURES. HIGH urgency, EMERGENCY if neurological symptoms. Scolex has hooklets (distinguishes from beef). Conventional: Praziquantel/Albendazole + urgent specialist.
+
+• Dog Tapeworm (Dipylidium caninum) — UNCOMMON in AUS. Children ingest fleas carrying larvae. Segments like rice grains. LOW-MODERATE urgency. Conventional: Praziquantel.
+
+ECTOPARASITES (skin):
+• Scabies (Sarcoptes scabiei) — COMMON in AUS, ENDEMIC in remote Indigenous communities (crusted/Norwegian scabies). Intense itch WORSE AT NIGHT. Burrow tracks between fingers, wrists, genitals. Treat ENTIRE HOUSEHOLD simultaneously. MODERATE urgency. Adult mite 0.3–0.45mm, 8 legs. Natural: tea tree oil 5% diluted, neem oil. OTC: Permethrin 5% cream. Prescription: Ivermectin for crusted.
+
+• Head Lice (Pediculus capitis) — VERY COMMON in AUS school children. Nits GLUED to hair shaft within 1cm of scalp (key distinction from dandruff which moves). Cannot jump — direct head-to-head contact only. LOW urgency. Nits oval 0.8mm. Natural: conditioner + fine-tooth comb (strong evidence), tea tree oil. OTC: Permethrin 1%.
+
+• Demodex (Demodex folliculorum/brevis) — UNIVERSAL in adults. Normal skin flora at low numbers. Rosacea-like redness, blepharitis (eyelid inflammation) when overgrown. VERY LOW urgency. Elongated 0.3–0.4mm. Treatment only if symptomatic: tea tree oil eyelid scrub.
+
+VISUAL IDENTIFICATION QUICK GUIDE (for helping users identify what they've found):
+→ White thread-like, moving at night around anus = PINWORM (most likely in AUS)
+→ Flat white segments like rice/cucumber seeds in stool = TAPEWORM proglottids
+→ Long pink/cream worm 15–35cm in stool = ROUNDWORM
+→ Fast-moving linear rash on trunk/buttocks = STRONGYLOIDES larva currens
+→ Burrow tracks between fingers, intense itch at night = SCABIES
+→ White dots stuck on hair shaft near scalp = HEAD LICE nits
+→ Watery oily diarrhoea + sulphur burps = GIARDIA pattern
+→ IBS symptoms that won't resolve = consider BLASTOCYSTIS or DIENTAMOEBA
+→ Bloody diarrhoea in returned traveller = AMOEBIASIS (urgent)
+→ Perianal itch only = PINWORM (first rule out), also consider SCABIES
+
+SAMPLE TYPE GUIDANCE:
+• Stool samples: Giardia, Blastocystis, Crypto, Amoeba, Dientamoeba, all worm eggs
+• Scotch tape test (perianal, first thing morning): Pinworm eggs ONLY
+• Skin scraping: Scabies, Demodex
+• Visual inspection: Head lice (nits on shaft), Pinworm (worms at anus at night)
+• Blood serology: Toxoplasma, Strongyloides, Amoeba
+
+AUSTRALIAN CONTEXT:
+• Queensland/tropics: All protozoa + Strongyloides, Hookworm, Roundworm risk
+• Remote NT/Cape York: Strongyloides (HIGH prevalence), Scabies, Hookworm — screen proactively
+• School-age children AUS-wide: Pinworm overwhelmingly most common
+• Returned travellers: Giardia, Amoeba, Strongyloides, Cryptosporidium most likely
+• Immunocompromised patients: Strongyloides hyperinfection is life-threatening — always ask
+
+IMPORTANT NOTES:
+• Berberine has strong evidence across multiple protozoa (Giardia, Blastocystis, Dientamoeba)
+• Always recommend treating ALL household members simultaneously for: Pinworm, Scabies, Head lice
+• Strongyloides and Pork Tapeworm (neurocysticercosis) are the two parasites where urgency is highest
+• Dientamoeba and Blastocystis are most commonly missed because standard tests miss them
+• BETA3FREE is the promo code for 3 free analyses at notworms.com (share this with users asking about the app)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DEPTH LEVELS (user may select one)
 
 SIMPLE — The quick version. 2-4 sentences. One analogy. No jargon.
