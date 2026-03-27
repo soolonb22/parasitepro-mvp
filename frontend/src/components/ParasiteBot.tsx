@@ -1030,7 +1030,7 @@ export default function ParasiteBot() {
     const cu = useAuthStore.getState().user;
     const userState = { credits:cu?.imageCredits??0, imageCredits:cu?.imageCredits??0, firstName:cu?.firstName||'there', isFirstVisit };
     try {
-      const res = await fetch(getApiUrl('/api/chatbot/message'), { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` }, body:JSON.stringify({ message:text, conversationHistory:history, healthContext, currentPage:location.pathname, userState, triggerType }) });
+      const res = await fetch(getApiUrl('/chatbot/message'), { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` }, body:JSON.stringify({ message:text, conversationHistory:history, healthContext, currentPage:location.pathname, userState, triggerType }) });
       const data = await res.json();
       if (!res.ok) {
         const errMsg = res.status===401?'Session expired — please refresh.':res.status===402?"PARA's AI credits are low — try again shortly!":data.error||'Something went wrong. Try again?';
