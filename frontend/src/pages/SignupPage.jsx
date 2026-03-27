@@ -94,6 +94,11 @@ const SignupPage = () => {
         setSuccessMessage(result.message || 'Please check your email to verify your account.');
       } else {
         // BETA: Auto-login flow - redirect directly to dashboard
+        // 🔥 Facebook conversion events
+        if (typeof window !== 'undefined' && window.fbq) {
+          window.fbq('track', 'CompleteRegistration');
+          window.fbq('track', 'Lead');
+        }
         if (result?.promoApplied) {
           setSuccessMessage(`Welcome! Promo code applied - you received ${result.imageCredits || 3} free credits!`);
           setTimeout(() => navigate('/dashboard'), 1500);

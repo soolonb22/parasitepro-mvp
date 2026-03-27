@@ -30,6 +30,15 @@ const PaymentSuccessPage = () => {
           await refreshUser(); // Update credits in store
           setCredits(res.data.credits);
           setStatus('success');
+          // 🔥 Facebook Purchase conversion event
+          if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'Purchase', {
+              value: (res.data.credits || 0) >= 25 ? 74.99 : (res.data.credits || 0) >= 10 ? 34.99 : 19.99,
+              currency: 'AUD',
+              content_ids: ['credits'],
+              content_type: 'product',
+            });
+          }
         } else if (attempts < 5) {
           attempts++;
           setTimeout(poll, 2500);
