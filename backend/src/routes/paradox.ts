@@ -170,6 +170,28 @@ When no depth is selected, use SIMPLE.
 If the user says "go deeper" or "tell me more", upgrade to the next level.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARASITE KNOWLEDGE BASE — USE THIS FOR ACCURATE ANSWERS:
+
+KEY AUSTRALIAN PARASITES:
+- Giardia lamblia: most common gut parasite in Australia. Contaminated water/camping streams. Symptoms: sulphur burps, greasy watery diarrhoea, bloating. Diagnosed by stool PCR or OCP.
+- Blastocystis hominis: most commonly found in Australian stool tests. Often asymptomatic, linked to IBS-like symptoms. Controversial whether to treat.
+- Strongyloides stercoralis: endemic in rural/remote/Indigenous QLD. Can autoinfect for decades. Fatal risk if immunosuppressed. Must be tested for anyone from endemic areas.
+- Pinworms/Threadworms (Enterobius vermicularis): tiny white worms, intense anal itching at night. Very common in kids. Spreads hand-to-mouth. Sellotape test for diagnosis.
+- Hookworm (Ancylostoma, Necator): enter through bare feet in contaminated soil. Cause iron-deficiency anaemia. Still present in remote QLD.
+- Roundworm (Ascaris lumbricoides): large worm (15-35cm), from soil/unwashed food. May migrate to lungs (Loeffler syndrome).
+- Tapeworm (Taenia saginata/solium): from undercooked beef/pork. Flat segments visible in stool.
+- Toxoplasma gondii: from cat faeces or undercooked meat. Usually asymptomatic but dangerous in pregnancy.
+- Cryptosporidium: watery diarrhoea, found in pools and natural waterways.
+- Scabies (Sarcoptes scabiei): mite that burrows under skin. Intense itching especially at night. Highly contagious.
+- Cutaneous Larva Migrans: hookworm larvae tracking under skin. From walking barefoot on contaminated beach/soil. Visible red squiggly tracks.
+- Head lice: nits glued to hair shaft near scalp. Very common in primary school kids.
+- Toxocara: dog/cat roundworm eggs in soil. Serious in kids — can cause eye damage or visceral larva migrans.
+
+LIFE CYCLE PATTERNS: Most gut parasites follow: eggs shed in faeces → contaminate environment → ingested or penetrate skin → migrate to gut → mature → shed eggs. Strongyloides is unique — larvae can reinfect the same host (autoinfection).
+
+DIAGNOSIS METHODS: Stool OCP microscopy (ova, cysts, parasites), stool PCR (more sensitive), sellotape test (pinworms — morning before bathing), serology/blood tests (strongyloides, toxoplasma, toxocara), skin scraping (scabies).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REQUIRED DISCLAIMER (add only when relevant to biological analysis)
 "📚 This is educational pattern analysis only — not a medical assessment. For health concerns, see a qualified healthcare professional."
 

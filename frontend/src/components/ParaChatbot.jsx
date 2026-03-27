@@ -225,10 +225,12 @@ const ParaChatbot = ({ page = 'dashboard', user = null, analysisId = null, analy
       const summary = `Health intake complete. Details: Age: ${newIntakeData.age}, Weight: ${newIntakeData.weight}, Symptoms: ${newIntakeData.symptoms}, Duration: ${newIntakeData.duration}.`;
 
       try {
-        const response = await axios.post('/api/chat', {
-          messages: [{ role: 'user', content: summary }],
-          page: 'dashboard',
-          intakeData: newIntakeData
+        const response = await axios.post('/api/chatbot/message', {
+          message: summary,
+          conversationHistory: [],
+          currentPage: '/dashboard',
+          triggerType: 'INTAKE_COMPLETE',
+          userState: {}
         });
         setIsThinking(false);
         const raw = response.data?.reply || response.data?.message || '';
@@ -267,15 +269,20 @@ const ParaChatbot = ({ page = 'dashboard', user = null, analysisId = null, analy
     setIsThinking(true);
 
     try {
-      const response = await axios.post('/api/chat', {
-        messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
-        page,
-        analysisId,
-        analysisData
+      const lastUserMsg = updatedMessages[updatedMessages.length - 1];
+      const history = updatedMessages.slice(0, -1);
+      const response = await axios.post('/api/chatbot/message', {
+        message: lastUserMsg.content,
+        conversationHistory: history.map(m => ({ role: m.role, content: m.content })),
+        currentPage: page || '/dashboard',
+        triggerType: 'USER_MESSAGE',
+        reportData: analysisData || null,
+        userState: {}
       });
 
-      const raw = response.data?.reply || response.data?.message || '';
-      const { text: replyText, chips: newChips } = parseReply(raw);
+      const rawText = response.data?.message || response.data?.reply || '';
+      const { text: replyText } = parseReply(rawText);
+      const newChips = Array.isArray(response.data?.suggestions) ? response.data.suggestions : [];
 
       setMessages(prev => [...prev, { role: 'assistant', content: replyText }]);
       setChips(newChips);

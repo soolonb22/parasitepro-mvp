@@ -40,6 +40,10 @@ export default function Navbar() {
                   style={{ color: 'var(--text-secondary)' }}>
                   <Upload size={14} /> New Analysis
                 </Link>
+                <Link to="/encyclopedia" className="flex items-center gap-1.5 text-sm hover:opacity-80 transition-opacity"
+                  style={{ color: 'var(--text-primary)' }}>
+                  🔬 Encyclopedia
+                </Link>
                 <Link to="/scientific-library" className="flex items-center gap-1.5 text-sm hover:opacity-80 transition-opacity"
                   style={{ color: 'var(--text-secondary)' }}>
                   <BookOpen size={14} /> Scientific Library
@@ -85,6 +89,8 @@ export default function Navbar() {
                   style={{ color: 'var(--text-secondary)' }} onClick={() => setMenuOpen(false)}>Dashboard</Link>
                 <Link to="/upload" className="block px-3 py-2 text-sm rounded-lg hover:bg-white/5"
                   style={{ color: 'var(--text-secondary)' }} onClick={() => setMenuOpen(false)}>New Analysis</Link>
+                <Link to="/encyclopedia" className="block px-3 py-2 text-sm rounded-lg hover:bg-white/5" onClick={() => setMenuOpen(false)}
+                  style={{ color: 'var(--text-primary)' }}>🔬 Encyclopedia</Link>
                 <Link to="/scientific-library" className="block px-3 py-2 text-sm rounded-lg hover:bg-white/5"
                   style={{ color: 'var(--text-secondary)' }} onClick={() => setMenuOpen(false)}>Scientific Library</Link>
                 <Link to="/settings" className="block px-3 py-2 text-sm rounded-lg hover:bg-white/5"

@@ -83,7 +83,7 @@ function AuthShell({ children }: { children: React.ReactNode }) {
             Upload a photo. Get a structured, evidence-based parasite identification in seconds. Built for Australians who live where the wildlife bites back.
           </p>
           <div className="grid grid-cols-3 gap-4 pt-2">
-            {[{ label: 'Sample Types', value: '6+' }, { label: 'AI Accuracy', value: '94%' }, { label: 'Avg. Response', value: '<30s' }].map(({ label, value }) => (
+            {[{ label: 'Sample Types', value: '6+' }, { label: 'Analyses Run', value: '500+' }, { label: 'Avg. Response', value: '<30s' }].map(({ label, value }) => (
               <div key={label} className="space-y-1">
                 <div className="font-display font-bold text-2xl" style={{ color: 'var(--amber-bright)' }}>{value}</div>
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</div>
@@ -297,6 +297,7 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/food-diary" element={<ProtectedRoute><FoodDiaryPage /></ProtectedRoute>} />
           <Route path="/scientific-library" element={<ScientificLibraryPage />} />
+          <Route path="/encyclopedia" element={<ScientificLibraryPage />} />
           <Route path="/treatment-tracker" element={<ProtectedRoute><TreatmentTrackerPage /></ProtectedRoute>} />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
