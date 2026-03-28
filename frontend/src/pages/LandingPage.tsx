@@ -9,6 +9,7 @@ import {
 import LiveStatsTicker from '../components/LiveStatsTicker';
 import AustraliaRiskMap from '../components/AustraliaRiskMap';
 import SymptomChecker from '../components/SymptomChecker';
+import { LandingPARA } from '../components/ParasiteBot';
 
 const LandingPage = () => {
   const navigate = useNavigate();
