@@ -174,6 +174,11 @@ function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const [promoCode, setPromoCode] = useState(() => {
+    // Pre-fill from SignupAssistant if BETA3FREE was offered
+    try { return sessionStorage.getItem('para_promo_code') || ''; } catch { return ''; }
+  });
+  const [promoApplied, setPromoApplied] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setError(''); setLoading(true);
@@ -182,11 +187,21 @@ function SignupPage() {
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
     const firstName = (form.elements.namedItem('firstName') as HTMLInputElement).value;
     const lastName = (form.elements.namedItem('lastName') as HTMLInputElement).value;
+    const code = promoCode.trim().toUpperCase();
     try {
-      const res = await fetch(`${API_URL}/auth/signup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, firstName, lastName }) });
+      const res = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, firstName, lastName, ...(code ? { promoCode: code } : {}) }),
+      });
       const data = await res.json();
-      if (res.ok) { login(data.user, data.accessToken, data.refreshToken); window.location.href = '/dashboard'; }
-      else setError(data.error || 'Sign up failed. Please try again.');
+      if (res.ok) {
+        login(data.user, data.accessToken, data.refreshToken);
+        try { sessionStorage.removeItem('para_promo_code'); } catch {}
+        if (data.promoApplied && data.promoCredits) {
+          sessionStorage.setItem('para_promo_toast', String(data.promoCredits));
+        }
+        window.location.href = '/dashboard';
+      } else setError(data.error || 'Sign up failed. Please try again.');
     } catch { setError('Unable to connect. Please try again.'); }
     finally { setLoading(false); }
   };
@@ -196,7 +211,9 @@ function SignupPage() {
       <div className="animate-slide-up space-y-7">
         <div>
           <h2 className="font-display font-bold text-2xl mb-1" style={{ color: 'var(--text-primary)' }}>Create account</h2>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Start with 3 free analyses. No credit card required.</p>
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            {promoCode ? <span>Code <strong style={{ color: 'var(--amber-bright)', fontFamily: 'monospace' }}>{promoCode}</strong> applied — 3 free analyses incoming!</span> : 'Start with your first free analysis. No credit card required.'}
+          </p>
         </div>
         {error && (
           <div className="flex items-start gap-3 rounded-lg p-3 text-sm"
@@ -222,9 +239,19 @@ function SignupPage() {
               </button>
             </div>
           </div>
+          <div>
+            <label className="pp-label">Promo code <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
+            <input
+              type="text" placeholder="e.g. BETA3FREE"
+              value={promoCode}
+              onChange={e => setPromoCode(e.target.value.toUpperCase())}
+              className="pp-input"
+              style={{ fontFamily: promoCode ? 'monospace' : undefined, textTransform: 'uppercase', letterSpacing: promoCode ? '0.08em' : undefined }}
+            />
+          </div>
           <button type="submit" disabled={loading} className="pp-btn-primary w-full" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
             {loading ? <span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Creating account…</span>
-              : <span className="flex items-center justify-center gap-2">Create free account <ArrowRight size={16} /></span>}
+              : <span className="flex items-center justify-center gap-2">{promoCode ? 'Claim free analyses' : 'Create free account'} <ArrowRight size={16} /></span>}
           </button>
           <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
             By signing up you agree to our <a href="/terms" style={{ color: 'var(--amber)' }}>Terms</a> and <a href="/privacy" style={{ color: 'var(--amber)' }}>Privacy Policy</a>.

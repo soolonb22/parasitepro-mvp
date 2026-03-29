@@ -408,6 +408,8 @@ export default function SignupAssistant() {
 
     if (next === ALL_STEPS.length) {
       const summaryMsg = "All set! This info will help make your report super accurate. Click below to finish signup.";
+      // Write promo code to sessionStorage so the signup form picks it up automatically
+      try { sessionStorage.setItem('para_promo_code', 'BETA3FREE'); } catch {}
       setTimeout(() => {
         setThinking(false); setShowSummary(true); setMood('happy'); setSpeaking(false);
         announce("All set! Your information has been collected.");

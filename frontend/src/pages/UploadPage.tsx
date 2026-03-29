@@ -58,7 +58,11 @@ const UploadPage = () => {
 
   const handleUpload = () => {
     if (!selectedFile) { toast.error('Please select an image first'); return; }
-    if (!hasCredits) { toast.error('You need credits to analyse images'); navigate('/pricing'); return; }
+    if (!hasCredits) {
+      toast.error('No credits left — redirecting to pricing…', { duration: 2500 });
+      setTimeout(() => navigate('/pricing'), 2000);
+      return;
+    }
     const privacyAccepted = localStorage.getItem(PRIVACY_CONSENT_KEY);
     if (!privacyAccepted) { setShowPrivacyConsent(true); setPendingUpload(true); return; }
     setShowPricingConfirm(true);
