@@ -198,169 +198,183 @@ function MarkdownText({ text }: { text: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   PARA AVATAR — cyberpunk teal-skin human, glowing blue eyes,
-   gaming headset, dark hair. Inspired by ParasitePro branding.
+   PARA AVATAR — Superhero: blue suit, gold cape, spiky brown
+   hair, big smile, blue shield. ParasitePro mascot.
 ══════════════════════════════════════════════════════════════ */
 function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; size?: number }) {
-  const [blink,  setBlink]  = useState(false);
-  const [mouth,  setMouth]  = useState(0);
-  const [pulse,  setPulse]  = useState(false);
+  const [blink, setBlink] = useState(false);
+  const [mouth, setMouth] = useState(0);
+  const [pulse, setPulse] = useState(false);
 
-  // Blink every 4-6s
   useEffect(() => {
     const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false), 120); next(); }, 4000 + Math.random() * 2000); return t; };
     const t = next(); return () => clearTimeout(t);
   }, []);
-  // Mouth animate while speaking
   useEffect(() => {
     if (!speaking) { setMouth(0); return; }
     const t = setInterval(() => setMouth(p => (p + 1) % 4), 140); return () => clearInterval(t);
   }, [speaking]);
-  // Headset LED pulse
   useEffect(() => {
-    const t = setInterval(() => setPulse(v => !v), 800 + Math.random() * 400); return () => clearInterval(t);
+    const t = setInterval(() => setPulse(v => !v), 900 + Math.random() * 300); return () => clearInterval(t);
   }, []);
 
-  // Mood-driven colours
-  const eyeGlow  = mood==='concerned'?'#f87171' : mood==='happy'?'#34d399' : mood==='thinking'?'#c4b5fd' : '#60a5fa';
-  const ledColor = mood==='thinking'?'#c4b5fd' : mood==='happy'?'#34d399' : mood==='concerned'?'#f87171' : '#f97316'; // orange headset default
-  const skinBase = mood==='concerned'?'#1a6060' : mood==='happy'?'#0d7070' : '#1a7f7f';
-  const skinMid  = mood==='concerned'?'#226666' : mood==='happy'?'#12887a' : '#228888';
-  const skinHi   = mood==='concerned'?'#2a7a7a' : mood==='happy'?'#18a090' : '#2aa0a0';
+  // Palette
+  const skinBase = '#FFBA80';
+  const skinMid  = '#E8964A';
+  const skinHi   = '#FFD4A8';
+  const hairDk   = '#2D1200';
+  const hairMd   = '#4A2000';
+  const suitBlue = '#1E40AF';
+  const suitLt   = '#2563EB';
+  const capeGold = '#FBBF24';
+  const capeDk   = '#D97706';
+  const shieldBl = '#93C5FD';
 
-  // Mouth paths — rest / open1 / open2 / open3
+  // Mood-reactive colours
+  const irisCol = mood==='concerned'?'#60A5FA':mood==='happy'?'#34D399':'#3B82F6';
+  const glowCol = mood==='concerned'?'#F87171':mood==='happy'?'#34D399':mood==='thinking'?'#C4B5FD':'#60A5FA';
+
+  // Mouth paths — rest / slight / medium / wide open
   const mouthPaths = [
-    'M 38 78 Q 50 83 62 78',           // closed smile
-    'M 39 78 Q 50 85 61 78',           // slight open
-    'M 40 77 Q 50 88 60 77',           // medium open
-    'M 41 76 Q 50 91 59 76',           // wide open (speaking)
+    'M 40 83 Q 55 93 70 83',
+    'M 41 83 Q 55 94 69 83',
+    'M 42 82 Q 55 96 68 82',
+    'M 43 81 Q 55 98 67 81',
   ];
-  const mp = speaking ? mouthPaths[mouth] : (mood==='concerned' ? 'M 40 80 Q 50 77 60 80' : mouthPaths[0]);
-
-  const eyeH = blink ? 1 : mood==='surprised' ? 10 : mood==='happy' ? 7 : 8;
+  const mp = speaking ? mouthPaths[mouth] : (mood==='concerned' ? 'M 43 87 Q 55 83 67 87' : mouthPaths[0]);
+  const eyeH = blink ? 1 : mood==='surprised' ? 11 : mood==='happy' ? 8 : 9;
 
   return (
     <svg width={110*size} height={150*size} viewBox="0 0 110 150"
-      style={{ overflow:'visible', filter:`drop-shadow(0 0 ${speaking?20:10}px ${eyeGlow}60)`, transition:'filter 0.3s' }}>
+      style={{ overflow:'visible', filter:`drop-shadow(0 4px 20px rgba(30,64,175,0.5))`, transition:'filter 0.3s' }}>
+
+      {/* ── Gold Cape (behind everything) ── */}
+      <path d="M 8 150 Q 2 112 22 93 Q 40 138 55 130 Q 70 138 88 93 Q 108 112 102 150"
+        fill={capeGold} stroke={capeDk} strokeWidth="1.5"/>
+      <path d="M 22 93 Q 38 128 55 130 Q 72 128 88 93 Q 78 118 55 123 Q 32 118 22 93"
+        fill={capeDk} opacity="0.3"/>
+      <path d="M 8 150 Q 15 130 22 93" fill="none" stroke={capeDk} strokeWidth="1" opacity="0.4"/>
+      <path d="M 102 150 Q 95 130 88 93" fill="none" stroke={capeDk} strokeWidth="1" opacity="0.4"/>
 
       {/* ── Neck ── */}
-      <rect x="40" y="112" width="30" height="22" rx="8" fill={skinBase}/>
-      <rect x="44" y="112" width="22" height="14" rx="4" fill={skinMid} opacity="0.6"/>
+      <rect x="43" y="110" width="24" height="22" rx="8" fill={skinBase}/>
+      <rect x="46" y="113" width="18" height="13" rx="4" fill={skinMid} opacity="0.35"/>
 
-      {/* ── Shoulders / body ── */}
-      <ellipse cx="55" cy="145" rx="38" ry="14" fill="#0f172a" stroke="rgba(13,148,136,0.3)" strokeWidth="1.5"/>
-      {/* Collar neon line */}
-      <path d="M 20 138 Q 55 128 90 138" fill="none" stroke="#0d9488" strokeWidth="1.5" opacity="0.7"/>
-      {/* Jacket seam */}
-      <line x1="55" y1="128" x2="55" y2="150" stroke="rgba(13,148,136,0.25)" strokeWidth="1"/>
+      {/* ── Blue Suit Shoulders & Collar ── */}
+      <ellipse cx="55" cy="150" rx="44" ry="16" fill={suitBlue}/>
+      <path d="M 18 140 L 55 122 L 92 140" fill={suitBlue} stroke="#1E3A8A" strokeWidth="1.5"/>
+      <path d="M 25 140 L 55 124 L 85 140" fill="none" stroke={suitLt} strokeWidth="0.8" opacity="0.4"/>
+      {/* Gold diamond chest emblem */}
+      <path d="M 55 124 L 64 131 L 55 140 L 46 131 Z" fill={capeGold} stroke={capeDk} strokeWidth="1"/>
+      <path d="M 55 126 L 61 131 L 55 138 L 49 131 Z" fill="#FDE68A" opacity="0.8"/>
+      {/* P on emblem */}
+      <path d="M 52 128 L 52 136 M 52 128 L 56 129 Q 58 131 56 133 L 52 133"
+        fill="none" stroke={capeDk} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Green boot-colour accent trim */}
+      <path d="M 15 148 Q 22 142 32 142" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
+      <path d="M 95 148 Q 88 142 78 142" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
 
-      {/* ── Head shape ── */}
-      <ellipse cx="55" cy="65" rx="34" ry="38" fill={skinBase}
-        style={{ filter:'drop-shadow(0 4px 14px rgba(0,0,0,0.5))' }}/>
-      {/* Face gradient — highlight on forehead */}
-      <ellipse cx="48" cy="48" rx="18" ry="12" fill={skinHi} opacity="0.35"/>
-      {/* Jaw definition */}
-      <ellipse cx="55" cy="95" rx="22" ry="9" fill={skinBase} opacity="0.8"/>
+      {/* ── Head ── */}
+      <ellipse cx="55" cy="63" rx="34" ry="38" fill={skinBase}
+        style={{ filter:'drop-shadow(0 4px 12px rgba(0,0,0,0.22))' }}/>
+      <ellipse cx="47" cy="47" rx="18" ry="10" fill={skinHi} opacity="0.5"/>
+      <ellipse cx="55" cy="94" rx="22" ry="8" fill={skinMid} opacity="0.2"/>
+      {/* Rosy cheeks when happy/speaking */}
+      {(mood==='happy' || speaking) && <>
+        <ellipse cx="32" cy="74" rx="10" ry="6" fill="#F87171" opacity="0.2"/>
+        <ellipse cx="78" cy="74" rx="10" ry="6" fill="#F87171" opacity="0.2"/>
+      </>}
 
-      {/* ── Dark hair ── */}
-      {/* Main hair mass */}
-      <ellipse cx="55" cy="32" rx="33" ry="16" fill="#1a1a2e"/>
-      <ellipse cx="55" cy="28" rx="30" ry="12" fill="#252540"/>
-      {/* Side hair */}
-      <ellipse cx="24" cy="52" rx="10" ry="20" fill="#1a1a2e"/>
-      <ellipse cx="86" cy="52" rx="10" ry="20" fill="#1a1a2e"/>
+      {/* ── Spiky Brown Hair ── */}
+      <ellipse cx="55" cy="29" rx="34" ry="19" fill={hairDk}/>
+      <ellipse cx="55" cy="25" rx="30" ry="14" fill={hairMd}/>
+      {/* Center spike */}
+      <path d="M 48 29 L 55 4 L 62 29" fill={hairDk}/>
+      <path d="M 50 30 L 55 8 L 60 30" fill={hairMd}/>
+      {/* Left-centre spike */}
+      <path d="M 35 32 L 37 8 L 49 31" fill={hairDk}/>
+      <path d="M 37 33 L 39 11 L 48 32" fill={hairMd}/>
+      {/* Right-centre spike */}
+      <path d="M 75 32 L 73 8 L 61 31" fill={hairDk}/>
+      <path d="M 73 33 L 71 11 L 62 32" fill={hairMd}/>
+      {/* Outer-left spike */}
+      <path d="M 21 42 L 19 16 L 36 38" fill={hairDk}/>
+      {/* Outer-right spike */}
+      <path d="M 89 42 L 91 16 L 74 38" fill={hairDk}/>
+      {/* Side hair panels */}
+      <ellipse cx="22" cy="53" rx="10" ry="20" fill={hairDk}/>
+      <ellipse cx="88" cy="53" rx="10" ry="20" fill={hairDk}/>
       {/* Hair sheen */}
-      <ellipse cx="45" cy="26" rx="12" ry="5" fill="white" opacity="0.08"/>
-      {/* Styled front sweep */}
-      <path d="M 30 35 Q 42 22 62 28 Q 72 30 78 38" fill="#252540" stroke="#1a1a2e" strokeWidth="1"/>
-      <path d="M 35 32 Q 50 18 68 26" fill="none" stroke="#333355" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M 43 22 Q 55 15 67 20" fill="none" stroke="#7C3A10" strokeWidth="2" strokeLinecap="round" opacity="0.45"/>
 
       {/* ── Eyebrows ── */}
-      <path d="M 32 54 Q 40 50 46 53" fill="none" stroke="#1a1a2e" strokeWidth="3" strokeLinecap="round"
-        style={{ transform: mood==='concerned'?'rotate(5deg)':mood==='curious'?'rotate(-3deg)':'none', transformOrigin:'39px 52px', transition:'transform 0.3s' }}/>
-      <path d="M 64 53 Q 70 50 78 54" fill="none" stroke="#1a1a2e" strokeWidth="3" strokeLinecap="round"
-        style={{ transform: mood==='concerned'?'rotate(-5deg)':mood==='curious'?'rotate(3deg)':'none', transformOrigin:'71px 52px', transition:'transform 0.3s' }}/>
+      <path d="M 29 52 Q 39 47 47 51" fill="none" stroke={hairDk} strokeWidth="4" strokeLinecap="round"
+        style={{ transform:mood==='concerned'?'rotate(9deg)':mood==='curious'?'rotate(-4deg)':'none', transformOrigin:'38px 50px', transition:'transform 0.3s' }}/>
+      <path d="M 63 51 Q 71 47 81 52" fill="none" stroke={hairDk} strokeWidth="4" strokeLinecap="round"
+        style={{ transform:mood==='concerned'?'rotate(-9deg)':mood==='curious'?'rotate(4deg)':'none', transformOrigin:'72px 50px', transition:'transform 0.3s' }}/>
 
       {/* ── Eyes ── */}
-      {/* Eye sockets */}
-      <ellipse cx="38" cy="62" rx="11" ry={blink?1:eyeH+2} fill="#0a1520" style={{ transition:'ry 0.08s' }}/>
-      <ellipse cx="72" cy="62" rx="11" ry={blink?1:eyeH+2} fill="#0a1520" style={{ transition:'ry 0.08s' }}/>
-      {/* Iris — glowing blue */}
+      <ellipse cx="39" cy="62" rx="12" ry={blink?1:eyeH+2} fill="white" style={{ transition:'ry 0.08s' }}/>
+      <ellipse cx="71" cy="62" rx="12" ry={blink?1:eyeH+2} fill="white" style={{ transition:'ry 0.08s' }}/>
+      <ellipse cx="39" cy="62" rx="12" ry={blink?1:eyeH+2} fill="none" stroke="#1A0A00" strokeWidth="1.5" style={{ transition:'ry 0.08s' }}/>
+      <ellipse cx="71" cy="62" rx="12" ry={blink?1:eyeH+2} fill="none" stroke="#1A0A00" strokeWidth="1.5" style={{ transition:'ry 0.08s' }}/>
       {!blink && <>
-        <ellipse cx="38" cy="62" rx="8" ry={eyeH} fill={eyeGlow} opacity="0.9"
-          style={{ filter:`drop-shadow(0 0 8px ${eyeGlow})`, transition:'fill 0.3s,ry 0.08s' }}/>
-        <ellipse cx="72" cy="62" rx="8" ry={eyeH} fill={eyeGlow} opacity="0.9"
-          style={{ filter:`drop-shadow(0 0 8px ${eyeGlow})`, transition:'fill 0.3s,ry 0.08s' }}/>
-        {/* Pupil */}
-        <ellipse cx="38" cy="62" rx="4" ry={Math.max(eyeH-3,1)} fill="#050d18"/>
-        <ellipse cx="72" cy="62" rx="4" ry={Math.max(eyeH-3,1)} fill="#050d18"/>
-        {/* Eye shine */}
-        <circle cx="35" cy="59" r="2.5" fill="white" opacity="0.75"/>
-        <circle cx="69" cy="59" r="2.5" fill="white" opacity="0.75"/>
-        <circle cx="36" cy="58" r="1" fill="white" opacity="0.5"/>
-        <circle cx="70" cy="58" r="1" fill="white" opacity="0.5"/>
+        <ellipse cx="39" cy="62" rx="8" ry={eyeH} fill={irisCol} style={{ transition:'fill 0.3s,ry 0.08s' }}/>
+        <ellipse cx="71" cy="62" rx="8" ry={eyeH} fill={irisCol} style={{ transition:'fill 0.3s,ry 0.08s' }}/>
+        <ellipse cx="39" cy="62" rx="4.5" ry={Math.max(eyeH-2,1)} fill="#050505"/>
+        <ellipse cx="71" cy="62" rx="4.5" ry={Math.max(eyeH-2,1)} fill="#050505"/>
+        <circle cx="35" cy="58" r="2.8" fill="white" opacity="0.9"/>
+        <circle cx="67" cy="58" r="2.8" fill="white" opacity="0.9"/>
+        <circle cx="36" cy="57" r="1.2" fill="white" opacity="0.5"/>
+        <circle cx="68" cy="57" r="1.2" fill="white" opacity="0.5"/>
       </>}
 
       {/* ── Nose ── */}
-      <path d="M 52 68 Q 50 76 47 78 Q 53 80 63 78 Q 60 76 58 68" fill="none"
-        stroke={skinBase} strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
+      <path d="M 52 70 Q 50 77 48 79 Q 54 81 62 79 Q 60 77 58 70"
+        fill="none" stroke={skinMid} strokeWidth="1.5" strokeLinecap="round" opacity="0.55"/>
 
-      {/* ── Mouth ── */}
-      <path d={mp} fill="none" stroke={speaking?eyeGlow:'#0d4040'}
-        strokeWidth={speaking?3:2.5} strokeLinecap="round"
-        style={{ filter:speaking?`drop-shadow(0 0 6px ${eyeGlow})`:'none', transition:'stroke 0.2s,d 0.08s' }}/>
-      {/* Teeth hint when speaking wide */}
-      {speaking && mouth >= 2 && (
-        <ellipse cx="55" cy="82" rx="7" ry="3" fill="white" opacity="0.8"/>
+      {/* ── Big Friendly Smile ── */}
+      {!speaking && mood!=='concerned' && (
+        <path d="M 41 85 Q 55 95 69 85 L 68 87 Q 55 97 42 87 Z" fill="white" opacity="0.95"/>
       )}
-      {/* Chin dimple */}
-      <circle cx="55" cy="100" r="2" fill={skinBase} opacity="0.4"/>
+      {speaking && mouth >= 1 && (
+        <ellipse cx="55" cy="88" rx={6+mouth*1.5} ry={2+mouth} fill="white" opacity="0.95"/>
+      )}
+      <path d={mp} fill="none" stroke={speaking?glowCol:'#1A0500'}
+        strokeWidth={speaking?3:2.5} strokeLinecap="round"
+        style={{ filter:speaking?`drop-shadow(0 0 6px ${glowCol})`:'none', transition:'stroke 0.2s,d 0.08s' }}/>
+      {mood!=='concerned' && <>
+        <path d="M 34 83 Q 30 88 33 93" fill="none" stroke={skinMid} strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
+        <path d="M 76 83 Q 80 88 77 93" fill="none" stroke={skinMid} strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
+      </>}
 
-      {/* ── Ear details ── */}
+      {/* ── Ears ── */}
       <ellipse cx="21" cy="65" rx="6" ry="9" fill={skinBase} stroke={skinMid} strokeWidth="1"/>
-      <ellipse cx="21" cy="65" rx="3" ry="5" fill={skinMid} opacity="0.5"/>
+      <ellipse cx="21" cy="65" rx="3.5" ry="5" fill={skinMid} opacity="0.3"/>
       <ellipse cx="89" cy="65" rx="6" ry="9" fill={skinBase} stroke={skinMid} strokeWidth="1"/>
-      <ellipse cx="89" cy="65" rx="3" ry="5" fill={skinMid} opacity="0.5"/>
+      <ellipse cx="89" cy="65" rx="3.5" ry="5" fill={skinMid} opacity="0.3"/>
 
-      {/* ── Gaming headset ── */}
-      {/* Headband arc */}
-      <path d="M 18 58 Q 18 20 55 18 Q 92 20 92 58"
-        fill="none" stroke="#1a1a2e" strokeWidth="8" strokeLinecap="round"/>
-      <path d="M 18 58 Q 18 20 55 18 Q 92 20 92 58"
-        fill="none" stroke="#333355" strokeWidth="5" strokeLinecap="round"/>
-      {/* Headband neon trim */}
-      <path d="M 20 56 Q 20 22 55 20 Q 90 22 90 56"
-        fill="none" stroke={ledColor} strokeWidth="1.5" strokeLinecap="round" opacity="0.6"
-        style={{ filter:`drop-shadow(0 0 4px ${ledColor})` }}/>
+      {/* ── Blue Shield (lower right) ── */}
+      <ellipse cx="101" cy="102" rx="13" ry="13" fill="#BFDBFE" stroke="#2563EB" strokeWidth="2"
+        style={{ filter:`drop-shadow(0 0 ${pulse?12:5}px #3B82F6)`, transition:'filter 0.5s' }}/>
+      <ellipse cx="101" cy="102" rx="9" ry="9" fill={shieldBl} stroke="#1D4ED8" strokeWidth="1"/>
+      <ellipse cx="101" cy="102" rx="5" ry="5" fill="#DBEAFE"/>
+      <path d="M 94 95 Q 101 92 108 95" fill="none" stroke="white" strokeWidth="1.5" opacity="0.55" strokeLinecap="round"/>
+      <circle cx="97" cy="98" r="2.5" fill="white" opacity="0.65"/>
 
-      {/* Left ear cup */}
-      <ellipse cx="18" cy="65" rx="9" ry="13" fill="#1a1a2e" stroke="#333355" strokeWidth="1.5"/>
-      <ellipse cx="18" cy="65" rx="6" ry="9" fill="#252540"/>
-      <circle cx="18" cy="65" r="3.5" fill={ledColor} opacity={pulse?0.95:0.5}
-        style={{ filter:pulse?`drop-shadow(0 0 8px ${ledColor})`:'none', transition:'opacity 0.4s,filter 0.4s' }}/>
-
-      {/* Right ear cup */}
-      <ellipse cx="92" cy="65" rx="9" ry="13" fill="#1a1a2e" stroke="#333355" strokeWidth="1.5"/>
-      <ellipse cx="92" cy="65" rx="6" ry="9" fill="#252540"/>
-      {/* Microphone arm */}
-      <path d="M 92 73 Q 100 80 98 90" fill="none" stroke="#333355" strokeWidth="2.5" strokeLinecap="round"/>
-      <ellipse cx="97" cy="92" rx="4" ry="3" fill="#1a1a2e" stroke={ledColor} strokeWidth="1"/>
-      <circle cx="97" cy="92" r="2" fill={ledColor} opacity="0.8"
-        style={{ filter:`drop-shadow(0 0 5px ${ledColor})` }}/>
-
-      {/* ── Thinking indicator ── */}
-      {mood === 'thinking' && [0,1,2].map((i) => (
-        <circle key={i} cx={42+i*13} cy="40" r="3.5" fill="#c4b5fd"
-          opacity={0.2 + 0.8*((mouth+i)%3===0?1:0)}
-          style={{ filter:'drop-shadow(0 0 5px #c4b5fd)', transition:'opacity 0.18s' }}/>
+      {/* ── Thinking dots ── */}
+      {mood==='thinking' && [0,1,2].map((i) => (
+        <circle key={i} cx={42+i*13} cy="18" r="3.5" fill="#C4B5FD"
+          opacity={0.2+0.8*((mouth+i)%3===0?1:0)}
+          style={{ filter:'drop-shadow(0 0 5px #C4B5FD)', transition:'opacity 0.18s' }}/>
       ))}
 
       {/* ── Surprised sparkles ── */}
-      {mood === 'surprised' && <>
-        <circle cx="18" cy="42" r="2.5" fill="#fbbf24" opacity="0.9" style={{ filter:'drop-shadow(0 0 6px #fbbf24)' }}/>
-        <circle cx="92" cy="42" r="2.5" fill="#fbbf24" opacity="0.9" style={{ filter:'drop-shadow(0 0 6px #fbbf24)' }}/>
-        <circle cx="10" cy="55" r="1.5" fill="#f472b6" opacity="0.8"/>
-        <circle cx="100" cy="55" r="1.5" fill="#f472b6" opacity="0.8"/>
+      {mood==='surprised' && <>
+        <circle cx="15" cy="38" r="3.5" fill={capeGold} opacity="0.95" style={{ filter:`drop-shadow(0 0 8px ${capeGold})` }}/>
+        <circle cx="95" cy="38" r="3.5" fill={capeGold} opacity="0.95" style={{ filter:`drop-shadow(0 0 8px ${capeGold})` }}/>
+        <circle cx="8" cy="55" r="2" fill="#F472B6" opacity="0.8"/>
+        <circle cx="102" cy="55" r="2" fill="#F472B6" opacity="0.8"/>
       </>}
     </svg>
   );
