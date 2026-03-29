@@ -12,7 +12,7 @@ interface ReferralSectionProps {
 const ReferralSection: React.FC<ReferralSectionProps> = ({ userId, referralCode, referralCount = 0, creditsEarned = 0 }) => {
   const [copied, setCopied] = useState(false);
   const code = referralCode || `PARA-${userId.slice(0, 6).toUpperCase()}`;
-  const referralLink = `https://parasitepro.com/signup?ref=${code}`;
+  const referralLink = `https://notworms.com/signup?ref=${code}`;
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink).then(() => {
       setCopied(true);

@@ -9,14 +9,14 @@ const FAQ_ITEMS = [
   { category: 'Image Quality', question: 'What file formats are accepted?', answer: 'JPEG and PNG only. Maximum file size is 10MB. Resize before uploading if needed using your phone\'s built-in photo editor.' },
   { category: 'Pricing', question: 'How much does each analysis cost?', answer: 'Each image analysis costs 1 credit. Credits are priced at ~AUD $7.50 each. Bulk packs are available — contact support for details.' },
   { category: 'Pricing', question: 'Do my credits expire?', answer: 'No. Credits never expire. Purchase now and use whenever you need.' },
-  { category: 'Pricing', question: 'Can I get a refund?', answer: 'Credits are non-refundable once used. If you have unused credits and are unhappy with the service, contact support@parasitepro.com within 14 days of purchase for review under Australian Consumer Law.' },
+  { category: 'Pricing', question: 'Can I get a refund?', answer: 'Credits are non-refundable once used. If you have unused credits and are unhappy with the service, contact support@notworms.com within 14 days of purchase for review under Australian Consumer Law.' },
   { category: 'Results', question: 'How accurate is the AI?', answer: 'Our AI uses Claude Vision for analysis to achieve high accuracy. Each detection includes a confidence score. Results above 80% confidence are generally reliable, but image quality is the biggest factor. Always consult a healthcare professional to confirm findings.' },
   { category: 'Results', question: 'What do the urgency levels mean?', answer: 'LOW: Monitor symptoms. MODERATE: See a doctor within a few days. HIGH: See a doctor within 24 hours. EMERGENCY: Seek medical attention immediately — emergency department or call 000.' },
   { category: 'Results', question: 'Can I share results with a doctor?', answer: 'Yes. From the results page, download a text report including AI findings, confidence scores, and treatment information. This is designed to assist your conversation with a healthcare professional.' },
   { category: 'Privacy', question: 'How is my data stored?', answer: 'Images are encrypted in transit (TLS 1.3) and stored securely. Personal data is never sold to third parties. We comply with Australian Privacy Principles (APPs).' },
   { category: 'Privacy', question: 'Can I delete my data?', answer: 'Yes. Delete your entire account from Settings → Delete Account. Deletions are permanent and processed within 30 days.' },
   { category: 'Technical', question: 'How long does analysis take?', answer: 'Typically 30–90 seconds. The page updates automatically. If it takes longer than 3 minutes, contact support.' },
-  { category: 'Technical', question: 'I\'m having trouble uploading. What should I try?', answer: 'Check image is JPEG/PNG under 10MB. Check your internet connection. Try a different browser. Clear your cache. If the problem persists, contact support@parasitepro.com.' },
+  { category: 'Technical', question: 'I\'m having trouble uploading. What should I try?', answer: 'Check image is JPEG/PNG under 10MB. Check your internet connection. Try a different browser. Clear your cache. If the problem persists, contact support@notworms.com.' },
 ];
 
 const FAQPage = () => {
@@ -105,7 +105,7 @@ const FAQPage = () => {
           </div>
           <h3 className="font-display font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>Still have questions?</h3>
           <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>We typically respond within one business day.</p>
-          <a href="mailto:support@parasitepro.com" className="pp-btn-primary inline-flex" style={{ padding: '10px 20px' }}>
+          <a href="mailto:support@notworms.com" className="pp-btn-primary inline-flex" style={{ padding: '10px 20px' }}>
             Contact Support
           </a>
         </div>
