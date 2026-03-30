@@ -406,6 +406,7 @@ export function LandingPARA() {
   const [showCTA, setShowCTA]     = useState(false);
   const sig = useRef({ cancelled: false });
   const speakRef = useRef<(idx: number) => void>(() => {});
+  const autoAdvTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     SpeechEngine.init();
@@ -444,7 +445,8 @@ export function LandingPARA() {
         onDone: () => { clearTimeout(fallback); setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(idx + 1); }, 400); },
       });
     } else {
-      setTimeout(() => { setSpeaking(false); if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2400, line.text.length * 26));
+      if (autoAdvTimerRef.current) clearTimeout(autoAdvTimerRef.current);
+      autoAdvTimerRef.current = setTimeout(() => { autoAdvTimerRef.current = null; setSpeaking(false); if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2400, line.text.length * 26));
     }
   }, [muted, voiceStarted, dismissed]);
 
@@ -452,6 +454,7 @@ export function LandingPARA() {
 
   const handleTapToStart = () => {
     setVoiceStarted(true);
+    if (autoAdvTimerRef.current) { clearTimeout(autoAdvTimerRef.current); autoAdvTimerRef.current = null; }
     sig.current.cancelled = false;
     SpeechEngine.unlockAndSpeak(LANDING_SCRIPT[0].text, {
       rate: 0.92, pitch: 1.05, signal: sig.current,
@@ -633,13 +636,13 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     if (idx >= script.length) {
       setLineIdx(-1); setSpeaking(false); setCardIn(false);
       setTimeout(() => { setCard(null); setPhase('intake'); setIntakeIn(true); }, 380);
-      if (!muted) { setSpeaking(true); setMood('curious'); SpeechEngine.speak(INTAKE_QUESTIONS[0].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
+      if (!muted && voiceOk) { setSpeaking(true); setMood('curious'); SpeechEngine.speak(INTAKE_QUESTIONS[0].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
       return;
     }
     const line = script[idx];
     setLineIdx(idx); setMood(line.mood); setSpeaking(true); setCardIn(false);
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 280);
-    if (!muted) {
+    if (!muted && voiceOk) {
       const fallback = setTimeout(() => { SpeechEngine.clearPending(); setSpeaking(false); if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2400, line.text.length * 28));
       SpeechEngine.speak(line.text, { rate:0.92, pitch:1.05, signal:sig.current,
         onStart: () => clearTimeout(fallback),
@@ -648,7 +651,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     } else {
       setTimeout(() => { if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2000, line.text.length * 26));
     }
-  }, [muted, script]);
+  }, [muted, voiceOk, script]);
 
   useEffect(() => { speakRef.current = speakLine; }, [speakLine]);
 
@@ -671,7 +674,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     setIntakeStep(next); setIntakeIn(false); setMultiSel([]);
     setTimeout(() => {
       setIntakeIn(true); setMood(INTAKE_QUESTIONS[next].mood);
-      if (!muted) { setSpeaking(true); SpeechEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
+      if (!muted && voiceOk) { setSpeaking(true); SpeechEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
     }, 320);
     setIntakeData(newData);
   };
@@ -865,7 +868,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
   const lastAssistantIdx = messages.reduce((acc: number, m: any, i: number) => m.role==='assistant' ? i : acc, -1);
 
   return (
-    <div style={{ position:'fixed', bottom:112, right:20, zIndex:9990, width:'min(400px, calc(100vw - 40px))', maxHeight:'76vh', background:'rgba(8,20,28,0.98)', border:'1px solid rgba(13,148,136,0.35)', borderRadius:20, boxShadow:'0 28px 72px rgba(0,0,0,0.7)', display:'flex', flexDirection:'column', transform:open?'translateY(0) scale(1)':'translateY(20px) scale(0.94)', opacity:open?1:0, pointerEvents:open?'all':'none', transition:'all 0.28s cubic-bezier(0.34,1.3,0.64,1)', overflow:'hidden' }}>
+    <div style={{ position:'fixed', bottom:168, right:20, zIndex:9990, width:'min(400px, calc(100vw - 40px))', maxHeight:'76vh', background:'rgba(8,20,28,0.98)', border:'1px solid rgba(13,148,136,0.35)', borderRadius:20, boxShadow:'0 28px 72px rgba(0,0,0,0.7)', display:'flex', flexDirection:'column', transform:open?'translateY(0) scale(1)':'translateY(20px) scale(0.94)', opacity:open?1:0, pointerEvents:open?'all':'none', transition:'all 0.28s cubic-bezier(0.34,1.3,0.64,1)', overflow:'hidden' }}>
       <div style={{ padding:'11px 15px', borderBottom:'1px solid rgba(13,148,136,0.15)', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(13,148,136,0.05)', flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', gap:9 }}>
           <div style={{ width:8, height:8, borderRadius:'50%', background:'#10b981', boxShadow:'0 0 7px #10b981' }}/>
@@ -916,7 +919,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
 ══════════════════════════════════════════════════════════════ */
 function FloatingBot({ mood, speaking, muted, chatOpen, onToggleChat, onToggleMute }: any) {
   return (
-    <div style={{ position:'fixed', bottom:18, right:18, zIndex:9991, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
+    <div style={{ position:'fixed', bottom:76, right:16, zIndex:9991, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
       <button onClick={onToggleMute} title={muted?'Unmute':'Mute'} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(8,20,28,0.95)', border:`1px solid ${muted?'rgba(255,255,255,0.08)':'rgba(13,148,136,0.5)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
         {muted ? <VolumeX size={13}/> : <Volume2 size={13}/>}
       </button>
