@@ -14,6 +14,8 @@ import ParasiteInfoWidget from '../components/ParasiteInfoWidget';
 import AustraliaRiskMap from '../components/AustraliaRiskMap';
 import SymptomChecker from '../components/SymptomChecker';
 import LiveStatsTicker from '../components/LiveStatsTicker';
+import ZeroCreditNudgeModal from '../components/ZeroCreditNudgeModal';
+import Para from '../components/Para';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -94,49 +96,12 @@ const DashboardPage = () => {
   return (
     <div className="pp-page">
       {/* ── Zero-credit modal ── */}
-      {showZeroModal && (
-        <div style={{ position:'fixed', inset:0, zIndex:9000, background:'rgba(4,10,18,0.92)', display:'flex', alignItems:'center', justifyContent:'center', padding:'16px' }}>
-          <div style={{ background:'var(--bg-elevated)', border:'1px solid var(--bg-border)', borderRadius:20, padding:'36px 32px', maxWidth:440, width:'100%', textAlign:'center', position:'relative' }}>
-            <button
-              onClick={() => { sessionStorage.setItem('zero_credit_modal_dismissed', '1'); setShowZeroModal(false); }}
-              style={{ position:'absolute', top:14, right:16, background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', fontSize:20 }}
-              aria-label="Close"
-            >✕</button>
-            <div style={{ fontSize:52, marginBottom:12 }}>🔬</div>
-            <h2 className="font-display" style={{ fontSize:22, fontWeight:800, color:'var(--text-primary)', marginBottom:8 }}>
-              You&apos;re out of credits
-            </h2>
-            <p style={{ color:'var(--text-secondary)', fontSize:14, lineHeight:1.65, marginBottom:20 }}>
-              Each AI analysis costs 1 credit. Top up to keep getting structured educational reports — know exactly what to say to your GP before you walk in.
-            </p>
-            <div style={{ background:'rgba(217,119,6,0.06)', border:'1px solid rgba(217,119,6,0.2)', borderRadius:12, padding:'14px 16px', marginBottom:20 }}>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, textAlign:'center' }}>
-                {[{label:'5 analyses',price:'9.99',note:'/each'},{label:'10 analyses',price:'4.99',note:'.50/each',hot:true},{label:'25 analyses',price:'4.99',note:'/each'}].map(p => (
-                  <div key={p.label} style={{ padding:'10px 8px', borderRadius:10, background:p.hot?'rgba(217,119,6,0.12)':'transparent', border:p.hot?'1px solid rgba(217,119,6,0.3)':'1px solid transparent' }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:'var(--amber-bright)', marginBottom:2 }}>{p.price}</div>
-                    <div style={{ fontSize:11, color:'var(--text-muted)' }}>{p.label}</div>
-                    <div style={{ fontSize:10, color:'var(--text-muted)', marginTop:1 }}>{p.note}</div>
-                    {p.hot && <div style={{ fontSize:9, fontWeight:700, color:'var(--amber)', letterSpacing:'0.08em', marginTop:3 }}>BEST VALUE</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button
-              onClick={() => navigate('/pricing')}
-              className="pp-btn-primary w-full"
-              style={{ fontSize:15, padding:'13px', marginBottom:10 }}
-            >
-              Top up credits →
-            </button>
-            <button
-              onClick={() => { sessionStorage.setItem('zero_credit_modal_dismissed', '1'); setShowZeroModal(false); }}
-              style={{ background:'none', border:'none', color:'var(--text-muted)', fontSize:13, cursor:'pointer', textDecoration:'underline' }}
-            >
-              Maybe later
-            </button>
-          </div>
-        </div>
-      )}
+      <ZeroCreditNudgeModal
+        isOpen={showZeroModal}
+        onClose={() => { sessionStorage.setItem('zero_credit_modal_dismissed', '1'); setShowZeroModal(false); }}
+        context="results"
+        accessToken={accessToken}
+      />
 
       {/* Nav */}
       <nav className="pp-nav">
@@ -215,7 +180,9 @@ const DashboardPage = () => {
 
             {/* PARA guide section — main focus for new users */}
             <div className="pp-card p-8 mb-6 text-center" style={{ border: '1px solid rgba(13,148,136,0.2)', background: 'rgba(13,148,136,0.03)' }}>
-              <div style={{ fontSize: 56, marginBottom: 16 }}>🤖</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                <Para state="wave" size={90} bobble />
+              </div>
               <h2 className="font-display font-bold text-2xl mb-3" style={{ color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                 PARA is here to guide you
               </h2>

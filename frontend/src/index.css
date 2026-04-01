@@ -304,3 +304,68 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-size: 256px 256px;
 }
+
+/* ── ParasitePro Brand Token Extension (notworms.com v2) ────────────────── */
+/* Added alongside existing dark theme — does not override pp- variables     */
+:root {
+  /* Teal scale */
+  --teal-50:  #E1F5EE;
+  --teal-100: #B3E6D8;
+  --teal-200: #80D3C0;
+  --teal-500: #00BFA5;
+  --teal-600: #00A896;
+  --teal-700: #008B7A;
+  --teal-800: #006E5F;
+  --teal-900: #004D43;
+
+  /* Sage scale */
+  --sage-100: #E1F0E8;
+  --sage-400: #A8D5BA;
+  --sage-600: #74B390;
+
+  /* Navy scale */
+  --navy-50:  #EEF2F9;
+  --navy-700: #1A366D;
+  --navy-800: #112554;
+  --navy-900: #0A1640;
+
+  /* Gold scale */
+  --gold-50:  #FDF9EC;
+  --gold-200: #F7DC88;
+  --gold-500: #D4A017;
+  --gold-600: #B88A10;
+  --gold-700: #9A7208;
+
+  /* Urgency scale */
+  --urg-50:  #FFF0F0;
+  --urg-200: #FFBDBD;
+  --urg-400: #FF6B6B;
+  --urg-600: #DC2626;
+  --urg-700: #B91C1C;
+
+  /* Success */
+  --green-100: #DCFCE7;
+  --green-400: #4CAF50;
+  --green-700: #166534;
+
+  /* Shadows */
+  --shadow-teal: 0 6px 24px rgba(0,191,165,0.28);
+  --shadow-focus: 0 0 0 3px rgba(0,191,165,0.22);
+
+  /* Radii */
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  20px;
+  --radius-full: 9999px;
+}
+
+/* PARA bobble animation (used by Para.tsx) */
+@keyframes para-bobble {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+/* Para onboarding sheet animations */
+@keyframes paraFadeIn  { from { opacity: 0; }                              to { opacity: 1; } }
+@keyframes paraSlideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

@@ -12,6 +12,7 @@ import { useAuthStore } from '../store/authStore';
 import PrivacyConsentModal from '../components/PrivacyConsentModal';
 import VoiceAssistant from '../components/VoiceAssistant';
 import PricingConfirmModal from '../components/PricingConfirmModal';
+import ZeroCreditNudgeModal from '../components/ZeroCreditNudgeModal';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -50,6 +51,7 @@ const UploadPage = () => {
   const [showMetadata, setShowMetadata] = useState(false);
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false);
   const [showPricingConfirm, setShowPricingConfirm] = useState(false);
+  const [showNudgeModal, setShowNudgeModal] = useState(false);
   const [pendingUpload, setPendingUpload] = useState(false);
 
   const [showVoiceAssistant, setShowVoiceAssistant] = useState(false);
@@ -59,8 +61,7 @@ const UploadPage = () => {
   const handleUpload = () => {
     if (!selectedFile) { toast.error('Please select an image first'); return; }
     if (!hasCredits) {
-      toast.error('No credits left — redirecting to pricing…', { duration: 2500 });
-      setTimeout(() => navigate('/pricing'), 2000);
+      setShowNudgeModal(true);
       return;
     }
     const privacyAccepted = localStorage.getItem(PRIVACY_CONSENT_KEY);
@@ -93,7 +94,7 @@ const UploadPage = () => {
       toast.success('Upload successful! Analysing your specimen…');
       setTimeout(() => navigate(`/analysis/${response.data.analysisId}`), 800);
     } catch (error) {
-      if (error.response?.status === 402) { toast.error('Insufficient credits.'); setTimeout(() => navigate('/pricing'), 2000); }
+      if (error.response?.status === 402) { setShowNudgeModal(true); }
       else if (error.response?.status === 400) toast.error(error.response.data.error || 'Invalid file.');
       else toast.error('Upload failed. Please try again.');
       setUploading(false); setUploadProgress(0);
@@ -122,6 +123,7 @@ const UploadPage = () => {
     <div className="pp-page">
       <PrivacyConsentModal isOpen={showPrivacyConsent} onAccept={handlePrivacyAccept} onDecline={() => { setShowPrivacyConsent(false); setPendingUpload(false); }} />
       <PricingConfirmModal isOpen={showPricingConfirm} imagePreview={preview} creditBalance={user?.imageCredits || 0} onConfirm={handleUploadConfirmed} onCancel={() => setShowPricingConfirm(false)} />
+      <ZeroCreditNudgeModal isOpen={showNudgeModal} onClose={() => setShowNudgeModal(false)} context="upload" accessToken={accessToken} />
 
       {/* Nav */}
       <nav className="pp-nav">

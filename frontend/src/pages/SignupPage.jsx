@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
@@ -9,13 +9,17 @@ import axios from 'axios';
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const SignupPage = () => {
+  const [searchParams] = useSearchParams();
+  const promoFromUrl = searchParams.get('promo') || '';
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     firstName: '',
     lastName: '',
-    promoCode: ''
+    promoCode: promoFromUrl.toUpperCase()
   });
+  const [promoAutoApplied] = useState(!!promoFromUrl);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -299,12 +303,33 @@ const SignupPage = () => {
 
             <div className="form-group">
               <label>Promo Code <span style={{ color: '#9ca3af', fontWeight: 'normal' }}>(optional)</span></label>
+              {promoAutoApplied && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'linear-gradient(135deg,#E1F5EE,#CCE8DC)',
+                  border: '1px solid #80D3C0', borderRadius: '0.5rem',
+                  padding: '0.625rem 0.875rem', marginBottom: '0.5rem'
+                }}>
+                  <span style={{ fontSize: 16 }}>🎉</span>
+                  <div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#008B7A' }}>
+                      BETA3FREE applied — 3 free credits on signup
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#008B7A', opacity: 0.8 }}>
+                      Credits never expire · No credit card required
+                    </div>
+                  </div>
+                </div>
+              )}
               <input
                 type="text"
                 placeholder="Enter promo code for free credits"
                 value={formData.promoCode}
                 onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
-                style={{ textTransform: 'uppercase' }}
+                style={{
+                  textTransform: 'uppercase',
+                  ...(promoAutoApplied ? { borderColor: '#00BFA5', background: '#F0FDF4', color: '#008B7A', fontWeight: 700 } : {})
+                }}
               />
             </div>
 
