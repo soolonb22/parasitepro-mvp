@@ -4,847 +4,579 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import SEO from '../components/SEO';
 
-/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+/* ─── Brand tokens — Image 4 reference ─────────────────────────────── */
 const C = {
-  pageBg:    '#EBF2EA',
-  heroBg:    '#E8F2E7',
-  dark:      '#192E19',
-  darkMid:   '#2D4A2D',
-  teal:      '#1D9E75',
-  tealDark:  '#0F6E56',
-  tealSoft:  '#E1F5EE',
-  green:     '#4DBD56',
-  greenDk:   '#329B3C',
-  amber:     '#EF9F27',
-  amberBg:   '#FFFBEB',
-  coral:     '#D85A30',
-  white:     '#FFFFFF',
-  gray:      '#4B5563',
-  grayLight: '#F3F4F6',
-  border:    '#D1D5DB',
+  teal:      '#00BFA5', tealDark:  '#008B7A', tealDeep:  '#006B62',
+  tealSoft:  '#E1F8F4', tealBtn:   '#00A896', sage:      '#A8D5BA',
+  sageSoft:  '#EBF5EE', sageLight: '#F4FAF6', pageBg:    '#F2F7F4',
+  navy:      '#1A365D', navyDark:  '#0F2440', urgency:   '#FF6B6B',
+  white:     '#FFFFFF', offWhite:  '#F8FAF8', gray:      '#6B7280',
+  grayMid:   '#9CA3AF', border:    '#C8E6D8', dark:      '#192E19',
+  green:     '#22C55E', greenDk:   '#16A34A', modalBg:   '#2D5A55',
 };
 
-/* ─── TROPICAL LEAF SVG ──────────────────────────────────────── */
-const Leaf = ({ w = 160, style = {}, flip = false, opacity = 0.65 }) => (
-  <svg
-    width={w} viewBox="0 0 160 340" fill="none"
-    style={{ display:'block', ...style, transform:`${flip ? 'scaleX(-1)' : ''} ${style.transform||''}` }}
-  >
-    <path d="M80 8 C48 70 12 168 32 258 C48 318 80 334 80 334 C80 334 112 318 128 258 C148 168 112 70 80 8Z"
-      fill={`rgba(20,90,30,${opacity * 0.22})`}/>
-    <path d="M80 8 L80 334" stroke={`rgba(20,90,30,${opacity * 0.28})`} strokeWidth="1.4"/>
-    {[85,148,210].map((y,i)=>[
-      <path key={`L${i}`} d={`M80 ${y} Q${55-i*5} ${y-8} ${35-i*4} ${y+18}`} stroke={`rgba(20,90,30,${opacity*0.2})`} strokeWidth="1" fill="none"/>,
-      <path key={`R${i}`} d={`M80 ${y} Q${105+i*5} ${y-8} ${125+i*4} ${y+18}`} stroke={`rgba(20,90,30,${opacity*0.2})`} strokeWidth="1" fill="none"/>
-    ])}
+/* ─── PARA Explorer character — teal blob + explorer hat (Image 5) ─── */
+const ParaFig = ({ size = 110, waving = false, style = {} }) => (
+  <svg width={size} height={Math.round(size * 1.18)} viewBox="0 0 100 118"
+    fill="none" style={{ display: 'block', ...style }}>
+    <ellipse cx="50" cy="114" rx="28" ry="5" fill="rgba(0,0,0,0.10)"/>
+    <ellipse cx="50" cy="80" rx="30" ry="33" fill={C.teal}/>
+    {waving
+      ? <ellipse cx="17" cy="52" rx="11" ry="8" fill={C.teal} transform="rotate(-50 17 52)"/>
+      : <ellipse cx="21" cy="74" rx="11" ry="8" fill={C.teal} transform="rotate(-18 21 74)"/>}
+    <ellipse cx="79" cy="74" rx="11" ry="8" fill={C.teal} transform="rotate(18 79 74)"/>
+    <ellipse cx="37" cy="108" rx="12" ry="7" fill={C.tealDark}/>
+    <ellipse cx="63" cy="108" rx="12" ry="7" fill={C.tealDark}/>
+    <ellipse cx="50" cy="52" rx="30" ry="29" fill={C.teal}/>
+    <ellipse cx="50" cy="54" rx="22" ry="20" fill="rgba(255,255,255,0.09)"/>
+    <ellipse cx="37" cy="48" rx="9.5" ry="10.5" fill="white"/>
+    <ellipse cx="63" cy="48" rx="9.5" ry="10.5" fill="white"/>
+    <circle cx="38.5" cy="50" r="5.8" fill="#0D2218"/>
+    <circle cx="64.5" cy="50" r="5.8" fill="#0D2218"/>
+    <circle cx="41" cy="46" r="2.3" fill="white"/>
+    <circle cx="67" cy="46" r="2.3" fill="white"/>
+    <ellipse cx="26" cy="58" rx="6" ry="4" fill="#FF9999" opacity="0.28"/>
+    <ellipse cx="74" cy="58" rx="6" ry="4" fill="#FF9999" opacity="0.28"/>
+    <path d="M37 63 Q50 76 63 63" fill="#0D2218"/>
+    <path d="M39 65 Q50 74 61 65" fill="#E87070"/>
+    <ellipse cx="50" cy="25" rx="39" ry="9.5" fill="#4D6B3C"/>
+    <path d="M22 25 Q26 3 50 3 Q74 3 78 25Z" fill="#5E8048"/>
+    <rect x="24" y="19" width="52" height="7.5" rx="2.5" fill="#3A5228"/>
+    <path d="M30 21 Q48 15 64 18" stroke="rgba(255,255,255,0.17)" strokeWidth="2.5"
+      fill="none" strokeLinecap="round"/>
   </svg>
 );
 
-/* ─── PARA EXPLORER CHARACTER ────────────────────────────────── */
-const Para = ({ size = 140 }) => {
-  const h = size * 1.4;
+/* ─── PARA Welcome Modal — Image 1 reference ─────────────────────────── */
+const ParaModal = ({ onClose, onStart }) => {
+  const [speaking, setSpeaking] = useState(false);
+  const handleSpeak = () => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(
+      "G'day! I'm PARA, your personal guide to ParasitePro! Found something weird and not sure what it is? You're in exactly the right place. Let me show you what we're all about."
+    );
+    u.rate = 0.96; u.pitch = 1.05;
+    const pick = window.speechSynthesis.getVoices().find(v => v.lang === 'en-AU')
+      || window.speechSynthesis.getVoices().find(v => v.lang.startsWith('en'));
+    if (pick) u.voice = pick;
+    u.onend = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(u);
+  };
   return (
-    <svg width={size} height={h} viewBox="0 0 110 155" fill="none">
-      {/* shadow */}
-      <ellipse cx="55" cy="150" rx="26" ry="4" fill="rgba(0,0,0,0.09)"/>
-      {/* legs */}
-      <rect x="40" y="120" width="11" height="22" rx="5.5" fill="#5A7A45"/>
-      <rect x="59" y="120" width="11" height="22" rx="5.5" fill="#4A6A35"/>
-      {/* shoes */}
-      <ellipse cx="46" cy="142" rx="9" ry="4.5" fill="#2E1E0A"/>
-      <ellipse cx="64" cy="142" rx="9" ry="4.5" fill="#2E1E0A"/>
-      {/* body */}
-      <rect x="30" y="85" width="50" height="42" rx="13" fill="#6A9050"/>
-      {/* shirt v */}
-      <path d="M47 85 L55 97 L63 85" fill="#5A8040"/>
-      {/* right arm raised/waving */}
-      <path d="M79 93 Q96 78 91 64" stroke="#6A9050" strokeWidth="10" strokeLinecap="round"/>
-      {/* right hand */}
-      <circle cx="90" cy="61" r="7.5" fill="#D4935A"/>
-      {/* finger waves */}
-      <path d="M90 53.5 Q95 48 93 44" stroke="#D4935A" strokeWidth="2.5" strokeLinecap="round"/>
-      <path d="M95 57 Q101 53 100 48" stroke="#D4935A" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* left arm down */}
-      <path d="M31 93 Q17 108 19 126" stroke="#6A9050" strokeWidth="10" strokeLinecap="round"/>
-      {/* left hand */}
-      <circle cx="20" cy="128" r="7" fill="#D4935A"/>
-      {/* neck */}
-      <rect x="48" y="76" width="14" height="13" rx="6.5" fill="#D4935A"/>
-      {/* head */}
-      <ellipse cx="55" cy="63" rx="25" ry="23" fill="#E8A870"/>
-      {/* hair back */}
-      <path d="M30 62 Q32 42 55 40 Q78 42 80 62" fill="#5C3A20"/>
-      {/* hat brim */}
-      <ellipse cx="55" cy="46" rx="33" ry="6.5" fill="#9B7B20"/>
-      {/* hat crown */}
-      <path d="M26 46 Q28 26 55 24 Q82 26 84 46Z" fill="#B8921A"/>
-      {/* hat band */}
-      <rect x="26" y="43" width="58" height="6" rx="2" fill="#7A5510"/>
-      {/* hat badge */}
-      <circle cx="55" cy="46" r="3" fill="#EF9F27"/>
-      {/* eyes whites */}
-      <ellipse cx="45" cy="62" rx="6.5" ry="7" fill="white"/>
-      <ellipse cx="65" cy="62" rx="6.5" ry="7" fill="white"/>
-      {/* pupils */}
-      <circle cx="46" cy="63" r="4" fill="#2D1B0E"/>
-      <circle cx="66" cy="63" r="4" fill="#2D1B0E"/>
-      {/* eye shine */}
-      <circle cx="47.5" cy="61" r="1.6" fill="white"/>
-      <circle cx="67.5" cy="61" r="1.6" fill="white"/>
-      {/* eyebrows */}
-      <path d="M39 55 Q45 52 51 55" stroke="#5C3A20" strokeWidth="1.4" strokeLinecap="round"/>
-      <path d="M59 55 Q65 52 71 55" stroke="#5C3A20" strokeWidth="1.4" strokeLinecap="round"/>
-      {/* cheeks */}
-      <ellipse cx="37" cy="68" rx="5.5" ry="3.5" fill="#E8785A" opacity="0.42"/>
-      <ellipse cx="73" cy="68" rx="5.5" ry="3.5" fill="#E8785A" opacity="0.42"/>
-      {/* nose */}
-      <ellipse cx="55" cy="67" rx="3.5" ry="2.5" fill="#D4835A" opacity="0.55"/>
-      {/* smile */}
-      <path d="M47 73 Q55 81 63 73" stroke="#5C3A20" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
-      {/* teeth */}
-      <path d="M50 74.5 Q55 79.5 60 74.5" fill="white"/>
-    </svg>
+    <div onClick={e => e.target === e.currentTarget && onClose()} style={{
+      position:'fixed', inset:0, zIndex:9999,
+      background:'rgba(0,0,0,0.52)',
+      display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem',
+      backdropFilter:'blur(4px)', animation:'pmFadeIn 0.2s ease both',
+    }}>
+      <div style={{
+        background:C.modalBg, borderRadius:24, width:'100%', maxWidth:380,
+        padding:'2rem 1.75rem 1.5rem', position:'relative',
+        animation:'pmSlide 0.32s cubic-bezier(0.22,0.68,0,1.2) both',
+        boxShadow:'0 24px 64px rgba(0,0,0,0.45)',
+      }}>
+        <button onClick={onClose} style={{
+          position:'absolute', top:14, right:14, width:36, height:36,
+          borderRadius:'50%', background:'rgba(255,255,255,0.15)', border:'none',
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          color:'white', fontSize:18, fontWeight:700,
+        }}>✕</button>
+
+        <div style={{
+          width:120, height:120, borderRadius:'50%',
+          background:'rgba(255,255,255,0.12)', border:'2px solid rgba(255,255,255,0.10)',
+          margin:'0 auto 1.25rem', display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          <ParaFig size={86} waving/>
+        </div>
+
+        <h2 style={{
+          color:'white', fontSize:'1.35rem', fontWeight:800, textAlign:'center',
+          margin:'0 0 0.75rem', lineHeight:1.35, letterSpacing:'-0.01em',
+        }}>G&apos;day! I&apos;m PARA — your personal guide to ParasitePro!</h2>
+
+        <p style={{
+          color:'rgba(255,255,255,0.80)', fontSize:'0.9rem',
+          textAlign:'center', lineHeight:1.65, margin:'0 0 1.5rem',
+        }}>Found something weird and not sure what it is? You are in exactly the right place.
+          Let me show you what we&apos;re all about.</p>
+
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem' }}>
+          <button onClick={handleSpeak} style={{
+            display:'flex', alignItems:'center', gap:8, background:'none', border:'none',
+            cursor:'pointer', color:'rgba(255,255,255,0.85)', fontSize:'0.875rem', fontWeight:500,
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth="2" strokeLinecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              {speaking && <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>}
+            </svg>
+            Tap to hear PARA
+          </button>
+          <button onClick={onClose} style={{
+            padding:'8px 22px', background:'rgba(255,255,255,0.10)',
+            border:'1.5px solid rgba(255,255,255,0.22)', borderRadius:20,
+            cursor:'pointer', color:'white', fontSize:'0.875rem', fontWeight:500,
+          }}>Skip</button>
+        </div>
+
+        <button onClick={onStart} style={{
+          width:'100%', padding:'14px', background:C.green, border:'none',
+          borderRadius:14, cursor:'pointer', color:'white',
+          fontSize:'1rem', fontWeight:800, letterSpacing:'0.01em',
+        }}>Start Free Analysis</button>
+
+        <p style={{
+          color:'rgba(255,255,255,0.40)', fontSize:'0.72rem',
+          textAlign:'center', marginTop:'0.875rem', lineHeight:1.5,
+        }}>Educational tool only — not a medical diagnosis</p>
+      </div>
+      <style>{`
+        @keyframes pmFadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes pmSlide{from{transform:translateY(48px);opacity:0}to{transform:translateY(0);opacity:1}}
+      `}</style>
+    </div>
   );
 };
 
-/* ─── MOCK MICROSCOPY IMAGE ──────────────────────────────────── */
-const MockSlide = () => (
+/* ─── Sample preview card (compliant — no accuracy % claims) ────────── */
+const SamplePreview = () => (
   <div style={{
-    width:'100%', height:170,
-    background:'radial-gradient(circle at 38% 38%, #3a1e06 0%, #170d03 55%, #0d0802 100%)',
-    borderRadius:10, position:'relative', overflow:'hidden',
-    display:'flex', alignItems:'center', justifyContent:'center',
+    background:'white', borderRadius:16, overflow:'hidden',
+    border:`1px solid ${C.border}`, boxShadow:'0 4px 20px rgba(0,0,0,0.06)',
+    flex:1, minWidth:0,
   }}>
-    {/* grain */}
     <div style={{
-      position:'absolute', inset:0, opacity:0.4,
-      backgroundImage:'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
-      backgroundSize:'7px 7px',
-    }}/>
-    {/* organism */}
+      background:'#E2EDE2', position:'relative',
+      aspectRatio:'4/3', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden',
+    }}>
+      <svg width="100%" height="100%" viewBox="0 0 280 210" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="mbg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#C8DCC4"/>
+            <stop offset="100%" stopColor="#A8C8A4"/>
+          </radialGradient>
+          <marker id="arr" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto">
+            <path d="M0,0 L5,2.5 L0,5 Z" fill="white"/>
+          </marker>
+        </defs>
+        <rect width="280" height="210" fill="url(#mbg)"/>
+        <ellipse cx="85" cy="105" rx="58" ry="68" fill="rgba(80,120,80,0.48)"/>
+        <ellipse cx="115" cy="88" rx="42" ry="52" fill="rgba(100,145,100,0.40)"/>
+        <ellipse cx="195" cy="125" rx="48" ry="56" fill="rgba(70,115,70,0.44)"/>
+        <ellipse cx="155" cy="150" rx="36" ry="42" fill="rgba(90,130,90,0.38)"/>
+        <circle cx="88" cy="95" r="30" stroke="#00BFA5" strokeWidth="2.5" fill="none"/>
+        <circle cx="190" cy="118" r="28" stroke="#00BFA5" strokeWidth="2.5" fill="none"/>
+        <circle cx="150" cy="152" r="22" stroke="#00BFA5" strokeWidth="2.5" fill="none"/>
+        <line x1="135" y1="58" x2="104" y2="78" stroke="white" strokeWidth="1.5" markerEnd="url(#arr)"/>
+        <line x1="225" y1="78" x2="205" y2="105" stroke="white" strokeWidth="1.5" markerEnd="url(#arr)"/>
+        <line x1="178" y1="172" x2="162" y2="162" stroke="white" strokeWidth="1.5" markerEnd="url(#arr)"/>
+        <text x="14" y="26" fontFamily="system-ui,sans-serif" fontSize="11"
+          fill="rgba(0,0,0,0.6)" fontWeight="500">Sample image — PARA annotated</text>
+      </svg>
+    </div>
+    <div style={{ padding:'12px 14px' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+        <span style={{
+          fontSize:'0.75rem', fontWeight:700, padding:'3px 10px',
+          background:'#FEF3C7', color:'#92400E', borderRadius:20,
+        }}>🟡 Moderate urgency</span>
+        <span style={{ fontSize:'0.75rem', color:C.gray }}>3 areas flagged</span>
+      </div>
+      <p style={{ fontSize:'0.75rem', color:C.gray, margin:0, lineHeight:1.5 }}>
+        Report includes differential diagnoses and GP next steps
+      </p>
+    </div>
+    <div style={{ background:C.navy, padding:'8px 14px', textAlign:'center' }}>
+      <span style={{ color:'rgba(255,255,255,0.85)', fontSize:'0.75rem', fontWeight:600 }}>
+        Educational report only — not a diagnosis
+      </span>
+    </div>
+  </div>
+);
+
+/* ─── PARA teaser card in hero ──────────────────────────────────────── */
+const ParaTeaser = ({ onClick }) => (
+  <div onClick={onClick} style={{
+    background:'white', borderRadius:16, border:`1px solid ${C.border}`,
+    boxShadow:'0 4px 20px rgba(0,0,0,0.06)',
+    padding:'1.5rem 1.25rem',
+    display:'flex', flexDirection:'column', alignItems:'center',
+    cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
+    flex:'0 0 auto', width:'220px',
+  }}
+  onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 10px 30px rgba(0,0,0,0.10)';}}
+  onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.06)';}}
+  >
+    <ParaFig size={100} waving/>
     <div style={{
-      width:86, height:76,
-      borderRadius:'50% 46% 54% 50% / 46% 54% 50% 56%',
-      background:'radial-gradient(ellipse at 42% 36%, #CC7A38 0%, #8A4515 55%, #5A2C08 100%)',
-      position:'relative', boxShadow:'0 0 18px rgba(200,120,56,0.28)',
+      background:C.sageSoft, border:`1.5px solid ${C.sage}`,
+      borderRadius:12, padding:'10px 14px', marginTop:12, position:'relative', textAlign:'center',
     }}>
       <div style={{
-        position:'absolute', top:'22%', left:'18%', width:'64%', height:'58%',
-        borderRadius:'50%', border:'2px solid rgba(255,195,90,0.55)',
-        boxShadow:'inset 0 0 10px rgba(255,140,45,0.35)',
+        position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)',
+        width:0, height:0, borderLeft:'8px solid transparent',
+        borderRight:'8px solid transparent', borderBottom:`8px solid ${C.sage}`,
       }}/>
-      <div style={{
-        position:'absolute', top:'35%', left:'30%', width:'40%', height:'34%',
-        borderRadius:'50%', background:'rgba(255,175,70,0.30)',
-      }}/>
-    </div>
-    {/* scale bar */}
-    <div style={{ position:'absolute', bottom:9, right:12, display:'flex', alignItems:'center', gap:4 }}>
-      <div style={{ width:22, height:1.5, background:'rgba(255,255,255,0.65)' }}/>
-      <span style={{ fontSize:8.5, color:'rgba(255,255,255,0.6)', fontFamily:'monospace' }}>100μm</span>
-    </div>
-    <span style={{ position:'absolute', top:8, left:10, fontSize:8, color:'rgba(255,255,255,0.4)', fontFamily:'monospace', letterSpacing:'0.06em' }}>SAMPLE IMAGE</span>
-  </div>
-);
-
-/* ─── HERO MOCK RESULT CARD ──────────────────────────────────── */
-const HeroCard = () => (
-  <div style={{
-    background:'white', borderRadius:16, padding:16,
-    boxShadow:'0 8px 40px rgba(0,0,0,0.13)', maxWidth:272, width:'100%',
-  }}>
-    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:11 }}>
-      <span style={{ fontSize:10.5, fontWeight:700, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.07em' }}>Sample Report</span>
-      <span style={{ fontSize:9.5, background:'#FEF3C7', color:'#92400E', padding:'2px 8px', borderRadius:9999, fontWeight:600 }}>EXAMPLE</span>
-    </div>
-    <MockSlide/>
-    <div style={{ marginTop:11 }}>
-      <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:7 }}>
-        <span style={{ fontSize:13.5, fontWeight:700, color:C.dark }}>Pattern detected</span>
-        <span style={{ fontSize:9.5, background:'#FEF3C7', color:'#92400E', padding:'2px 8px', borderRadius:9999 }}>🟡 Moderate</span>
-      </div>
-      <p style={{ fontSize:11.5, color:C.gray, margin:'0 0 9px', lineHeight:1.55 }}>
-        Characteristics consistent with <em>Ascaris lumbricoides</em>. Further investigation recommended.
+      <p style={{ margin:0, fontSize:'0.8rem', color:C.navy, fontWeight:600, lineHeight:1.4 }}>
+        G&apos;day! Upload your photo now — it&apos;s free
       </p>
-      {/* confidence bar */}
-      <div style={{ marginBottom:9 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
-          <span style={{ fontSize:10, color:C.gray }}>AI confidence</span>
-          <span style={{ fontSize:10, fontWeight:600, color:C.tealDark }}>High</span>
-        </div>
-        <div style={{ height:5, background:'#E5E7EB', borderRadius:9999 }}>
-          <div style={{ width:'81%', height:'100%', background:C.teal, borderRadius:9999 }}/>
-        </div>
-      </div>
-      {/* next step */}
-      <div style={{ background:C.tealSoft, borderRadius:8, padding:'8px 10px', display:'flex', gap:8, alignItems:'center' }}>
-        <span style={{ fontSize:15 }}>👩‍⚕️</span>
-        <div>
-          <div style={{ fontSize:10.5, fontWeight:600, color:C.tealDark }}>Recommended next step</div>
-          <div style={{ fontSize:10.5, color:C.tealDark }}>Book a GP appointment (1–2 weeks)</div>
-        </div>
-      </div>
     </div>
-    <p style={{ fontSize:9, color:'#9CA3AF', textAlign:'center', margin:'9px 0 0' }}>
-      ⚠️ Sample educational output only — not a diagnosis
-    </p>
   </div>
 );
 
-/* ─── SECTION LABEL ──────────────────────────────────────────── */
-const SectionLabel = ({ children }) => (
-  <span style={{
-    display:'block', fontSize:11.5, fontWeight:700, letterSpacing:'0.13em',
-    color:C.teal, textTransform:'uppercase', marginBottom:12,
-  }}>{children}</span>
+/* ─── Logo mark ─────────────────────────────────────────────────────── */
+const Logo = () => (
+  <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+    <div style={{
+      width:32, height:32, borderRadius:8, background:C.teal,
+      display:'flex', alignItems:'center', justifyContent:'center',
+    }}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+        strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <span style={{ fontWeight:800, fontSize:'1.05rem', color:C.navy, letterSpacing:'-0.01em' }}>
+      notworms.com
+    </span>
+  </div>
 );
 
-/* ─── MAIN COMPONENT ─────────────────────────────────────────── */
+/* ─── LANDING PAGE ───────────────────────────────────────────────────── */
 const LandingPage = () => {
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const { user }  = useAuthStore();
-  const [scrolled, setScrolled] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [scrolled, setScrolled]   = useState(false);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 56);
-    window.addEventListener('scroll', fn, { passive: true });
+    const seen = sessionStorage.getItem('para_welcome_shown');
+    if (!seen) { const t = setTimeout(() => setShowModal(true), 800); return () => clearTimeout(t); }
+  }, []);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', fn, { passive:true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  const goUpload = () => navigate(user ? '/upload' : '/signup?promo=BETA3FREE');
+  const handleStart = () => {
+    sessionStorage.setItem('para_welcome_shown', '1');
+    setShowModal(false);
+    navigate(user ? '/upload' : '/signup?promo=BETA3FREE');
+  };
+  const openModal = () => { sessionStorage.setItem('para_welcome_shown', '1'); setShowModal(true); };
 
   return (
-    <div style={{ minHeight:'100vh', background:C.pageBg, fontFamily:'"Nunito", system-ui, -apple-system, sans-serif' }}>
-
+    <div style={{ background:C.pageBg, minHeight:'100vh',
+      fontFamily:'"Inter","DM Sans",system-ui,sans-serif' }}>
       <SEO
-        title="Found something weird? AI analysis in 60 seconds — notworms.com"
-        description="Upload a photo and get an AI-powered educational report on parasites, rashes, and skin conditions — designed to help you prepare for a GP visit. First analysis free."
-        canonical="/"
+        title="notworms.com — AI parasite education for Australians"
+        description="Found something weird? Upload a photo and get a structured educational report in 60 seconds. For Queensland parents, travellers, and pet owners."
       />
 
-      {/* ── GOOGLE FONT ── */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+      {showModal && (
+        <ParaModal
+          onClose={() => { sessionStorage.setItem('para_welcome_shown','1'); setShowModal(false); }}
+          onStart={handleStart}
+        />
+      )}
 
-        *, *::before, *::after { box-sizing: border-box; }
-
-        @keyframes leafSway {
-          0%,100% { transform: rotate(-2deg) translateY(0); }
-          50%     { transform: rotate(2deg)  translateY(-8px); }
-        }
-        @keyframes bobble {
-          0%,100% { transform: translateY(0px); }
-          50%     { transform: translateY(-7px); }
-        }
-        @keyframes scrollDot {
-          0%,100% { opacity: 1; transform: translateY(0); }
-          50%     { opacity: 0.4; transform: translateY(6px); }
-        }
-        .cta-green:hover  { background: #329B3C !important; transform: translateY(-2px) !important; box-shadow: 0 10px 36px rgba(77,189,86,0.52) !important; }
-        .cta-teal:hover   { background: #0F6E56 !important; transform: translateY(-2px) !important; }
-        .bundle-card:hover{ transform: translateY(-3px); box-shadow: 0 6px 28px rgba(0,0,0,0.10) !important; }
-
-        @media (max-width: 640px) {
-          .hide-sm { display: none !important; }
-          .hero-flex { flex-direction: column !important; align-items: center !important; }
-          .hero-left { align-items: center !important; }
-          .hero-card { max-width: 100% !important; }
-          .bundles-grid { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 900px) {
-          .nav-links { display: none !important; }
-        }
-      `}</style>
-
-      {/* ══════════════ NAV ══════════════ */}
+      {/* ── NAV ─────────────────────────────────────────────────────── */}
       <nav style={{
-        position:'fixed', top:0, left:0, right:0, zIndex:100,
-        padding:'0.9rem 1.75rem',
-        display:'flex', justifyContent:'space-between', alignItems:'center',
-        background: scrolled ? 'rgba(255,255,255,0.96)' : 'transparent',
+        position:'sticky', top:0, zIndex:100,
+        background: scrolled ? 'rgba(242,247,244,0.95)' : 'transparent',
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        boxShadow: scrolled ? '0 1px 0 rgba(0,0,0,0.07)' : 'none',
-        transition:'all 0.3s ease',
+        borderBottom: scrolled ? `1px solid ${C.border}` : '1px solid transparent',
+        transition:'all 0.2s ease', padding:'0 1.5rem',
       }}>
-        {/* Logo */}
-        <Link to="/" style={{ display:'flex', alignItems:'center', gap:9, textDecoration:'none' }}>
-          <div style={{
-            width:34, height:34, borderRadius:9, background:C.teal,
-            display:'flex', alignItems:'center', justifyContent:'center', fontSize:18,
-          }}>🔬</div>
-          <span style={{ fontWeight:900, fontSize:'1.1rem', color:C.dark, letterSpacing:'-0.02em' }}>notworms.com</span>
-        </Link>
+        <div style={{
+          maxWidth:1120, margin:'0 auto',
+          display:'flex', alignItems:'center', justifyContent:'space-between', height:64,
+        }}>
+          <Link to="/" style={{ textDecoration:'none' }}><Logo/></Link>
 
-        {/* Desktop links */}
-        <div className="nav-links" style={{ display:'flex', alignItems:'center', gap:'2rem' }}>
-          {[
-            ['How it works', '#how-it-works'],
-            ['Sample report', '/sample-report'],
-            ['Pricing', '/pricing'],
-            ['Blog', '/blog'],
-          ].map(([label, href]) => (
-            <a key={label} href={href}
-              onClick={!href.startsWith('/') ? e => { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior:'smooth' }); } : undefined}
-              style={{ fontSize:'0.9rem', color:C.dark, textDecoration:'none', fontWeight:600, opacity:0.7 }}
-            >{label}</a>
-          ))}
-        </div>
-
-        {/* Auth */}
-        <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
-          {user ? (
-            <Link to="/dashboard" className="cta-teal" style={{
-              fontSize:'0.875rem', fontWeight:700, color:'white', background:C.teal,
-              padding:'0.5rem 1.25rem', borderRadius:9999, textDecoration:'none',
-              transition:'all 0.2s',
-            }}>Dashboard →</Link>
-          ) : (
-            <>
-              <Link to="/login" className="hide-sm" style={{ fontSize:'0.875rem', color:C.dark, textDecoration:'none', fontWeight:600, opacity:0.65 }}>Sign in</Link>
-              <Link to="/signup?promo=BETA3FREE" className="cta-teal" style={{
-                fontSize:'0.875rem', fontWeight:800, color:'white', background:C.teal,
-                padding:'0.5rem 1.375rem', borderRadius:9999, textDecoration:'none',
-                transition:'all 0.2s',
-              }}>Get started free</Link>
-            </>
-          )}
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            {user ? (
+              <Link to="/dashboard" style={{
+                padding:'8px 18px', borderRadius:20, background:C.teal, color:'white',
+                textDecoration:'none', fontSize:'0.875rem', fontWeight:700,
+              }}>Dashboard →</Link>
+            ) : (
+              <>
+                <Link to="/login" style={{
+                  padding:'8px 16px', borderRadius:20, fontSize:'0.875rem',
+                  color:C.navy, textDecoration:'none', fontWeight:500,
+                }}>Sign in</Link>
+                <button onClick={openModal} style={{
+                  padding:'8px 18px', borderRadius:20, background:C.teal, color:'white',
+                  border:'none', cursor:'pointer', fontSize:'0.875rem', fontWeight:700,
+                }}>Upload Free →</button>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
-
-      {/* ══════════════ HERO ══════════════ */}
+      {/* ── HERO — Image 6 layout ────────────────────────────────────── */}
       <section style={{
-        position:'relative', minHeight:'100vh',
-        background:C.heroBg, overflow:'hidden',
-        display:'flex', flexDirection:'column',
-        alignItems:'center', justifyContent:'center',
-        paddingTop:'5.5rem', paddingBottom:'5rem',
+        padding:'clamp(3rem,8vw,6rem) 1.5rem 2rem',
+        textAlign:'center', maxWidth:760, margin:'0 auto',
       }}>
-        {/* leaf decorations */}
-        <div style={{ position:'absolute', top:-10, left:-12, animation:'leafSway 6s ease-in-out infinite', transformOrigin:'bottom center' }}>
-          <Leaf w={170} opacity={0.8}/>
-        </div>
-        <div style={{ position:'absolute', top:-10, right:-12, animation:'leafSway 7s ease-in-out infinite 1s', transformOrigin:'bottom center' }}>
-          <Leaf w={160} flip opacity={0.75}/>
-        </div>
-        <div style={{ position:'absolute', bottom:-20, right:-8, animation:'leafSway 8s ease-in-out infinite 2s', transformOrigin:'top center' }}>
-          <Leaf w={140} opacity={0.55}/>
-        </div>
-        <div style={{ position:'absolute', bottom:-20, left:80, animation:'leafSway 9s ease-in-out infinite 0.5s', transformOrigin:'top center' }}>
-          <Leaf w={110} opacity={0.35}/>
-        </div>
-
-        {/* content */}
-        <div style={{ position:'relative', zIndex:2, maxWidth:1020, width:'100%', padding:'0 1.5rem', textAlign:'center' }}>
-
-          {/* HEADLINE */}
-          <h1 style={{
-            fontSize:'clamp(2rem, 5.5vw, 3.8rem)',
-            fontWeight:900, color:C.dark, lineHeight:1.13,
-            margin:'0 auto 2.25rem', maxWidth:820,
-            letterSpacing:'-0.025em',
-          }}>
-            Found something weird in your stool?<br/>
-            Get AI analysis in 60 seconds<br/>
-            <span style={{ color:C.teal }}>— no lab, no wait.</span>
-          </h1>
-
-          {/* PARA + CARD ROW */}
-          <div className="hero-flex" style={{
-            display:'flex', flexWrap:'wrap',
-            alignItems:'flex-end', justifyContent:'center', gap:'2.5rem',
-          }}>
-
-            {/* LEFT: Para + CTA */}
-            <div className="hero-left" style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', minWidth:260, maxWidth:340 }}>
-              <span style={{ fontSize:12.5, fontWeight:700, color:C.gray, marginBottom:10, letterSpacing:'0.05em', alignSelf:'center' }}>
-                PARA, your friendly guide, is ready
-              </span>
-
-              {/* character + bubble row */}
-              <div style={{ display:'flex', alignItems:'flex-end', gap:12, marginBottom:22, alignSelf:'center' }}>
-                <div style={{ animation:'bobble 3s ease-in-out infinite', flexShrink:0 }}>
-                  <Para size={128}/>
-                </div>
-                {/* speech bubble */}
-                <div style={{
-                  background:'rgba(255,255,255,0.93)',
-                  borderRadius:'18px 18px 18px 4px',
-                  padding:'13px 16px',
-                  boxShadow:'0 4px 18px rgba(0,0,0,0.10)',
-                  maxWidth:160, position:'relative', bottom:14,
-                }}>
-                  <p style={{ margin:0, fontSize:14.5, fontWeight:700, color:C.dark, lineHeight:1.45 }}>
-                    G'day! Upload your<br/>photo — it's free
-                  </p>
-                </div>
-              </div>
-
-              {/* PRIMARY CTA */}
-              <button
-                className="cta-green"
-                onClick={goUpload}
-                style={{
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:10,
-                  width:'100%', background:C.green, color:'white',
-                  border:'none', borderRadius:14, padding:'1rem 1.5rem',
-                  fontSize:'1.08rem', fontWeight:900, cursor:'pointer',
-                  boxShadow:'0 6px 24px rgba(77,189,86,0.38)',
-                  transition:'all 0.2s', letterSpacing:'-0.01em',
-                }}
-              >
-                {/* add-person icon */}
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <line x1="19" y1="8" x2="19" y2="14"/>
-                  <line x1="16" y1="11" x2="22" y2="11"/>
-                </svg>
-                Upload Photo Now
-              </button>
-
-              {/* secondary */}
-              <p style={{ fontSize:12.5, color:C.gray, textAlign:'center', width:'100%', marginTop:10, lineHeight:1.6 }}>
-                Use code{' '}
-                <Link to="/signup?promo=BETA3FREE" style={{ color:C.teal, fontWeight:700, textDecoration:'none' }}>
-                  BETA3FREE
-                </Link>
-                {' '}for 3 free credits on signup
-              </p>
-            </div>
-
-            {/* RIGHT: mock card */}
-            <div className="hero-card" style={{ maxWidth:272, width:'100%', flexShrink:0 }}>
-              <HeroCard/>
-            </div>
-          </div>
-        </div>
-
-        {/* scroll cue */}
         <div style={{
-          position:'absolute', bottom:26, left:'50%', transform:'translateX(-50%)',
-          display:'flex', flexDirection:'column', alignItems:'center', gap:5,
+          display:'inline-flex', alignItems:'center', gap:7,
+          background:C.tealSoft, border:`1.5px solid ${C.sage}`,
+          borderRadius:20, padding:'5px 14px', marginBottom:'1.5rem',
         }}>
-          <span style={{ fontSize:11, color:C.darkMid, opacity:0.45, letterSpacing:'0.05em' }}>scroll to learn more</span>
-          <svg style={{ animation:'scrollDot 1.8s ease-in-out infinite' }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.dark} strokeWidth="2" opacity="0.4">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
+          <span style={{ fontSize:14 }}>🇦🇺</span>
+          <span style={{ fontSize:'0.8rem', fontWeight:700, color:C.tealDark }}>
+            Built for Australians — educational tool, not diagnostic
+          </span>
         </div>
+
+        <h1 style={{
+          fontSize:'clamp(1.9rem, 5vw, 3.1rem)', fontWeight:900, color:C.navy,
+          lineHeight:1.18, letterSpacing:'-0.025em', margin:'0 0 1.1rem',
+        }}>
+          Found something weird in your stool or on your skin?{' '}
+          <span style={{ color:C.teal }}>Get AI analysis in 60 seconds</span>
+          {' '}— no lab, no wait.
+        </h1>
+
+        <p style={{
+          fontSize:'clamp(1rem,2.5vw,1.2rem)', color:C.gray,
+          margin:'0 0 2rem', lineHeight:1.6,
+        }}>
+          PARA, your friendly guide, is ready. G&apos;day!
+        </p>
+
+        <button onClick={openModal} style={{
+          padding:'16px 44px', background:C.teal, color:'white',
+          border:'none', borderRadius:14, fontSize:'1.1rem', fontWeight:800,
+          cursor:'pointer', letterSpacing:'0.01em',
+          boxShadow:'0 6px 24px rgba(0,191,165,0.35)', transition:'all 0.15s',
+        }}
+        onMouseEnter={e=>{e.target.style.background=C.tealDark;e.target.style.transform='translateY(-2px)';}}
+        onMouseLeave={e=>{e.target.style.background=C.teal;e.target.style.transform='none';}}
+        >
+          Upload Photo Now — Free
+        </button>
+
+        <p style={{ fontSize:'0.8rem', color:C.grayMid, marginTop:'0.75rem' }}>
+          No credit card needed · First analysis free ·{' '}
+          <strong style={{ color:C.tealDark }}>BETA3FREE</strong> = 3 free analyses
+        </p>
       </section>
 
+      {/* ── PREVIEW CARDS — teaser + sample ─────────────────────────── */}
+      <section style={{
+        maxWidth:900, margin:'0 auto 4rem', padding:'0 1.5rem',
+        display:'flex', gap:'1.25rem', alignItems:'flex-start',
+        flexWrap:'wrap', justifyContent:'center',
+      }}>
+        <ParaTeaser onClick={openModal}/>
+        <SamplePreview/>
+      </section>
 
-      {/* ══════════════ HOW IT WORKS ══════════════ */}
-      <section id="how-it-works" style={{ background:C.white, padding:'5.5rem 1.5rem' }}>
-        <div style={{ maxWidth:840, margin:'0 auto', textAlign:'center' }}>
-          <SectionLabel>Simple process</SectionLabel>
-          <h2 style={{ fontSize:'clamp(1.75rem, 4vw, 2.6rem)', fontWeight:900, color:C.dark, marginBottom:'0.75rem', letterSpacing:'-0.02em' }}>
-            Three steps. Sixty seconds.
-          </h2>
-          <p style={{ color:C.gray, fontSize:'1.05rem', maxWidth:520, margin:'0 auto 3.5rem', lineHeight:1.7 }}>
-            Our AI reads visual patterns the way a clinician does — then builds a structured educational report to bring to your GP.
-          </p>
-
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(230px, 1fr))', gap:'1.5rem' }}>
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
+      <section style={{
+        background:'white', padding:'clamp(3rem,6vw,5rem) 1.5rem',
+        borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`,
+      }}>
+        <div style={{ maxWidth:900, margin:'0 auto' }}>
+          <p style={{
+            textAlign:'center', textTransform:'uppercase', letterSpacing:'0.1em',
+            fontSize:'0.72rem', fontWeight:700, color:C.teal, marginBottom:'0.5rem',
+          }}>How it works</p>
+          <h2 style={{
+            textAlign:'center', fontSize:'clamp(1.5rem,3vw,2.1rem)',
+            fontWeight:800, color:C.navy, margin:'0 0 3rem', letterSpacing:'-0.02em',
+          }}>Three steps. Sixty seconds.</h2>
+          <div style={{
+            display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:'1.5rem',
+          }}>
             {[
-              {
-                step:'01', emoji:'📸', bg:C.tealSoft,
-                title:'Take a clear photo',
-                body:'Good lighting, steady hand, whole area in frame. Works with any phone camera. Takes 30 seconds.',
-              },
-              {
-                step:'02', emoji:'🔬', bg:'#FFF8E7',
-                title:'Upload + add symptoms',
-                body:"Select your sample type, tick any symptoms you're experiencing. The more context you add, the better the report.",
-              },
-              {
-                step:'03', emoji:'📋', bg:'#FFF0EC',
-                title:'Get your educational report',
-                body:'Urgency level, visual findings, differential possibilities, and GP prep notes — structured and ready instantly.',
-              },
-            ].map((s,i) => (
-              <div key={i} style={{
-                background:s.bg, borderRadius:18, padding:'2rem 1.75rem',
-                textAlign:'left', position:'relative', overflow:'hidden',
+              { step:'01', icon:'📸', title:'Take or upload a photo',
+                desc:"Stool sample, skin rash, anything that's got you worried. Clear photo in good light." },
+              { step:'02', icon:'🔬', title:'PARA analyses it',
+                desc:'Our AI identifies visual patterns, flags urgency level, and lists what could be worth investigating.' },
+              { step:'03', icon:'📋', title:'You get a structured report',
+                desc:'Share with your GP. Know exactly what to say before you walk in the door.' },
+            ].map(s => (
+              <div key={s.step} style={{
+                background:C.sageLight, borderRadius:16, padding:'1.75rem 1.5rem',
+                border:`1px solid ${C.border}`, position:'relative',
               }}>
-                <span style={{ position:'absolute', top:10, right:16, fontSize:'3.5rem', fontWeight:900, color:'rgba(0,0,0,0.05)', lineHeight:1 }}>{s.step}</span>
-                <span style={{ fontSize:'2.25rem', display:'block', marginBottom:14 }}>{s.emoji}</span>
-                <h3 style={{ fontSize:'1.05rem', fontWeight:800, color:C.dark, marginBottom:9, lineHeight:1.35 }}>{s.title}</h3>
-                <p style={{ fontSize:'0.885rem', color:C.gray, lineHeight:1.7, margin:0 }}>{s.body}</p>
+                <span style={{
+                  position:'absolute', top:14, right:14,
+                  fontSize:'0.7rem', fontWeight:800, color:C.sage, letterSpacing:'0.05em',
+                }}>{s.step}</span>
+                <div style={{ fontSize:36, marginBottom:'0.875rem' }}>{s.icon}</div>
+                <h3 style={{ fontSize:'1rem', fontWeight:700, color:C.navy, margin:'0 0 0.5rem' }}>{s.title}</h3>
+                <p style={{ fontSize:'0.875rem', color:C.gray, lineHeight:1.6, margin:0 }}>{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* ── WHO IT'S FOR ─────────────────────────────────────────────── */}
+      <section style={{ padding:'clamp(3rem,6vw,5rem) 1.5rem' }}>
+        <div style={{ maxWidth:900, margin:'0 auto' }}>
+          <p style={{
+            textAlign:'center', textTransform:'uppercase', letterSpacing:'0.1em',
+            fontSize:'0.72rem', fontWeight:700, color:C.teal, marginBottom:'0.5rem',
+          }}>Who uses ParasitePro</p>
+          <h2 style={{
+            textAlign:'center', fontSize:'clamp(1.5rem,3vw,2.1rem)',
+            fontWeight:800, color:C.navy, margin:'0 0 3rem', letterSpacing:'-0.02em',
+          }}>You&apos;re not overreacting. You&apos;re under-informed.</h2>
+          <div style={{
+            display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:'1.25rem',
+          }}>
+            {[
+              { emoji:'👨‍👩‍👧‍👦', title:'Queensland parents', color:C.tealSoft,
+                desc:"You worm the dog every 3 months. When did you last think about the kids? Tropical QLD has real parasite exposure risk most families underestimate." },
+              { emoji:'✈️', title:'Post-travel Australians', color:'#FEF9EE',
+                desc:"Gut symptoms after SE Asia or Bali that won't quit? You need organised information before your GP appointment, not a 2am Google spiral." },
+              { emoji:'🐕', title:'Pet owners', color:'#F5EEFF',
+                desc:"Your vet just found worms in your dog. Some are zoonotic — they transfer to humans. Worth a quick check before assuming everyone's fine." },
+            ].map(c => (
+              <div key={c.title} style={{
+                background:c.color, borderRadius:16, padding:'1.75rem 1.5rem',
+                border:'1px solid rgba(0,0,0,0.06)',
+              }}>
+                <div style={{ fontSize:36, marginBottom:'0.875rem' }}>{c.emoji}</div>
+                <h3 style={{ fontSize:'1rem', fontWeight:700, color:C.navy, margin:'0 0 0.5rem' }}>{c.title}</h3>
+                <p style={{ fontSize:'0.875rem', color:C.gray, lineHeight:1.6, margin:0 }}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* ══════════════ EXPANDED MOCK REPORT ══════════════ */}
-      <section style={{ background:C.grayLight, padding:'5.5rem 1.5rem' }}>
-        <div style={{ maxWidth:920, margin:'0 auto' }}>
-          <div style={{ textAlign:'center', marginBottom:'2.75rem' }}>
-            <SectionLabel>What you actually get</SectionLabel>
-            <h2 style={{ fontSize:'clamp(1.75rem, 4vw, 2.6rem)', fontWeight:900, color:C.dark, marginBottom:8, letterSpacing:'-0.02em' }}>
-              A real structured report — not a guess
-            </h2>
-            <p style={{ color:C.gray, maxWidth:540, margin:'0 auto', lineHeight:1.7 }}>
-              Every report follows a clinical framework — the same structure a clinician uses — so you walk into your GP appointment prepared.
+      {/* ── PRICING ANCHOR ───────────────────────────────────────────── */}
+      <section style={{ background:C.navy, padding:'clamp(3rem,6vw,4.5rem) 1.5rem' }}>
+        <div style={{ maxWidth:700, margin:'0 auto', textAlign:'center' }}>
+          <h2 style={{
+            fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:800, color:'white',
+            margin:'0 0 1rem', letterSpacing:'-0.02em',
+          }}>
+            A GP visit costs $80.<br/>
+            <span style={{ color:C.teal }}>Each analysis costs $3.50.</span>
+          </h2>
+          <p style={{ color:'rgba(255,255,255,0.72)', fontSize:'1rem', lineHeight:1.65, margin:'0 0 2rem' }}>
+            First analysis completely free. Credits in bundles — no subscription, no monthly fee.
+          </p>
+          <div style={{
+            display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',
+            gap:'1rem', marginBottom:'2rem',
+          }}>
+            {[
+              { credits:5,  price:'$19.99', ppc:'$4.00 each' },
+              { credits:10, price:'$34.99', ppc:'$3.50 each', hot:true },
+              { credits:25, price:'$74.99', ppc:'$3.00 each' },
+            ].map(b => (
+              <div key={b.credits} style={{
+                background: b.hot ? C.teal : 'rgba(255,255,255,0.08)',
+                border: b.hot ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                borderRadius:12, padding:'1.25rem', position:'relative',
+              }}>
+                {b.hot && <div style={{
+                  position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)',
+                  background:C.green, color:'white', fontSize:'0.65rem', fontWeight:800,
+                  padding:'2px 10px', borderRadius:20, letterSpacing:'0.06em', whiteSpace:'nowrap',
+                }}>BEST VALUE</div>}
+                <div style={{ fontSize:'1.75rem', fontWeight:900, color:'white', marginBottom:2 }}>{b.credits}</div>
+                <div style={{ fontSize:'0.7rem', color:'rgba(255,255,255,0.65)', marginBottom:4 }}>analyses</div>
+                <div style={{ fontSize:'1.15rem', fontWeight:800, color:'white' }}>{b.price}</div>
+                <div style={{ fontSize:'0.7rem', color:'rgba(255,255,255,0.6)' }}>{b.ppc}</div>
+              </div>
+            ))}
+          </div>
+          <button onClick={openModal} style={{
+            padding:'14px 40px', background:C.green, color:'white',
+            border:'none', borderRadius:12, fontSize:'1rem', fontWeight:800, cursor:'pointer',
+          }}>Start free — no credit card needed</button>
+          <p style={{ color:'rgba(255,255,255,0.40)', fontSize:'0.78rem', marginTop:'0.75rem' }}>
+            Credits never expire · 30-day money-back guarantee · Secured by Stripe
+          </p>
+        </div>
+      </section>
+
+      {/* ── COMPLIANCE STRIP ─────────────────────────────────────────── */}
+      <section style={{
+        background:'#FFF8E7', borderTop:'2px solid #F59E0B',
+        padding:'1.5rem', textAlign:'center',
+      }}>
+        <div style={{ maxWidth:680, margin:'0 auto' }}>
+          <p style={{ fontSize:'0.82rem', color:'#78350F', lineHeight:1.7, margin:0 }}>
+            ⚠️ <strong>Educational tool only.</strong> ParasitePro provides structured educational
+            reports to help you prepare for GP visits. It does not provide medical diagnoses,
+            prescribe treatments, or replace professional medical advice. Complies with TGA Software
+            as a Medical Device guidelines and AHPRA advertising standards.{' '}
+            <strong>In an emergency, call 000.</strong>
+          </p>
+        </div>
+      </section>
+
+      {/* ── FOOTER ───────────────────────────────────────────────────── */}
+      <footer style={{ background:C.navyDark, padding:'2.5rem 1.5rem 2rem' }}>
+        <div style={{
+          maxWidth:900, margin:'0 auto',
+          display:'flex', flexWrap:'wrap', justifyContent:'space-between',
+          alignItems:'flex-start', gap:'1.5rem',
+        }}>
+          <div>
+            <Logo/>
+            <p style={{ color:'rgba(255,255,255,0.4)', fontSize:'0.78rem', marginTop:'0.6rem', maxWidth:200 }}>
+              AI-powered parasite education for Australians.
             </p>
           </div>
-
-          {/* Report card */}
-          <div style={{ background:'white', borderRadius:20, boxShadow:'0 4px 48px rgba(0,0,0,0.08)', overflow:'hidden' }}>
-            {/* header */}
-            <div style={{
-              background:'linear-gradient(135deg, #0A1F12 0%, #1D9E75 100%)',
-              padding:'1.5rem 2rem',
-              display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'1rem',
-            }}>
-              <div>
-                <div style={{ fontSize:11, color:'rgba(255,255,255,0.55)', letterSpacing:'0.09em', marginBottom:4 }}>EDUCATIONAL ANALYSIS REPORT</div>
-                <div style={{ fontSize:'1.1rem', fontWeight:800, color:'white' }}>Sample Report — Stool Analysis</div>
-              </div>
-              <span style={{ fontSize:11, background:'#FEF3C7', color:'#92400E', padding:'4px 14px', borderRadius:9999, fontWeight:700 }}>SAMPLE ONLY — NOT A DIAGNOSIS</span>
-            </div>
-
-            <div style={{ padding:'2rem', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(270px, 1fr))', gap:'2rem' }}>
-              {/* Left */}
-              <div>
-                <div style={{ fontSize:11, fontWeight:700, color:C.gray, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'1rem' }}>Visual assessment</div>
-
-                {/* Image quality */}
-                <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12.5, color:C.gray, marginBottom:6 }}>Image quality</div>
-                  <div style={{ display:'flex', gap:6 }}>
-                    {[['Good','#DCFCE7','#166534'],['Adequate',C.border,C.gray],['Poor',C.border,C.gray]].map(([q,bg,col])=>(
-                      <span key={q} style={{ fontSize:11.5, padding:'3px 11px', borderRadius:9999, background:bg, color:col, fontWeight: q==='Good'?700:400 }}>{q}</span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Primary finding */}
-                <div style={{ background:C.tealSoft, borderRadius:12, padding:'1rem', marginBottom:16 }}>
-                  <div style={{ fontSize:10.5, fontWeight:700, color:C.tealDark, textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:6 }}>Primary finding</div>
-                  <div style={{ fontSize:'1rem', fontWeight:800, color:C.dark }}>Possible roundworm</div>
-                  <div style={{ fontSize:12, color:C.tealDark, fontStyle:'italic', marginTop:2 }}>(Ascaris lumbricoides)</div>
-                </div>
-
-                {/* Visual evidence */}
-                <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12.5, fontWeight:700, color:C.dark, marginBottom:9 }}>Visual evidence</div>
-                  {[
-                    'Elongated cylindrical body structure',
-                    'Smooth cuticle surface appearance',
-                    'Tapered anterior and posterior ends',
-                    'Estimated size: 15–35cm range',
-                  ].map((e,i)=>(
-                    <div key={i} style={{ display:'flex', gap:9, marginBottom:6, alignItems:'flex-start' }}>
-                      <div style={{ width:5, height:5, borderRadius:'50%', background:C.teal, marginTop:7, flexShrink:0 }}/>
-                      <span style={{ fontSize:12.5, color:C.gray, lineHeight:1.55 }}>{e}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Geographic relevance */}
-                <div style={{ background:'#F0F9FF', borderRadius:10, padding:'0.75rem 1rem', display:'flex', gap:8, alignItems:'flex-start' }}>
-                  <span style={{ fontSize:16 }}>🌏</span>
-                  <div>
-                    <div style={{ fontSize:11, fontWeight:700, color:'#075985', marginBottom:2 }}>Geographic relevance</div>
-                    <p style={{ fontSize:11.5, color:'#0369A1', margin:0, lineHeight:1.55 }}>
-                      Common in tropical Queensland and northern Australia. Higher prevalence in regional communities.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right */}
-              <div>
-                <div style={{ fontSize:11, fontWeight:700, color:C.gray, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'1rem' }}>Assessment & guidance</div>
-
-                {/* Confidence */}
-                <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12.5, color:C.gray, marginBottom:6 }}>Confidence level</div>
-                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ flex:1, height:8, background:'#E5E7EB', borderRadius:9999 }}>
-                      <div style={{ width:'79%', height:'100%', background:C.teal, borderRadius:9999 }}/>
-                    </div>
-                    <span style={{ fontSize:12.5, fontWeight:700, color:C.tealDark, flexShrink:0 }}>High</span>
-                  </div>
-                </div>
-
-                {/* Urgency */}
-                <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12.5, color:C.gray, marginBottom:6 }}>Urgency level</div>
-                  <div style={{ background:'#FEF3C7', borderRadius:12, padding:'0.875rem 1rem', display:'flex', gap:10, alignItems:'center' }}>
-                    <span style={{ fontSize:20 }}>🟡</span>
-                    <div>
-                      <div style={{ fontSize:12.5, fontWeight:800, color:'#92400E' }}>MODERATE</div>
-                      <div style={{ fontSize:12, color:'#78350F' }}>Seek medical advice within 1–2 weeks</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Differential table */}
-                <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12.5, fontWeight:700, color:C.dark, marginBottom:9 }}>Differential diagnoses</div>
-                  <table style={{ width:'100%', fontSize:12, borderCollapse:'collapse' }}>
-                    <thead>
-                      <tr>{['Condition','Likelihood','Key differentiator'].map(h=>(
-                        <th key={h} style={{ textAlign:'left', padding:'4px 6px', color:C.gray, fontWeight:600, fontSize:10.5, borderBottom:`1px solid ${C.border}` }}>{h}</th>
-                      ))}</tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        ['Tapeworm segment','Low','No proglottid segments visible'],
-                        ['Mucus strand','Low','Organised structure present'],
-                        ['Undigested food','Very low','Bilateral symmetry observed'],
-                      ].map(([c,l,k],i)=>(
-                        <tr key={i}>
-                          <td style={{ padding:'5px 6px', color:C.dark, borderBottom:`1px solid ${C.border}` }}>{c}</td>
-                          <td style={{ padding:'5px 6px', color:C.gray, borderBottom:`1px solid ${C.border}` }}>{l}</td>
-                          <td style={{ padding:'5px 6px', color:C.gray, borderBottom:`1px solid ${C.border}`, fontSize:10.5 }}>{k}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Recommended action */}
-                <div style={{ background:C.tealSoft, borderRadius:12, padding:'1rem' }}>
-                  <div style={{ fontSize:10.5, fontWeight:700, color:C.tealDark, textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:7 }}>Recommended action</div>
-                  <p style={{ fontSize:12.5, color:C.tealDark, margin:0, lineHeight:1.65 }}>
-                    Book a GP appointment within 1–2 weeks and bring this report. Antiparasitic treatment is likely — your doctor will confirm and prescribe appropriately. Do not self-medicate.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* disclaimer footer */}
-            <div style={{ background:'#FFFBEB', borderTop:'1px solid #FCD34D', padding:'1rem 2rem', display:'flex', alignItems:'flex-start', gap:10 }}>
-              <span style={{ fontSize:17, flexShrink:0 }}>⚠️</span>
-              <p style={{ fontSize:11.5, color:'#92400E', margin:0, lineHeight:1.65 }}>
-                <strong>This is a sample educational report only.</strong> All analysis from notworms.com is for educational and GP-preparation purposes. It does not constitute a medical diagnosis. Always consult a qualified healthcare professional. In an emergency, call <strong>000</strong>.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* ══════════════ WHO IT'S FOR ══════════════ */}
-      <section style={{ background:C.white, padding:'5.5rem 1.5rem' }}>
-        <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
-          <SectionLabel>Built for Australians</SectionLabel>
-          <h2 style={{ fontSize:'clamp(1.75rem, 4vw, 2.6rem)', fontWeight:900, color:C.dark, marginBottom:6, letterSpacing:'-0.02em' }}>
-            You're not overreacting.<br/>You're under-informed.
-          </h2>
-          <p style={{ color:C.gray, marginBottom:'3.25rem', lineHeight:1.7 }}>
-            This tool was built for the exact moment you're in right now.
-          </p>
-
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(256px, 1fr))', gap:'1.5rem' }}>
-            {[
-              {
-                emoji:'👶', audience:'Queensland parents',
-                headline:'You worm the dog. Who worms the kids?',
-                body:'Kids pick up parasites from soil, pets, and sandpits year-round in Queensland. A photo of a rash or finding gets you an educational report before the GP call.',
-              },
-              {
-                emoji:'✈️', audience:'Post-travel Australians',
-                headline:"Something's not right since you got back.",
-                body:'Gut symptoms, skin rashes, and fatigue after overseas travel are classic signs. Know exactly what to ask about before you walk into the clinic.',
-              },
-              {
-                emoji:'🐕', audience:'Pet owners',
-                headline:'The dog tested positive. Now what about the family?',
-                body:"Some pet parasites are zoonotic — they transfer to humans. Get educated before you assume everyone's in the clear.",
-              },
-            ].map((c,i)=>(
-              <div key={i} style={{ background:C.grayLight, borderRadius:18, padding:'1.875rem', textAlign:'left' }}>
-                <span style={{ fontSize:'2.5rem', display:'block', marginBottom:13 }}>{c.emoji}</span>
-                <div style={{ fontSize:10.5, fontWeight:700, color:C.teal, textTransform:'uppercase', letterSpacing:'0.09em', marginBottom:8 }}>{c.audience}</div>
-                <h3 style={{ fontSize:'1.025rem', fontWeight:800, color:C.dark, marginBottom:9, lineHeight:1.4 }}>{c.headline}</h3>
-                <p style={{ fontSize:'0.875rem', color:C.gray, lineHeight:1.7, margin:0 }}>{c.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* ══════════════ PRICING ══════════════ */}
-      <section style={{ background:C.pageBg, padding:'5.5rem 1.5rem' }}>
-        <div style={{ maxWidth:820, margin:'0 auto', textAlign:'center' }}>
-          <SectionLabel>Simple pricing</SectionLabel>
-          <h2 style={{ fontSize:'clamp(1.75rem, 4vw, 2.6rem)', fontWeight:900, color:C.dark, marginBottom:6, letterSpacing:'-0.02em' }}>
-            First analysis free. Credits never expire.
-          </h2>
-          <p style={{ color:C.gray, marginBottom:'2.5rem', lineHeight:1.7 }}>
-            No subscription. No lock-in. Pay only when you need another analysis.
-          </p>
-
-          {/* Free highlight */}
-          <div style={{
-            background:'linear-gradient(135deg, #E1F5EE 0%, #CCE8DC 100%)',
-            border:`2px solid ${C.teal}`, borderRadius:18,
-            padding:'1.5rem 2rem', marginBottom:'1.75rem',
-            display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'1rem',
-          }}>
-            <div style={{ textAlign:'left' }}>
-              <div style={{ fontSize:'1.2rem', fontWeight:900, color:C.dark }}>🎉 First analysis — completely free</div>
-              <div style={{ fontSize:13, color:C.tealDark, marginTop:4 }}>Signup in 30 seconds. No credit card required. Use code BETA3FREE for 3 free credits.</div>
-            </div>
-            <button onClick={goUpload} className="cta-teal" style={{
-              background:C.teal, color:'white', border:'none', borderRadius:12,
-              padding:'0.8rem 2rem', fontSize:'0.95rem', fontWeight:800, cursor:'pointer',
-              whiteSpace:'nowrap', transition:'all 0.2s',
-            }}>Start free →</button>
-          </div>
-
-          {/* Bundles */}
-          <div className="bundles-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1rem', marginBottom:'1.5rem' }}>
-            {[
-              { name:'5 credits', price:'$19.99', ppc:'$4.00 per analysis', pop:false },
-              { name:'10 credits', price:'$34.99', ppc:'$3.50 per analysis', pop:true },
-              { name:'25 credits', price:'$74.99', ppc:'$3.00 per analysis', pop:false },
-            ].map((b,i)=>(
-              <div key={i} className="bundle-card" style={{
-                background:C.white,
-                border:`${b.pop ? 2 : 1}px solid ${b.pop ? C.teal : C.border}`,
-                borderRadius:14, padding:'1.5rem', position:'relative',
-                transition:'all 0.2s', cursor:'default',
-              }}>
-                {b.pop && (
-                  <div style={{
-                    position:'absolute', top:-11, left:'50%', transform:'translateX(-50%)',
-                    background:C.teal, color:'white', fontSize:9.5, fontWeight:800,
-                    padding:'3px 12px', borderRadius:9999, letterSpacing:'0.05em', whiteSpace:'nowrap',
-                  }}>MOST POPULAR</div>
-                )}
-                <div style={{ fontSize:'1.7rem', fontWeight:900, color:C.dark, letterSpacing:'-0.02em' }}>{b.price}</div>
-                <div style={{ fontSize:'0.9rem', fontWeight:700, color:C.teal, margin:'4px 0 3px' }}>{b.name}</div>
-                <div style={{ fontSize:12, color:C.gray, marginBottom:14 }}>{b.ppc}</div>
-                <Link to="/pricing" style={{
-                  display:'block', textAlign:'center',
-                  background: b.pop ? C.teal : 'transparent',
-                  color: b.pop ? 'white' : C.teal,
-                  border:`1.5px solid ${C.teal}`,
-                  borderRadius:9, padding:'8px',
-                  fontSize:13, fontWeight:700, textDecoration:'none',
-                }}>Buy credits →</Link>
-              </div>
-            ))}
-          </div>
-
-          <p style={{ fontSize:12.5, color:C.gray }}>
-            Credits never expire · 30-day money-back guarantee · Secure payment via Stripe · All prices in AUD
-          </p>
-        </div>
-      </section>
-
-
-      {/* ══════════════ FINAL CTA ══════════════ */}
-      <section style={{
-        background:'linear-gradient(135deg, #0A1F12 0%, #103520 50%, #1D9E75 100%)',
-        padding:'6rem 1.5rem', textAlign:'center', position:'relative', overflow:'hidden',
-      }}>
-        {/* subtle leaf bg */}
-        <div style={{ position:'absolute', top:-20, right:-20, opacity:0.08 }}>
-          <Leaf w={220} opacity={1}/>
-        </div>
-        <div style={{ maxWidth:620, margin:'0 auto', position:'relative', zIndex:1 }}>
-          <h2 style={{
-            fontSize:'clamp(2rem, 5vw, 3.25rem)', fontWeight:900, color:'white',
-            marginBottom:'0.875rem', lineHeight:1.18, letterSpacing:'-0.025em',
-          }}>
-            Stop wondering.<br/>
-            <span style={{ color:'#5DCAA5' }}>Start knowing.</span>
-          </h2>
-          <p style={{ color:'rgba(255,255,255,0.72)', fontSize:'1.05rem', marginBottom:'2.25rem', lineHeight:1.7 }}>
-            You're not a hypochondriac. You're under-informed.<br/>
-            Get an educational analysis in 60 seconds. First one's free.
-          </p>
-          <button onClick={goUpload} className="cta-green" style={{
-            display:'inline-flex', alignItems:'center', gap:11,
-            background:C.green, color:'white', border:'none',
-            borderRadius:16, padding:'1.1rem 2.75rem',
-            fontSize:'1.125rem', fontWeight:900, cursor:'pointer',
-            boxShadow:'0 8px 32px rgba(77,189,86,0.42)',
-            transition:'all 0.2s', letterSpacing:'-0.01em',
-          }}>
-            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Upload Photo Now — Free
-          </button>
-          <p style={{ color:'rgba(255,255,255,0.38)', marginTop:14, fontSize:12.5 }}>
-            No credit card required · Promo code BETA3FREE = 3 free analyses
-          </p>
-        </div>
-      </section>
-
-
-      {/* ══════════════ DISCLAIMER ══════════════ */}
-      <section style={{ background:C.amberBg, borderTop:'1px solid #FCD34D', padding:'2.75rem 1.5rem' }}>
-        <div style={{ maxWidth:720, margin:'0 auto', textAlign:'center' }}>
-          <p style={{ fontWeight:800, color:'#92400E', marginBottom:7, fontSize:'0.95rem' }}>
-            ⚠️ Educational tool — not a medical diagnostic service
-          </p>
-          <p style={{ fontSize:'0.855rem', color:'#B45309', lineHeight:1.75 }}>
-            notworms.com provides <strong>educational information and AI-assisted visual pattern recognition only</strong>,
-            designed to help you prepare for a GP visit. It does not constitute a medical diagnosis, medical advice, or
-            clinical assessment and is not a substitute for professional healthcare. Always consult a qualified healthcare
-            professional for diagnosis and treatment. This platform operates in accordance with TGA Software as a Medical
-            Device guidelines and AHPRA advertising standards. In an emergency, call <strong>000</strong>.
-          </p>
-        </div>
-      </section>
-
-
-      {/* ══════════════ FOOTER ══════════════ */}
-      <footer style={{ background:'#091410', color:'#9CA3AF', padding:'3.5rem 1.5rem 2rem' }}>
-        <div style={{ maxWidth:940, margin:'0 auto' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'2.5rem', marginBottom:'2.5rem' }}>
-            {/* Brand */}
+          <div style={{ display:'flex', gap:'3rem', flexWrap:'wrap' }}>
             <div>
-              <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:13 }}>
-                <div style={{ width:32, height:32, borderRadius:8, background:C.teal, display:'flex', alignItems:'center', justifyContent:'center', fontSize:17 }}>🔬</div>
-                <span style={{ fontWeight:900, color:'white', fontSize:'1.05rem' }}>notworms.com</span>
-              </div>
-              <p style={{ fontSize:13, lineHeight:1.65, maxWidth:230, margin:0 }}>
-                AI-powered educational parasite pattern analysis. Helping Australians prepare for GP visits — not replace them.
-              </p>
-              <p style={{ fontSize:12, marginTop:10 }}>Mackay, Queensland, Australia 🦘</p>
+              <p style={{
+                color:'rgba(255,255,255,0.45)', fontSize:'0.72rem', fontWeight:700,
+                letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'0.75rem',
+              }}>Product</p>
+              {[['/upload','Upload Photo'],['/scientific-library','Scientific Library'],['/pricing','Pricing'],['/sample-report','Sample Report']].map(([h,l]) => (
+                <Link key={h} to={h} style={{
+                  display:'block', color:'rgba(255,255,255,0.6)',
+                  textDecoration:'none', fontSize:'0.82rem', marginBottom:'0.4rem',
+                }}>{l}</Link>
+              ))}
             </div>
-
-            {/* Link columns */}
-            {[
-              ['Platform', [['How it works','#how-it-works'],['Pricing','/pricing'],['Sample report','/sample-report'],['FAQ','/faq'],['Blog','/blog']]],
-              ['Educational', [['Worm in stool guide','/worm-in-stool-picture'],['Dog worms guide','/dog-worms'],['Parasite encyclopedia','/encyclopedia'],['Pinworm guide','/pinworm'],['Tapeworm guide','/tapeworm']]],
-              ['Legal', [['Privacy policy','/privacy'],['Terms of service','/terms'],['Medical disclaimer','/disclaimer'],['Contact','/contact']]],
-            ].map(([heading, links])=>(
-              <div key={heading}>
-                <div style={{ fontSize:10.5, fontWeight:800, color:'rgba(255,255,255,0.35)', textTransform:'uppercase', letterSpacing:'0.11em', marginBottom:13 }}>{heading}</div>
-                {links.map(([label, href])=>(
-                  <div key={label} style={{ marginBottom:9 }}>
-                    {href.startsWith('/') ? (
-                      <Link to={href} style={{ color:'#9CA3AF', textDecoration:'none', fontSize:13 }}>{label}</Link>
-                    ) : (
-                      <a href={href} onClick={e=>{e.preventDefault();document.querySelector(href)?.scrollIntoView({behavior:'smooth'});}} style={{ color:'#9CA3AF', textDecoration:'none', fontSize:13, cursor:'pointer' }}>{label}</a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ))}
+            <div>
+              <p style={{
+                color:'rgba(255,255,255,0.45)', fontSize:'0.72rem', fontWeight:700,
+                letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'0.75rem',
+              }}>Legal</p>
+              {[['/privacy','Privacy Policy'],['/terms','Terms of Service'],['/disclaimer','Disclaimer'],['/contact','Contact']].map(([h,l]) => (
+                <Link key={h} to={h} style={{
+                  display:'block', color:'rgba(255,255,255,0.6)',
+                  textDecoration:'none', fontSize:'0.82rem', marginBottom:'0.4rem',
+                }}>{l}</Link>
+              ))}
+            </div>
           </div>
-
-          <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)', paddingTop:'1.5rem', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'0.75rem' }}>
-            <p style={{ fontSize:12, margin:0 }}>© 2025 ParasitePro · notworms.com · ABN pending</p>
-            <p style={{ fontSize:12, margin:0 }}>Educational purposes only · Always consult a healthcare professional</p>
-          </div>
+        </div>
+        <div style={{
+          maxWidth:900, margin:'2rem auto 0',
+          borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:'1.25rem',
+          display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'0.5rem',
+        }}>
+          <p style={{ color:'rgba(255,255,255,0.28)', fontSize:'0.75rem', margin:0 }}>
+            © 2026 notworms.com · Made in Mackay, Queensland 🇦🇺
+          </p>
+          <p style={{ color:'rgba(255,255,255,0.28)', fontSize:'0.75rem', margin:0 }}>
+            support@notworms.com
+          </p>
         </div>
       </footer>
-
     </div>
   );
 };
