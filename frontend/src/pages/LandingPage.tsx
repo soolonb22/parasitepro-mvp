@@ -202,7 +202,7 @@ const SectionLabel = ({ children }) => (
 /* ─── MAIN COMPONENT ─────────────────────────────────────────── */
 const LandingPage = () => {
   const navigate  = useNavigate();
-  const { user }  = useAuth();
+  const { user }  = useAuthStore();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
