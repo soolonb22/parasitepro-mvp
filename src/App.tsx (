@@ -1,42 +1,35 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import ParaGuide from './components/ParaGuide';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import UploadPage from './pages/UploadPage';
+import Report from './pages/Report';
+import PricingPage from './pages/PricingPage';
+import DashboardPage from './pages/DashboardPage';
+import HowItWorks from './pages/HowItWorks';
+import Resources from './pages/Resources';
+import Privacy from './pages/Privacy';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-slate-50">
-        {/* Navbar */}
-        <nav className="bg-white border-b sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-teal-600 rounded-2xl flex items-center justify-center text-white font-bold">P</div>
-              <span className="text-2xl font-semibold text-navy">notworms</span>
-            </div>
-            <div className="flex items-center gap-8 text-sm font-medium">
-              <Link to="/" className="hover:text-teal">Home</Link>
-              <Link to="/upload" className="hover:text-teal">Analyse</Link>
-              <Link to="/pricing" className="hover:text-teal">Pricing</Link>
-              <Link to="/dashboard" className="hover:text-teal">Dashboard</Link>
-              <ParaGuide variant="inline" />
-            </div>
-          </div>
-        </nav>
+      <Navbar />   {/* ← This is the new navbar with all links and mobile menu */}
 
-       <Routes>
-  <Route path="/" element={<Home />} />
-  <Route path="/upload" element={<UploadPage />} />
-  <Route path="/report" element={<Report />} />
-  <Route path="/pricing" element={<PricingPage />} />
-  <Route path="/dashboard" element={<DashboardPage />} />
-  <Route path="/how-it-works" element={<HowItWorks />} />
-  <Route path="/resources" element={<Resources />} />
-  <Route path="/privacy" element={<Privacy />} />
-</Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/upload" element={<UploadPage />} />
+        <Route path="/report" element={<Report />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/privacy" element={<Privacy />} />
+      </Routes>
     </Router>
   );
 }
+
+export default App;
 
 // Placeholder pages (expand these later)
 const Home = () => (
