@@ -24,11 +24,12 @@ function App() {
         </nav>
 
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/upload" element={<UploadPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-        </Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/upload" element={<UploadPage />} />
+  <Route path="/report" element={<Report />} />
+  <Route path="/pricing" element={<PricingPage />} />
+  <Route path="/dashboard" element={<DashboardPage />} />
+</Routes>
       </div>
     </Router>
   );
