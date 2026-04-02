@@ -1,76 +1,201 @@
-<!doctype html>
-<html lang="en-AU">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parasite ID Pro | notworms.com</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { font-family: system_ui, sans-serif; }
+    .para-hat { filter: brightness(1.05); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
 
-    <title>Parasite ID Pro — AI-Powered Parasite Education | notworms.com</title>
-    <meta name="description" content="Upload a photo and get a structured AI-assisted educational report on common parasites. Not a diagnosis — designed to help you get informed before your GP visit. First analysis free." />
-    <meta name="keywords" content="parasite identification Australia, worms in stool, parasite symptoms, gut health, AI health education, Queensland parasites, post-travel gut symptoms" />
-    <meta name="author" content="ParasitePro" />
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <link rel="canonical" href="https://notworms.com/" />
+  <!-- Navbar -->
+  <nav class="bg-white border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-teal-600 rounded-2xl flex items-center justify-center text-white font-bold">P</div>
+        <span class="text-2xl font-semibold text-navy">notworms</span>
+      </div>
+      <div class="flex items-center gap-8 text-sm font-medium">
+        <a href="#" class="hover:text-teal transition">How it Works</a>
+        <a href="#" class="hover:text-teal transition">Pricing</a>
+        <a href="#" class="hover:text-teal transition">Resources</a>
+        <button onclick="showParaModal()" 
+          class="flex items-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-3xl hover:bg-teal-700 transition">
+          <i class="fas fa-user"></i> Meet PARA
+        </button>
+      </div>
+    </div>
+  </nav>
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Parasite ID Pro" />
-    <meta property="og:title" content="Parasite ID Pro — AI-Powered Parasite Education" />
-    <meta property="og:description" content="Upload a photo and get a structured AI-assisted educational report on common parasites. Not a diagnosis — designed to help you get informed before your GP visit." />
-    <meta property="og:url" content="https://notworms.com/" />
-    <meta property="og:image" content="https://notworms.com/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Parasite ID Pro — AI-powered parasite education for Australians" />
-    <meta property="og:locale" content="en_AU" />
+  <!-- HERO -->
+  <section class="max-w-7xl mx-auto px-6 pt-20 pb-24">
+    <div class="grid md:grid-cols-2 gap-16 items-center">
+      <div>
+        <h1 class="text-5xl leading-tight font-semibold text-navy">
+          Found something concerning in your stool?<br>
+          Get fast AI-powered analysis in 60 seconds — no lab visit required.
+        </h1>
+        <p class="mt-6 text-xl text-slate-600">Your supportive guide PARA is ready to help.</p>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Parasite ID Pro — AI-Powered Parasite Education" />
-    <meta name="twitter:description" content="Upload a photo and get a structured AI-assisted educational report on common parasites. Free first analysis. notworms.com" />
-    <meta name="twitter:image" content="https://notworms.com/og-image.png" />
+        <div class="mt-10 flex flex-wrap gap-4">
+          <button onclick="showParaModal()" 
+            class="bg-teal-600 text-white px-10 py-5 rounded-3xl text-lg font-medium flex items-center gap-3 hover:bg-teal-700 transition">
+            <i class="fas fa-camera"></i>
+            Upload Photo for Analysis
+          </button>
+          <button onclick="showExportModal()" 
+            class="border-2 border-navy text-navy px-8 py-5 rounded-3xl text-lg font-medium flex items-center gap-3 hover:bg-navy hover:text-white transition">
+            <i class="fas fa-file-export"></i>
+            Export to My Health Record
+          </button>
+        </div>
 
-    <meta name="theme-color" content="#0D9488" />
-    <meta name="msapplication-TileColor" content="#0D9488" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Parasite ID Pro" />
-    <meta name="geo.region" content="AU" />
-    <meta name="geo.placename" content="Australia" />
+        <div class="mt-12 flex items-center gap-8 text-sm">
+          <div class="flex items-center gap-2"><i class="fas fa-lock text-teal-600"></i> Privacy First</div>
+          <div class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-teal-600"></i> Built in Australia</div>
+          <div class="flex items-center gap-2"><i class="fas fa-graduation-cap text-teal-600"></i> Educational Tool Only</div>
+        </div>
+      </div>
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+      <!-- PARA Hero Visual -->
+      <div class="flex justify-center">
+        <div class="relative w-96">
+          <img src="https://via.placeholder.com/420x480/00BFA5/ffffff?text=PARA" 
+               alt="PARA" class="w-full rounded-3xl shadow-2xl para-hat">
+          <div class="absolute -bottom-4 left-8 bg-white px-6 py-3 rounded-3xl shadow-xl flex items-center gap-3">
+            <span class="text-3xl">👋</span>
+            <div>
+              <p class="font-medium text-navy">G'day, I'm PARA</p>
+              <p class="text-sm text-slate-500">Your supportive guide</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <link rel="preconnect" href="https://res.cloudinary.com" />
+  <!-- Human / Pet Toggle -->
+  <div class="max-w-4xl mx-auto px-6 py-16 bg-white rounded-3xl shadow">
+    <h2 class="text-center text-3xl font-semibold text-navy mb-8">Analyse for yourself or your pet</h2>
+    <div class="flex justify-center">
+      <div class="inline-flex bg-slate-100 rounded-3xl p-2">
+        <button onclick="setMode(this)" class="human-btn px-12 py-4 rounded-3xl font-medium bg-white shadow">Human</button>
+        <button onclick="setMode(this)" class="pet-btn px-12 py-4 rounded-3xl font-medium">Pet (Dogs, Cats, etc.)</button>
+      </div>
+    </div>
+    <div class="text-center mt-12">
+      <button onclick="startUpload()" 
+        class="bg-teal-600 text-white px-16 py-6 rounded-3xl text-xl font-medium flex items-center gap-4 mx-auto hover:bg-teal-700 transition">
+        <i class="fas fa-upload"></i>
+        Upload Photo Now
+      </button>
+    </div>
+  </div>
 
-    <style>
-      html { background: #0E0F11; }
-      body { margin: 0; }
-      #root { min-height: 100vh; }
-    </style>
+  <!-- PARA Modal -->
+  <div id="paraModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl max-w-md w-full mx-4 overflow-hidden">
+      <div class="p-10 text-center">
+        <div class="mx-auto w-28 h-28 bg-teal-100 rounded-3xl flex items-center justify-center mb-6">
+          <span class="text-7xl">👒</span>
+        </div>
+        <h2 class="text-3xl font-medium text-navy">G’day, I’m PARA</h2>
+        <p class="mt-4 text-lg text-slate-600">your supportive guide for ParasitePro!</p>
+        <p class="mt-6 text-slate-600">I’m here to help you understand your results with clear, easy-to-follow advice.</p>
 
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '866160922709662');
-      fbq('track', 'PageView');
-    </script>
+        <div class="mt-10 flex gap-4">
+          <button onclick="hideParaModal()" class="flex-1 py-4 border border-slate-300 rounded-2xl font-medium">Skip</button>
+          <button onclick="playParaAudio()" class="flex-1 py-4 bg-teal-600 text-white rounded-2xl font-medium flex items-center justify-center gap-2">
+            <i class="fas fa-volume-up"></i> Tap to hear PARA
+          </button>
+        </div>
 
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Parasite ID Pro","alternateName":["ParasitePro","notworms.com"],"url":"https://notworms.com","description":"AI-powered parasite education platform for Australians. Upload photos for structured educational reports — not a diagnosis.","inLanguage":"en-AU","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://notworms.com/encyclopedia?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"ParasitePro","url":"https://notworms.com","logo":"https://notworms.com/logo.png","sameAs":["https://parasitepro.com"],"contactPoint":{"@type":"ContactPoint","contactType":"customer support","availableLanguage":"English","areaServed":"AU"},"areaServed":{"@type":"Country","name":"Australia"},"foundingLocation":{"@type":"Place","name":"Mackay, Queensland, Australia"}}</script>
-  </head>
-  <body>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=866160922709662&ev=PageView&noscript=1" alt="" /></noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        <button onclick="startAnalysisFromModal()" 
+          class="mt-6 w-full py-5 bg-teal-600 text-white rounded-3xl text-xl font-semibold">Start Free Analysis</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Preview Section (shown after upload) -->
+  <div id="reportPreview" class="hidden max-w-5xl mx-auto px-6 py-20">
+    <div class="bg-white rounded-3xl shadow-2xl p-10">
+      <h2 class="text-3xl font-semibold text-navy mb-8">Parasite Analysis Report</h2>
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <div class="bg-slate-100 rounded-3xl p-6">
+            <img src="https://picsum.photos/id/1015/800/600" alt="sample" class="rounded-2xl w-full">
+            <!-- Green AI highlights -->
+            <div class="absolute top-24 left-20 w-16 h-16 border-4 border-emerald-400 rounded-full pointer-events-none"></div>
+            <div class="absolute top-40 right-32 w-12 h-12 border-4 border-emerald-400 rounded-full pointer-events-none"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex gap-8">
+            <div>
+              <p class="text-sm text-slate-500">Urgency Level</p>
+              <p class="text-4xl font-bold text-orange-500">Moderate</p>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500">AI Confidence</p>
+              <p class="text-4xl font-bold text-emerald-500">92%</p>
+            </div>
+          </div>
+          <div class="mt-8">
+            <p class="font-medium">PARA's note:</p>
+            <p class="text-slate-600 mt-2">This result suggests a possible parasite. Here's what it means and when you should see your doctor.</p>
+          </div>
+          <div class="mt-10">
+            <button onclick="alert('PDF downloaded for My Health Record')" 
+              class="w-full py-4 bg-navy text-white rounded-2xl">Download PDF for My Health Record</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showParaModal() {
+      document.getElementById('paraModal').classList.remove('hidden');
+      document.getElementById('paraModal').classList.add('flex');
+    }
+
+    function hideParaModal() {
+      const modal = document.getElementById('paraModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function playParaAudio() {
+      alert("🎙️ Playing: G'day! I'm PARA, your supportive guide...");
+    }
+
+    function startAnalysisFromModal() {
+      hideParaModal();
+      startUpload();
+    }
+
+    function setMode(btn) {
+      document.querySelectorAll('.human-btn, .pet-btn').forEach(b => {
+        b.classList.remove('bg-teal-600', 'text-white');
+      });
+      btn.classList.add('bg-teal-600', 'text-white');
+    }
+
+    function startUpload() {
+      document.getElementById('reportPreview').classList.remove('hidden');
+      document.getElementById('reportPreview').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showExportModal() {
+      alert("📄 PDF ready for My Health Record!\n\nThis would open the export modal with Download PDF button.");
+    }
+
+    // Tailwind script already loaded
+  </script>
+</body>
 </html>
