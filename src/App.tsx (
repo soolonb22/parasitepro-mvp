@@ -30,6 +30,8 @@ function App() {
   <Route path="/pricing" element={<PricingPage />} />
   <Route path="/dashboard" element={<DashboardPage />} />
   <Route path="/how-it-works" element={<HowItWorks />} />
+  <Route path="/resources" element={<Resources />} />
+  <Route path="/privacy" element={<Privacy />} />
 </Routes>
       </div>
     </Router>
