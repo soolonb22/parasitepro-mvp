@@ -1,7 +1,7 @@
 // src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';   // ← This line must be here
+import Navbar from './components/Navbar';
 
 import Home from './pages/Home';
 import UploadPage from './pages/UploadPage';
@@ -15,9 +15,9 @@ import Privacy from './pages/Privacy';
 function App() {
   return (
     <Router>
-      <Navbar />   {/* ← The new navbar is placed here */}
+      <Navbar />
 
-      <main>
+      <main className="min-h-screen bg-slate-50">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/upload" element={<UploadPage />} />
