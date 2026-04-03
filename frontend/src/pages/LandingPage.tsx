@@ -6,6 +6,7 @@ import SEO from '../components/SEO';
 
 /* ─── Brand tokens — Image 4 reference ─────────────────────────────── */
 const C = {
+  heroBg:    '#8AADA6', heroText:  '#0F2733', heroBtnTeal:'#1B6B5F',
   teal:      '#00BFA5', tealDark:  '#008B7A', tealDeep:  '#006B62',
   tealSoft:  '#E1F8F4', tealBtn:   '#00A896', sage:      '#A8D5BA',
   sageSoft:  '#EBF5EE', sageLight: '#F4FAF6', pageBg:    '#F2F7F4',
@@ -15,64 +16,58 @@ const C = {
   green:     '#22C55E', greenDk:   '#16A34A', modalBg:   '#2D5A55',
 };
 
-/* ─── PARA — professional woman with wide-brim hat (hero illustration) ── */
+/* ─── PARA — line-art sketch figure with wide-brim hat (exact match to mockup) ── */
 const ParaWoman = ({ style = {} }) => (
-  <svg viewBox="0 0 320 480" fill="none" xmlns="http://www.w3.org/2000/svg"
+  <svg viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg"
     style={{ display: 'block', width: '100%', height: '100%', ...style }}>
-    {/* Shadow */}
-    <ellipse cx="160" cy="470" rx="90" ry="10" fill="rgba(0,0,0,0.08)"/>
-    {/* Body */}
-    <path d="M110 310 Q105 390 100 470 L220 470 Q215 390 210 310 Q190 330 160 330 Q130 330 110 310Z" fill="#5A8E7A"/>
-    {/* Collar / scarf */}
-    <path d="M130 300 Q160 320 190 300 L195 320 Q160 345 125 320Z" fill="#3D7060"/>
+
+    {/* Wide brim hat — flat, sketchy, with slight tilt */}
+    {/* Brim — wide oval */}
+    <ellipse cx="168" cy="122" rx="105" ry="14" stroke="#0F2733" strokeWidth="3.5" fill="none"
+      strokeLinecap="round" transform="rotate(-3 168 122)"/>
+    {/* Crown — trapezoidal top */}
+    <path d="M105 122 Q112 72 168 68 Q224 72 232 122"
+      stroke="#0F2733" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Hat crown top */}
+    <path d="M112 75 Q168 60 225 75" stroke="#0F2733" strokeWidth="2.5" fill="none"
+      strokeLinecap="round" opacity="0.5"/>
+    {/* Hat indent crease */}
+    <path d="M130 95 Q168 88 206 95" stroke="#0F2733" strokeWidth="2" fill="none"
+      strokeLinecap="round" strokeDasharray="4 3" opacity="0.4"/>
+
+    {/* Head / face — simple oval, no face features per mockup */}
+    <ellipse cx="168" cy="178" rx="44" ry="50" stroke="#0F2733" strokeWidth="3"
+      fill="none" strokeLinecap="round"/>
+
     {/* Neck */}
-    <rect x="148" y="250" width="24" height="55" rx="12" fill="#C49A7A"/>
+    <path d="M152 225 L152 248 M184 225 L184 248"
+      stroke="#0F2733" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+
+    {/* Collar / shirt top */}
+    <path d="M140 248 Q168 256 196 248 L208 272 Q168 278 128 272 Z"
+      stroke="#0F2733" strokeWidth="2.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+
+    {/* Shoulders & body */}
+    <path d="M108 270 Q88 278 75 310 Q68 340 72 380 L265 380 Q268 340 260 310 Q248 278 228 270"
+      stroke="#0F2733" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+
     {/* Left arm */}
-    <path d="M110 310 Q75 340 65 390 Q70 395 80 390 Q88 350 118 325Z" fill="#5A8E7A"/>
-    <ellipse cx="70" cy="393" rx="12" ry="8" fill="#C49A7A" transform="rotate(-20 70 393)"/>
+    <path d="M108 272 Q82 300 74 350"
+      stroke="#0F2733" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    {/* Left hand hint */}
+    <path d="M70 352 Q68 362 74 365 Q80 360 78 350"
+      stroke="#0F2733" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+
     {/* Right arm */}
-    <path d="M210 310 Q245 335 255 385 Q260 390 270 386 Q265 340 222 318Z" fill="#5A8E7A"/>
-    <ellipse cx="260" cy="389" rx="12" ry="8" fill="#C49A7A" transform="rotate(15 260 389)"/>
-    {/* Head */}
-    <ellipse cx="160" cy="200" rx="52" ry="58" fill="#C49A7A"/>
-    {/* Hair behind */}
-    <path d="M108 195 Q100 260 115 300 Q130 310 148 305 L148 250 Q120 248 108 195Z" fill="#5C3D28"/>
-    <path d="M212 195 Q220 260 205 300 Q190 310 172 305 L172 250 Q200 248 212 195Z" fill="#5C3D28"/>
-    {/* Face shading */}
-    <ellipse cx="160" cy="215" rx="38" ry="42" fill="#D4A882" opacity="0.3"/>
-    {/* Eyes */}
-    <ellipse cx="143" cy="195" rx="8" ry="9" fill="white"/>
-    <ellipse cx="177" cy="195" rx="8" ry="9" fill="white"/>
-    <circle cx="145" cy="197" r="5.5" fill="#3D2810"/>
-    <circle cx="179" cy="197" r="5.5" fill="#3D2810"/>
-    <circle cx="147" cy="194" r="2" fill="white"/>
-    <circle cx="181" cy="194" r="2" fill="white"/>
-    {/* Eyebrows */}
-    <path d="M133 184 Q143 179 154 182" stroke="#5C3D28" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M166 182 Q177 179 187 184" stroke="#5C3D28" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    {/* Nose */}
-    <path d="M157 208 Q160 220 163 208" stroke="#B8845A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-    {/* Lips */}
-    <path d="M147 228 Q160 238 173 228" fill="#C0725A"/>
-    <path d="M147 228 Q160 234 173 228" fill="#D4896E"/>
-    {/* Cheeks */}
-    <ellipse cx="128" cy="215" rx="10" ry="7" fill="#E8A090" opacity="0.35"/>
-    <ellipse cx="192" cy="215" rx="10" ry="7" fill="#E8A090" opacity="0.35"/>
-    {/* Hair front */}
-    <path d="M108 185 Q112 155 135 145 Q160 138 185 145 Q208 155 212 185" fill="#5C3D28"/>
-    <path d="M108 185 Q104 170 108 155 Q112 135 130 128 Q148 122 160 124 Q172 122 190 128 Q208 135 212 155 Q216 170 212 185" fill="#6B4832"/>
-    {/* Wide brim hat */}
-    <ellipse cx="160" cy="140" rx="105" ry="18" fill="#4A7A5E"/>
-    <ellipse cx="160" cy="136" rx="105" ry="18" fill="#5A9070"/>
-    {/* Hat crown */}
-    <path d="M92 138 Q95 75 160 72 Q225 75 228 138Z" fill="#5A9070"/>
-    <path d="M95 138 Q98 78 160 76 Q222 78 225 138Z" fill="#6AAB84"/>
-    {/* Hat band */}
-    <rect x="95" y="127" width="130" height="11" rx="3" fill="#3D7060"/>
-    {/* Hat shine */}
-    <path d="M110 108 Q130 90 160 88" stroke="rgba(255,255,255,0.2)" strokeWidth="2" fill="none" strokeLinecap="round"/>
-    {/* Brim shadow */}
-    <ellipse cx="160" cy="140" rx="105" ry="5" fill="rgba(0,0,0,0.08)"/>
+    <path d="M228 272 Q254 300 262 348"
+      stroke="#0F2733" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    {/* Right hand hint */}
+    <path d="M264 350 Q266 360 260 364 Q254 358 256 348"
+      stroke="#0F2733" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+
+    {/* Shirt buttons line */}
+    <path d="M168 278 L168 376" stroke="#0F2733" strokeWidth="1.5"
+      fill="none" strokeLinecap="round" strokeDasharray="3 5" opacity="0.35"/>
   </svg>
 );
 
@@ -356,113 +351,115 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* ── HERO — split layout ───────────────────────────────────────── */}
+      {/* ── HERO — exact match to mockup ──────────────────────────────── */}
       <section style={{
-        maxWidth:1120, margin:'0 auto',
-        padding:'clamp(2rem,5vw,4rem) 1.5rem clamp(2rem,4vw,3rem)',
+        background: C.heroBg,
+        borderRadius: 24,
+        margin: '0 1rem 0',
+        padding: 'clamp(2.5rem,5vw,4rem) clamp(1.5rem,4vw,3.5rem)',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
+        {/* Subtle texture overlay */}
         <div style={{
+          position:'absolute', inset:0, borderRadius:24,
+          background:'radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.06) 0%, transparent 60%)',
+          pointerEvents:'none',
+        }}/>
+
+        <div style={{
+          position:'relative',
           display:'grid',
           gridTemplateColumns:'1fr auto',
-          gap:'2rem',
+          gap:'clamp(1rem,4vw,3rem)',
           alignItems:'center',
+          maxWidth:1040,
+          margin:'0 auto',
         }}>
 
-          {/* LEFT — headline + CTAs + trust bar */}
-          <div style={{ maxWidth:620 }}>
+          {/* LEFT col */}
+          <div>
 
-            {/* Badge */}
-            <div style={{
-              display:'inline-flex', alignItems:'center', gap:7,
-              background:C.tealSoft, border:`1.5px solid ${C.sage}`,
-              borderRadius:20, padding:'5px 14px', marginBottom:'1.5rem',
-            }}>
-              <span style={{ fontSize:13 }}>🇦🇺</span>
-              <span style={{ fontSize:'0.78rem', fontWeight:700, color:C.tealDark }}>
-                Built for Australians — educational, not diagnostic
-              </span>
-            </div>
-
-            {/* Headline */}
+            {/* Big headline — 2 lines like mockup */}
             <h1 style={{
-              fontSize:'clamp(2rem,4.5vw,3.2rem)', fontWeight:900, color:C.navy,
-              lineHeight:1.15, letterSpacing:'-0.03em', margin:'0 0 1.5rem',
+              fontSize:'clamp(2.4rem,5.5vw,4rem)', fontWeight:800, color:C.heroText,
+              lineHeight:1.08, letterSpacing:'-0.03em', margin:'0 0 1rem',
+              maxWidth:560,
             }}>
-              Found something concerning in your stool?{' '}
-              <span style={{ color:C.teal }}>Get fast AI-powered analysis in 60 seconds</span>
-              {' '}<span style={{ fontWeight:500, color:C.gray }}>— no lab visit required</span>
+              Found something concerning in your stool?
             </h1>
 
-            {/* Dual CTAs */}
-            <div style={{ display:'flex', gap:'0.875rem', flexWrap:'wrap', marginBottom:'1.75rem' }}>
+            {/* Subtitle */}
+            <p style={{
+              fontSize:'clamp(1rem,2vw,1.25rem)', color:C.heroText,
+              opacity:0.75, margin:'0 0 2rem', lineHeight:1.5,
+              maxWidth:480, fontWeight:400,
+            }}>
+              Get fast AI-powered analysis in 60 seconds — no lab visit required
+            </p>
+
+            {/* CTA buttons — row */}
+            <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'center', marginBottom:'2rem' }}>
+
+              {/* Primary — teal fill */}
               <button
                 onClick={() => navigate(user ? '/upload' : '/signup?promo=BETA3FREE')}
                 style={{
-                  padding:'15px 28px', background:C.navyDark, color:'white',
-                  border:'none', borderRadius:12, fontSize:'1rem', fontWeight:700,
-                  cursor:'pointer', letterSpacing:'0.01em', transition:'all 0.15s',
-                  boxShadow:'0 4px 16px rgba(15,36,64,0.3)',
+                  padding:'16px 32px',
+                  background: C.heroBtnTeal,
+                  color:'white',
+                  border:'none',
+                  borderRadius:14,
+                  fontSize:'1.05rem',
+                  fontWeight:700,
+                  cursor:'pointer',
+                  letterSpacing:'0.01em',
+                  transition:'all 0.15s',
+                  boxShadow:'0 4px 20px rgba(0,0,0,0.18)',
                 }}
-                onMouseEnter={e=>{e.currentTarget.style.background='#0a1a30';e.currentTarget.style.transform='translateY(-2px)';}}
-                onMouseLeave={e=>{e.currentTarget.style.background=C.navyDark;e.currentTarget.style.transform='none';}}
+                onMouseEnter={e=>{e.currentTarget.style.background='#145047';e.currentTarget.style.transform='translateY(-2px)';}}
+                onMouseLeave={e=>{e.currentTarget.style.background=C.heroBtnTeal;e.currentTarget.style.transform='none';}}
               >
                 Upload Photo for Analysis
               </button>
 
+              {/* Secondary — outlined */}
               <button
                 onClick={() => navigate(user ? '/dashboard' : '/signup')}
                 style={{
-                  padding:'15px 28px', background:C.navyDark, color:'white',
-                  border:'none', borderRadius:12, fontSize:'1rem', fontWeight:700,
-                  cursor:'pointer', transition:'all 0.15s', lineHeight:1.3,
-                  boxShadow:'0 4px 16px rgba(15,36,64,0.3)',
+                  padding:'15px 32px',
+                  background:'transparent',
+                  color: C.heroText,
+                  border:`2px solid ${C.heroText}`,
+                  borderRadius:14,
+                  fontSize:'1.05rem',
+                  fontWeight:700,
+                  cursor:'pointer',
+                  transition:'all 0.15s',
+                  opacity:0.85,
                 }}
-                onMouseEnter={e=>{e.currentTarget.style.background='#0a1a30';e.currentTarget.style.transform='translateY(-2px)';}}
-                onMouseLeave={e=>{e.currentTarget.style.background=C.navyDark;e.currentTarget.style.transform='none';}}
+                onMouseEnter={e=>{e.currentTarget.style.background='rgba(15,39,51,0.1)';e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.opacity='1';}}
+                onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.transform='none';e.currentTarget.style.opacity='0.85';}}
               >
-                Export report to<br/>My Health Record
+                Export to My Health Record
               </button>
             </div>
 
-            {/* Trust signals bar */}
-            <div style={{
-              display:'flex',
-              background:'rgba(255,255,255,0.6)', borderRadius:10,
-              border:`1px solid ${C.border}`, overflow:'hidden',
-              maxWidth:480,
+            {/* Trust bar — inline dots */}
+            <p style={{
+              fontSize:'0.85rem', color:C.heroText, opacity:0.6,
+              margin:0, fontWeight:500, letterSpacing:'0.01em',
             }}>
-              {[
-                { icon:'🇦🇺', label:'Built in Australia' },
-                { icon:'🔒', label:'Privacy First' },
-                { icon:'📋', label:'Educational Tool Only' },
-              ].map((s, i) => (
-                <div key={s.label} style={{
-                  flex:1, padding:'9px 10px', textAlign:'center',
-                  borderRight: i < 2 ? `1px solid ${C.border}` : 'none',
-                  display:'flex', alignItems:'center', justifyContent:'center', gap:5,
-                }}>
-                  <span style={{ fontSize:13 }}>{s.icon}</span>
-                  <span style={{ fontSize:'0.7rem', fontWeight:600, color:C.navy, whiteSpace:'nowrap' }}>{s.label}</span>
-                </div>
-              ))}
-            </div>
-
-            <p style={{ fontSize:'0.78rem', color:C.grayMid, marginTop:'0.75rem' }}>
-              No credit card · First analysis free ·{' '}
-              <strong style={{ color:C.tealDark }}>BETA3FREE</strong> = 3 free
+              Built in Australia &nbsp;•&nbsp; Privacy First &nbsp;•&nbsp; Educational Tool Only
             </p>
           </div>
 
-          {/* RIGHT — PARA woman illustration */}
+          {/* RIGHT col — line-art figure */}
           <div style={{
-            width:'clamp(180px,26vw,320px)',
-            height:'clamp(270px,39vw,480px)',
-            flexShrink:0, position:'relative',
+            width:'clamp(160px,24vw,300px)',
+            height:'clamp(220px,34vw,420px)',
+            flexShrink:0,
           }}>
-            <div style={{
-              position:'absolute', inset:0, borderRadius:'50% 50% 45% 45%',
-              background:`radial-gradient(ellipse at 50% 40%, rgba(0,191,165,0.10) 0%, transparent 70%)`,
-            }}/>
             <ParaWoman/>
           </div>
         </div>
