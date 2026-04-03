@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Share2, Loader, AlertTriangle, Printer } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Loader, AlertTriangle, Printer, ExternalLink, X } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
@@ -75,6 +75,7 @@ const GPReportPage = () => {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading]   = useState(true);
   const [copying, setCopying]   = useState(false);
+  const [showMHR, setShowMHR]   = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -175,8 +176,8 @@ const GPReportPage = () => {
           <ArrowLeft size={13} /> Back to Results
         </button>
         <div style={{ display:'flex', gap:10 }}>
-          <button onClick={handleShare} style={{ display:'flex', alignItems:'center', gap:7, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.25)', color:'white', padding:'8px 18px', borderRadius:8, cursor:'pointer', fontSize:'0.85rem', fontWeight:600 }}>
-            <Share2 size={14} /> {copying ? 'Copied!' : 'Share with GP'}
+          <button onClick={() => setShowMHR(true)} style={{ display:'flex', alignItems:'center', gap:7, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.25)', color:'white', padding:'8px 18px', borderRadius:8, cursor:'pointer', fontSize:'0.85rem', fontWeight:600 }}>
+            <ExternalLink size={14} /> Share to My Health Record
           </button>
           <button onClick={handlePrint} style={{ display:'flex', alignItems:'center', gap:7, background:'#1B6B5F', border:'none', color:'white', padding:'8px 18px', borderRadius:8, cursor:'pointer', fontSize:'0.85rem', fontWeight:700, boxShadow:'0 2px 12px rgba(0,0,0,0.25)' }}>
             <Download size={14} /> Download PDF
@@ -418,11 +419,62 @@ const GPReportPage = () => {
           <button onClick={handlePrint} style={{ display:'flex', alignItems:'center', gap:8, background:'#1B6B5F', border:'none', color:'white', padding:'12px 28px', borderRadius:10, cursor:'pointer', fontSize:'0.9rem', fontWeight:700, boxShadow:'0 4px 16px rgba(0,0,0,0.25)' }}>
             <Printer size={16} /> Download / Print PDF
           </button>
-          <button onClick={handleShare} style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.3)', color:'white', padding:'12px 28px', borderRadius:10, cursor:'pointer', fontSize:'0.9rem', fontWeight:600 }}>
-            <Share2 size={16} /> {copying ? '✓ Link Copied' : 'Share with GP'}
+          <button onClick={() => setShowMHR(true)} style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.3)', color:'white', padding:'12px 28px', borderRadius:10, cursor:'pointer', fontSize:'0.9rem', fontWeight:600 }}>
+            <ExternalLink size={16} /> Share to My Health Record
           </button>
         </div>
       </div>
+
+      {/* My Health Record modal */}
+      {showMHR && (
+        <div
+          onClick={e => e.target === e.currentTarget && setShowMHR(false)}
+          style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.65)', display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem', backdropFilter:'blur(4px)' }}
+        >
+          <div style={{ background:'#1A2A2E', border:'1px solid rgba(255,255,255,0.12)', borderRadius:20, width:'100%', maxWidth:480, padding:'2rem', position:'relative', boxShadow:'0 24px 64px rgba(0,0,0,0.5)' }}>
+            <button onClick={() => setShowMHR(false)} style={{ position:'absolute', top:14, right:14, background:'rgba(255,255,255,0.08)', border:'none', color:'white', width:32, height:32, borderRadius:'50%', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <X size={15} />
+            </button>
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:'1.25rem' }}>
+              <div style={{ width:44, height:44, borderRadius:12, background:'rgba(27,107,95,0.2)', border:'1px solid rgba(27,107,95,0.4)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <ExternalLink size={20} style={{ color:'#5AB89A' }} />
+              </div>
+              <div>
+                <h3 style={{ color:'white', fontWeight:800, fontSize:'1.05rem', margin:0 }}>Share to My Health Record</h3>
+                <p style={{ color:'rgba(255,255,255,0.5)', fontSize:'0.75rem', margin:0 }}>Australia's national health record system</p>
+              </div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:'1.5rem' }}>
+              {[
+                { n:'1', title:'Download your PDF report', desc:'Click "Download / Print PDF" to save the clinical report to your device.' },
+                { n:'2', title:'Log into My Health Record', desc:'Visit myhr.gov.au or open the My Health Record app and sign in with myGov.' },
+                { n:'3', title:'Upload the document', desc:'Go to Documents → Upload a document → select the PDF you downloaded.' },
+                { n:'4', title:'Share access with your GP', desc:'Your GP can now view the report at your next appointment.' },
+              ].map(step => (
+                <div key={step.n} style={{ display:'flex', gap:12, alignItems:'flex-start' }}>
+                  <div style={{ width:26, height:26, borderRadius:'50%', background:'#1B6B5F', color:'white', fontSize:'0.75rem', fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>{step.n}</div>
+                  <div>
+                    <p style={{ color:'rgba(255,255,255,0.9)', fontSize:'0.82rem', fontWeight:600, margin:'0 0 2px' }}>{step.title}</p>
+                    <p style={{ color:'rgba(255,255,255,0.5)', fontSize:'0.75rem', margin:0, lineHeight:1.5 }}>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display:'flex', gap:10 }}>
+              <button onClick={() => { setShowMHR(false); handlePrint(); }} style={{ flex:1, padding:'12px', background:'#1B6B5F', color:'white', border:'none', borderRadius:10, fontWeight:700, cursor:'pointer', fontSize:'0.85rem' }}>
+                Download PDF First
+              </button>
+              <a href="https://www.myhealthrecord.gov.au" target="_blank" rel="noopener noreferrer"
+                style={{ flex:1, padding:'12px', background:'rgba(255,255,255,0.08)', color:'rgba(255,255,255,0.85)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, fontWeight:600, cursor:'pointer', fontSize:'0.85rem', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                Open myhr.gov.au <ExternalLink size={12} />
+              </a>
+            </div>
+            <p style={{ color:'rgba(255,255,255,0.3)', fontSize:'0.68rem', marginTop:'1rem', textAlign:'center', lineHeight:1.5 }}>
+              notworms.com is not affiliated with My Health Record or the Australian Digital Health Agency. This report is educational only.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

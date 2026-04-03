@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Loader, AlertTriangle, CheckCircle, AlertCircle,
   Microscope, ClipboardList, BookOpen, Pill, Leaf, MessageSquare,
-  ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Activity, FileText,
+  ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Activity, FileText, X, ExternalLink,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -328,6 +328,7 @@ const AnalysisResultsPage = () => {
   const [feedbackDone, setFeedbackDone] = useState(false);
   const [showDeepDive, setDeepDive]     = useState(false);
   const [userCredits, setUserCredits]   = useState(0);
+  const [showMHR, setShowMHR]           = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -436,6 +437,57 @@ const AnalysisResultsPage = () => {
 
         {/* White GP report card */}
         <ReportCard analysis={analysis} />
+
+        {/* ── GP Action Panel — prominent, right below the card ── */}
+        <div style={{
+          background: 'rgba(27,107,95,0.15)',
+          border: '1.5px solid rgba(27,107,95,0.45)',
+          borderRadius: 16,
+          padding: '20px 22px',
+          marginTop: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+        }}>
+          {/* Label row */}
+          <div className="flex items-center gap-3">
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(27,107,95,0.25)', border: '1px solid rgba(27,107,95,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <FileText size={17} style={{ color: '#5AB89A' }} />
+            </div>
+            <div>
+              <p className="font-heading font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Take this to your GP</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Print or share a clean clinical report — designed for your doctor, not a diagnosis.</p>
+            </div>
+          </div>
+
+          {/* Two action buttons */}
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {/* Primary — Download PDF */}
+            <button
+              onClick={() => navigate(`/gp-report/${id}`)}
+              style={{ flex: 1, minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 20px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 10, fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(27,107,95,0.4)', transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#145047'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#1B6B5F'; e.currentTarget.style.transform = 'none'; }}
+            >
+              <FileText size={15} /> Download PDF for GP
+            </button>
+
+            {/* Secondary — My Health Record */}
+            <button
+              onClick={() => setShowMHR(true)}
+              style={{ flex: 1, minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 20px', background: 'transparent', color: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: 10, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.65)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
+            >
+              <ExternalLink size={15} /> Share to My Health Record
+            </button>
+          </div>
+
+          {/* Disclaimer inline */}
+          <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.5 }}>
+            ⚠️ This report is for educational purposes only and does not constitute a medical diagnosis. Always consult a qualified healthcare professional.
+          </p>
+        </div>
 
         {/* Extended details */}
         <div className="mt-6 space-y-3">
@@ -593,30 +645,6 @@ const AnalysisResultsPage = () => {
             </div>
           )}
 
-          {/* GP Report CTA */}
-          <div className="pp-card p-5 flex items-start justify-between gap-4"
-            style={{ border: '1px solid rgba(27,107,95,0.3)', background: 'rgba(27,107,95,0.05)' }}>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(27,107,95,0.15)', border: '1px solid rgba(27,107,95,0.3)' }}>
-                <FileText size={17} style={{ color: '#1B6B5F' }} />
-              </div>
-              <div>
-                <p className="font-heading font-bold text-sm mb-0.5" style={{ color: 'var(--text-primary)' }}>
-                  GP-Ready Report
-                </p>
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  Clean, printable clinical report — designed to share with your doctor. Includes all findings, differential diagnoses, and recommended tests.
-                </p>
-              </div>
-            </div>
-            <button onClick={() => navigate(`/gp-report/${id}`)}
-              className="flex-shrink-0 flex items-center gap-1.5"
-              style={{ padding: '9px 16px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 8, fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-              <FileText size={13} /> View Report
-            </button>
-          </div>
-
           {/* Feedback */}
           {!feedbackDone ? (
             <div className="pp-card p-5 text-center">
@@ -646,6 +674,74 @@ const AnalysisResultsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* My Health Record instructions modal */}
+      {showMHR && (
+        <div
+          onClick={e => e.target === e.currentTarget && setShowMHR(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(4px)' }}
+        >
+          <div style={{ background: '#1A2A2E', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 20, width: '100%', maxWidth: 480, padding: '2rem', position: 'relative', boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}>
+            {/* Close */}
+            <button onClick={() => setShowMHR(false)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <X size={15} />
+            </button>
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '1.25rem' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(27,107,95,0.2)', border: '1px solid rgba(27,107,95,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <ExternalLink size={20} style={{ color: '#5AB89A' }} />
+              </div>
+              <div>
+                <h3 style={{ color: 'white', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>Share to My Health Record</h3>
+                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: 0 }}>Australia's national health record system</p>
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '1.5rem' }}>
+              {[
+                { n: '1', title: 'Download your PDF report', desc: 'Click "Download PDF for GP" to save the clinical report to your device.' },
+                { n: '2', title: 'Log into My Health Record', desc: 'Visit myhr.gov.au or open the My Health Record app and sign in with myGov.' },
+                { n: '3', title: 'Upload the document', desc: 'Go to Documents → Upload a document → select the PDF you downloaded.' },
+                { n: '4', title: 'Share access with your GP', desc: 'Your GP can now view the report at your next appointment.' },
+              ].map(step => (
+                <div key={step.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#1B6B5F', color: 'white', fontSize: '0.75rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{step.n}</div>
+                  <div>
+                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.82rem', fontWeight: 600, margin: '0 0 2px' }}>{step.title}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => { setShowMHR(false); navigate(`/gp-report/${id}`); }}
+                style={{ flex: 1, padding: '12px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                Download PDF First
+              </button>
+              <a
+                href="https://www.myhealthrecord.gov.au"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              >
+                Open myhr.gov.au <ExternalLink size={12} />
+              </a>
+            </div>
+
+            {/* Disclaimer */}
+            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.68rem', marginTop: '1rem', textAlign: 'center', lineHeight: 1.5 }}>
+              notworms.com is not affiliated with My Health Record or the Australian Digital Health Agency.
+              This report is educational only and is not a medical record or diagnosis.
+            </p>
+          </div>
+        </div>
+      )}
 
       {showDeepDive && analysis.detections?.length > 0 && (
         <DeepDiveModal analysisId={id} parasiteName={analysis.detections[0]?.commonName || 'Unknown'} scientificName={analysis.detections[0]?.scientificName} userCredits={userCredits} onClose={() => setDeepDive(false)} onCreditsUsed={() => setUserCredits(c => Math.max(0, c - 1))} />
