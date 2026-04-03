@@ -78,12 +78,54 @@ const AnnotatedImage = ({ imageUrl, detectionCount = 1 }) => {
 const DisclaimerBanner = () => (
   <div className="grid grid-cols-2 gap-3 mb-5">
     {['This report is not a diagnosis', 'Consult a medical professional for confirmation'].map(text => (
-      <div key={text} className="text-center py-2.5 px-4 rounded-lg text-xs font-bold"
-        style={{ border: '2px solid rgba(255,255,255,0.55)', color: 'rgba(255,255,255,0.8)', letterSpacing: '0.02em' }}>
+      <div key={text} className="text-center py-3 px-4 rounded-xl font-bold"
+        style={{ border: '2.5px solid rgba(255,255,255,0.7)', color: 'rgba(255,255,255,0.92)',
+                 fontSize: '0.85rem', letterSpacing: '0.01em', background: 'rgba(255,255,255,0.05)' }}>
         {text}
       </div>
     ))}
   </div>
+);
+
+
+// ─── PARA woman avatar — small version for report card corner ────────────────
+const ParaWomanSmall = () => (
+  <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="72" height="96">
+    {/* Body */}
+    <path d="M40 115 Q38 145 36 158 L84 158 Q82 145 80 115 Q68 122 60 122 Q52 122 40 115Z" fill="#5A8E7A"/>
+    {/* Collar */}
+    <path d="M50 112 Q60 118 70 112 L73 120 Q60 126 47 120Z" fill="#3D7060"/>
+    {/* Neck */}
+    <rect x="55" y="94" width="10" height="20" rx="5" fill="#C49A7A"/>
+    {/* Left arm */}
+    <path d="M40 116 Q28 128 25 148" stroke="#5A8E7A" strokeWidth="10" strokeLinecap="round" fill="none"/>
+    {/* Right arm */}
+    <path d="M80 116 Q92 128 95 148" stroke="#5A8E7A" strokeWidth="10" strokeLinecap="round" fill="none"/>
+    {/* Head */}
+    <ellipse cx="60" cy="72" rx="22" ry="24" fill="#C49A7A"/>
+    {/* Hair */}
+    <path d="M38 72 Q36 96 44 114 Q52 118 55 116 L55 94 Q44 92 38 72Z" fill="#5C3D28"/>
+    <path d="M82 72 Q84 96 76 114 Q68 118 65 116 L65 94 Q76 92 82 72Z" fill="#5C3D28"/>
+    {/* Eyes */}
+    <ellipse cx="53" cy="68" rx="4" ry="4.5" fill="white"/>
+    <ellipse cx="67" cy="68" rx="4" ry="4.5" fill="white"/>
+    <circle cx="54" cy="69" r="2.8" fill="#3D2810"/>
+    <circle cx="68" cy="69" r="2.8" fill="#3D2810"/>
+    <circle cx="55" cy="67.5" r="1" fill="white"/>
+    <circle cx="69" cy="67.5" r="1" fill="white"/>
+    {/* Lips */}
+    <path d="M55 82 Q60 87 65 82" fill="#C0725A"/>
+    {/* Cheeks */}
+    <ellipse cx="47" cy="76" rx="5" ry="3.5" fill="#E8A090" opacity="0.4"/>
+    <ellipse cx="73" cy="76" rx="5" ry="3.5" fill="#E8A090" opacity="0.4"/>
+    {/* Hat brim */}
+    <ellipse cx="60" cy="51" rx="38" ry="7" fill="#4A7A5E"/>
+    <ellipse cx="60" cy="49" rx="38" ry="7" fill="#5A9070"/>
+    {/* Hat crown */}
+    <path d="M30 50 Q33 22 60 20 Q87 22 90 50Z" fill="#6AAB84"/>
+    {/* Hat band */}
+    <rect x="33" y="44" width="54" height="6" rx="2" fill="#3D7060"/>
+  </svg>
 );
 
 // ─── White GP Report Card ─────────────────────────────────────────────────────
@@ -122,7 +164,7 @@ const ReportCard = ({ analysis }) => {
       <div className="grid grid-cols-1 md:grid-cols-2">
 
         {/* LEFT — image */}
-        <div className="p-5 flex flex-col gap-3" style={{ background: '#F1F1EF', borderRight: '1px solid #E0E0DC' }}>
+        <div className="p-5 flex flex-col gap-3" style={{ background: '#EAEBE8', borderRight: '1px solid #D8D9D5' }}>
           <AnnotatedImage imageUrl={analysis.imageUrl || analysis.thumbnailUrl} detectionCount={analysis.detections?.length || 1} />
           <div className="flex items-center justify-between text-xs" style={{ color: '#888' }}>
             <span className="font-medium">
@@ -144,8 +186,8 @@ const ReportCard = ({ analysis }) => {
 
           {/* Title */}
           <div>
-            <h1 className="font-display font-bold leading-tight" style={{ fontSize: '1.75rem', color: '#111827' }}>Parasite Analysis</h1>
-            <p className="text-sm font-medium mt-0.5" style={{ color: '#6B7280' }}>Report — For Discussion with Your GP</p>
+            <h1 className="font-display font-bold leading-tight" style={{ fontSize: '2.1rem', color: '#111827', letterSpacing: '-0.02em' }}>Parasite Analysis</h1>
+            <p className="text-sm font-medium mt-1" style={{ color: '#6B7280' }}>Report — For Discussion with Your GP</p>
           </div>
 
           {/* Urgency + Confidence */}
@@ -236,9 +278,8 @@ const ReportCard = ({ analysis }) => {
                 {analysis.overallAssessment ? analysis.overallAssessment.split('.')[0] + '.' : 'This report should be discussed with a qualified healthcare professional.'}
               </p>
             </div>
-            <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-              style={{ background: 'rgba(217,119,6,0.08)', border: '2px solid rgba(217,119,6,0.25)' }}>
-              🔬
+            <div className="flex-shrink-0">
+              <ParaWomanSmall />
             </div>
           </div>
         </div>
@@ -322,7 +363,7 @@ const AnalysisResultsPage = () => {
 
   // Loading
   if (loading) return (
-    <div className="pp-page flex items-center justify-center" style={{ minHeight: '60vh' }}>
+    <div style={{ background: '#2E4A52', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="text-center">
         <Loader size={28} className="animate-spin mx-auto mb-3" style={{ color: 'var(--amber)' }} />
         <p className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>Loading report…</p>
@@ -331,7 +372,7 @@ const AnalysisResultsPage = () => {
   );
 
   if (!analysis) return (
-    <div className="pp-page flex items-center justify-center" style={{ minHeight: '60vh' }}>
+    <div style={{ background: '#2E4A52', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="text-center">
         <AlertTriangle size={28} className="mx-auto mb-3" style={{ color: '#EF4444' }} />
         <p className="mb-4" style={{ color: 'var(--text-primary)' }}>Analysis not found.</p>
@@ -342,7 +383,7 @@ const AnalysisResultsPage = () => {
 
   // Processing
   if (analysis.status === 'processing' || analysis.status === 'pending') return (
-    <div className="pp-page flex items-center justify-center" style={{ minHeight: '70vh' }}>
+    <div style={{ background: '#2E4A52', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="text-center max-w-sm px-4">
         <div className="relative mx-auto w-20 h-20 mb-6">
           <div className="absolute inset-0 rounded-full animate-ping" style={{ background: 'rgba(217,119,6,0.12)' }} />
@@ -365,7 +406,7 @@ const AnalysisResultsPage = () => {
 
   // Failed
   if (analysis.status === 'failed') return (
-    <div className="pp-page flex items-center justify-center" style={{ minHeight: '60vh' }}>
+    <div style={{ background: '#2E4A52', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="text-center max-w-sm px-4">
         <AlertCircle size={32} className="mx-auto mb-4" style={{ color: '#EF4444' }} />
         <h2 className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>Analysis Failed</h2>
@@ -377,7 +418,7 @@ const AnalysisResultsPage = () => {
 
   // Completed
   return (
-    <div className="pp-page" style={{ paddingBottom: '4rem' }}>
+    <div style={{ background: '#2E4A52', minHeight: '100vh', paddingBottom: '4rem' }}>
       <div style={{ maxWidth: '940px', margin: '0 auto', padding: '0 1rem' }}>
 
         {/* Nav */}
