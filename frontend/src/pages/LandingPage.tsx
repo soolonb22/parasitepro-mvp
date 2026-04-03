@@ -15,7 +15,68 @@ const C = {
   green:     '#22C55E', greenDk:   '#16A34A', modalBg:   '#2D5A55',
 };
 
-/* ─── PARA Explorer character — teal blob + explorer hat (Image 5) ─── */
+/* ─── PARA — professional woman with wide-brim hat (hero illustration) ── */
+const ParaWoman = ({ style = {} }) => (
+  <svg viewBox="0 0 320 480" fill="none" xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'block', width: '100%', height: '100%', ...style }}>
+    {/* Shadow */}
+    <ellipse cx="160" cy="470" rx="90" ry="10" fill="rgba(0,0,0,0.08)"/>
+    {/* Body */}
+    <path d="M110 310 Q105 390 100 470 L220 470 Q215 390 210 310 Q190 330 160 330 Q130 330 110 310Z" fill="#5A8E7A"/>
+    {/* Collar / scarf */}
+    <path d="M130 300 Q160 320 190 300 L195 320 Q160 345 125 320Z" fill="#3D7060"/>
+    {/* Neck */}
+    <rect x="148" y="250" width="24" height="55" rx="12" fill="#C49A7A"/>
+    {/* Left arm */}
+    <path d="M110 310 Q75 340 65 390 Q70 395 80 390 Q88 350 118 325Z" fill="#5A8E7A"/>
+    <ellipse cx="70" cy="393" rx="12" ry="8" fill="#C49A7A" transform="rotate(-20 70 393)"/>
+    {/* Right arm */}
+    <path d="M210 310 Q245 335 255 385 Q260 390 270 386 Q265 340 222 318Z" fill="#5A8E7A"/>
+    <ellipse cx="260" cy="389" rx="12" ry="8" fill="#C49A7A" transform="rotate(15 260 389)"/>
+    {/* Head */}
+    <ellipse cx="160" cy="200" rx="52" ry="58" fill="#C49A7A"/>
+    {/* Hair behind */}
+    <path d="M108 195 Q100 260 115 300 Q130 310 148 305 L148 250 Q120 248 108 195Z" fill="#5C3D28"/>
+    <path d="M212 195 Q220 260 205 300 Q190 310 172 305 L172 250 Q200 248 212 195Z" fill="#5C3D28"/>
+    {/* Face shading */}
+    <ellipse cx="160" cy="215" rx="38" ry="42" fill="#D4A882" opacity="0.3"/>
+    {/* Eyes */}
+    <ellipse cx="143" cy="195" rx="8" ry="9" fill="white"/>
+    <ellipse cx="177" cy="195" rx="8" ry="9" fill="white"/>
+    <circle cx="145" cy="197" r="5.5" fill="#3D2810"/>
+    <circle cx="179" cy="197" r="5.5" fill="#3D2810"/>
+    <circle cx="147" cy="194" r="2" fill="white"/>
+    <circle cx="181" cy="194" r="2" fill="white"/>
+    {/* Eyebrows */}
+    <path d="M133 184 Q143 179 154 182" stroke="#5C3D28" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M166 182 Q177 179 187 184" stroke="#5C3D28" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* Nose */}
+    <path d="M157 208 Q160 220 163 208" stroke="#B8845A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* Lips */}
+    <path d="M147 228 Q160 238 173 228" fill="#C0725A"/>
+    <path d="M147 228 Q160 234 173 228" fill="#D4896E"/>
+    {/* Cheeks */}
+    <ellipse cx="128" cy="215" rx="10" ry="7" fill="#E8A090" opacity="0.35"/>
+    <ellipse cx="192" cy="215" rx="10" ry="7" fill="#E8A090" opacity="0.35"/>
+    {/* Hair front */}
+    <path d="M108 185 Q112 155 135 145 Q160 138 185 145 Q208 155 212 185" fill="#5C3D28"/>
+    <path d="M108 185 Q104 170 108 155 Q112 135 130 128 Q148 122 160 124 Q172 122 190 128 Q208 135 212 155 Q216 170 212 185" fill="#6B4832"/>
+    {/* Wide brim hat */}
+    <ellipse cx="160" cy="140" rx="105" ry="18" fill="#4A7A5E"/>
+    <ellipse cx="160" cy="136" rx="105" ry="18" fill="#5A9070"/>
+    {/* Hat crown */}
+    <path d="M92 138 Q95 75 160 72 Q225 75 228 138Z" fill="#5A9070"/>
+    <path d="M95 138 Q98 78 160 76 Q222 78 225 138Z" fill="#6AAB84"/>
+    {/* Hat band */}
+    <rect x="95" y="127" width="130" height="11" rx="3" fill="#3D7060"/>
+    {/* Hat shine */}
+    <path d="M110 108 Q130 90 160 88" stroke="rgba(255,255,255,0.2)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    {/* Brim shadow */}
+    <ellipse cx="160" cy="140" rx="105" ry="5" fill="rgba(0,0,0,0.08)"/>
+  </svg>
+);
+
+/* Legacy blob — keep for modal only */
 const ParaFig = ({ size = 110, waving = false, style = {} }) => (
   <svg width={size} height={Math.round(size * 1.18)} viewBox="0 0 100 118"
     fill="none" style={{ display: 'block', ...style }}>
@@ -198,35 +259,8 @@ const SamplePreview = () => (
   </div>
 );
 
-/* ─── PARA teaser card in hero ──────────────────────────────────────── */
-const ParaTeaser = ({ onClick }) => (
-  <div onClick={onClick} style={{
-    background:'white', borderRadius:16, border:`1px solid ${C.border}`,
-    boxShadow:'0 4px 20px rgba(0,0,0,0.06)',
-    padding:'1.5rem 1.25rem',
-    display:'flex', flexDirection:'column', alignItems:'center',
-    cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
-    flex:'0 0 auto', width:'220px',
-  }}
-  onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 10px 30px rgba(0,0,0,0.10)';}}
-  onMouseLeave={e=>{e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,0.06)';}}
-  >
-    <ParaFig size={100} waving/>
-    <div style={{
-      background:C.sageSoft, border:`1.5px solid ${C.sage}`,
-      borderRadius:12, padding:'10px 14px', marginTop:12, position:'relative', textAlign:'center',
-    }}>
-      <div style={{
-        position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)',
-        width:0, height:0, borderLeft:'8px solid transparent',
-        borderRight:'8px solid transparent', borderBottom:`8px solid ${C.sage}`,
-      }}/>
-      <p style={{ margin:0, fontSize:'0.8rem', color:C.navy, fontWeight:600, lineHeight:1.4 }}>
-        G&apos;day! Upload your photo now — it&apos;s free
-      </p>
-    </div>
-  </div>
-);
+/* ─── ParaTeaser removed — replaced by split hero layout ─── */
+const ParaTeaser = ({ onClick }) => null;
 
 /* ─── Logo mark ─────────────────────────────────────────────────────── */
 const Logo = () => (
