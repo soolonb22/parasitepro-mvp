@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import SEO from '../components/SEO';
+import TrustBar from '../components/TrustBar';
 
 /* ─── Brand tokens — Image 4 reference ─────────────────────────────── */
 const C = {
@@ -506,17 +507,8 @@ const LandingPage = () => {
             </button>
           </div>
 
-          {/* Trust bar */}
-          <p style={{
-            fontSize: '0.83rem',
-            color: C.heroText,
-            opacity: 0.55,
-            margin: 0,
-            fontWeight: 500,
-            letterSpacing: '0.01em',
-          }}>
-            Built in Australia &nbsp;•&nbsp; Privacy First &nbsp;•&nbsp; Educational Tool Only
-          </p>
+          {/* Trust bar — pill component */}
+          <TrustBar variant="sage" />
         </div>
       </section>
 
@@ -681,7 +673,7 @@ const LandingPage = () => {
                 color:'rgba(255,255,255,0.45)', fontSize:'0.72rem', fontWeight:700,
                 letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'0.75rem',
               }}>Product</p>
-              {[['/upload','Upload Photo'],['/scientific-library','Scientific Library'],['/pricing','Pricing'],['/sample-report','Sample Report']].map(([h,l]) => (
+              {[['/upload','Upload Photo'],['/resources','Resources & Guides'],['/scientific-library','Scientific Library'],['/pricing','Pricing'],['/sample-report','Sample Report']].map(([h,l]) => (
                 <Link key={h} to={h} style={{
                   display:'block', color:'rgba(255,255,255,0.6)',
                   textDecoration:'none', fontSize:'0.82rem', marginBottom:'0.4rem',

@@ -46,6 +46,10 @@ import FoodDiaryPage from './pages/FoodDiaryPage';
 import TreatmentTrackerPage from './pages/TreatmentTrackerPage';
 import SharedResultsPage from './pages/SharedResultsPage';
 import GPReportPage from './pages/GPReportPage';
+import ResourcesPage from './pages/ResourcesPage';
+import ResourceTropicalAustraliaPage from './pages/ResourceTropicalAustraliaPage';
+import ResourceAiVsLabPage from './pages/ResourceAiVsLabPage';
+import ResourceWhenToWorryPage from './pages/ResourceWhenToWorryPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -315,6 +319,10 @@ function App() {
           {/* Shared/public result */}
           <Route path="/results/shared/:token" element={<SharedResultsPage />} />
           <Route path="/gp-report/:id" element={<ProtectedRoute><GPReportPage /></ProtectedRoute>} />
+          <Route path="/resources" element={<ResourcesPage />} />
+          <Route path="/resources/tropical-australia-parasites" element={<ResourceTropicalAustraliaPage />} />
+          <Route path="/resources/ai-vs-lab-testing" element={<ResourceAiVsLabPage />} />
+          <Route path="/resources/when-to-worry-about-parasites" element={<ResourceWhenToWorryPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
 
           {/* Protected */}
