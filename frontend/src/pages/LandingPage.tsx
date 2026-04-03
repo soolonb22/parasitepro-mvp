@@ -356,64 +356,116 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* ── HERO — Image 6 layout ────────────────────────────────────── */}
+      {/* ── HERO — split layout ───────────────────────────────────────── */}
       <section style={{
-        padding:'clamp(3rem,8vw,6rem) 1.5rem 2rem',
-        textAlign:'center', maxWidth:760, margin:'0 auto',
+        maxWidth:1120, margin:'0 auto',
+        padding:'clamp(2rem,5vw,4rem) 1.5rem clamp(2rem,4vw,3rem)',
       }}>
         <div style={{
-          display:'inline-flex', alignItems:'center', gap:7,
-          background:C.tealSoft, border:`1.5px solid ${C.sage}`,
-          borderRadius:20, padding:'5px 14px', marginBottom:'1.5rem',
+          display:'grid',
+          gridTemplateColumns:'1fr auto',
+          gap:'2rem',
+          alignItems:'center',
         }}>
-          <span style={{ fontSize:14 }}>🇦🇺</span>
-          <span style={{ fontSize:'0.8rem', fontWeight:700, color:C.tealDark }}>
-            Built for Australians — educational tool, not diagnostic
-          </span>
+
+          {/* LEFT — headline + CTAs + trust bar */}
+          <div style={{ maxWidth:620 }}>
+
+            {/* Badge */}
+            <div style={{
+              display:'inline-flex', alignItems:'center', gap:7,
+              background:C.tealSoft, border:`1.5px solid ${C.sage}`,
+              borderRadius:20, padding:'5px 14px', marginBottom:'1.5rem',
+            }}>
+              <span style={{ fontSize:13 }}>🇦🇺</span>
+              <span style={{ fontSize:'0.78rem', fontWeight:700, color:C.tealDark }}>
+                Built for Australians — educational, not diagnostic
+              </span>
+            </div>
+
+            {/* Headline */}
+            <h1 style={{
+              fontSize:'clamp(2rem,4.5vw,3.2rem)', fontWeight:900, color:C.navy,
+              lineHeight:1.15, letterSpacing:'-0.03em', margin:'0 0 1.5rem',
+            }}>
+              Found something concerning in your stool?{' '}
+              <span style={{ color:C.teal }}>Get fast AI-powered analysis in 60 seconds</span>
+              {' '}<span style={{ fontWeight:500, color:C.gray }}>— no lab visit required</span>
+            </h1>
+
+            {/* Dual CTAs */}
+            <div style={{ display:'flex', gap:'0.875rem', flexWrap:'wrap', marginBottom:'1.75rem' }}>
+              <button
+                onClick={() => navigate(user ? '/upload' : '/signup?promo=BETA3FREE')}
+                style={{
+                  padding:'15px 28px', background:C.navyDark, color:'white',
+                  border:'none', borderRadius:12, fontSize:'1rem', fontWeight:700,
+                  cursor:'pointer', letterSpacing:'0.01em', transition:'all 0.15s',
+                  boxShadow:'0 4px 16px rgba(15,36,64,0.3)',
+                }}
+                onMouseEnter={e=>{e.currentTarget.style.background='#0a1a30';e.currentTarget.style.transform='translateY(-2px)';}}
+                onMouseLeave={e=>{e.currentTarget.style.background=C.navyDark;e.currentTarget.style.transform='none';}}
+              >
+                Upload Photo for Analysis
+              </button>
+
+              <button
+                onClick={() => navigate(user ? '/dashboard' : '/signup')}
+                style={{
+                  padding:'15px 28px', background:C.navyDark, color:'white',
+                  border:'none', borderRadius:12, fontSize:'1rem', fontWeight:700,
+                  cursor:'pointer', transition:'all 0.15s', lineHeight:1.3,
+                  boxShadow:'0 4px 16px rgba(15,36,64,0.3)',
+                }}
+                onMouseEnter={e=>{e.currentTarget.style.background='#0a1a30';e.currentTarget.style.transform='translateY(-2px)';}}
+                onMouseLeave={e=>{e.currentTarget.style.background=C.navyDark;e.currentTarget.style.transform='none';}}
+              >
+                Export report to<br/>My Health Record
+              </button>
+            </div>
+
+            {/* Trust signals bar */}
+            <div style={{
+              display:'flex',
+              background:'rgba(255,255,255,0.6)', borderRadius:10,
+              border:`1px solid ${C.border}`, overflow:'hidden',
+              maxWidth:480,
+            }}>
+              {[
+                { icon:'🇦🇺', label:'Built in Australia' },
+                { icon:'🔒', label:'Privacy First' },
+                { icon:'📋', label:'Educational Tool Only' },
+              ].map((s, i) => (
+                <div key={s.label} style={{
+                  flex:1, padding:'9px 10px', textAlign:'center',
+                  borderRight: i < 2 ? `1px solid ${C.border}` : 'none',
+                  display:'flex', alignItems:'center', justifyContent:'center', gap:5,
+                }}>
+                  <span style={{ fontSize:13 }}>{s.icon}</span>
+                  <span style={{ fontSize:'0.7rem', fontWeight:600, color:C.navy, whiteSpace:'nowrap' }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <p style={{ fontSize:'0.78rem', color:C.grayMid, marginTop:'0.75rem' }}>
+              No credit card · First analysis free ·{' '}
+              <strong style={{ color:C.tealDark }}>BETA3FREE</strong> = 3 free
+            </p>
+          </div>
+
+          {/* RIGHT — PARA woman illustration */}
+          <div style={{
+            width:'clamp(180px,26vw,320px)',
+            height:'clamp(270px,39vw,480px)',
+            flexShrink:0, position:'relative',
+          }}>
+            <div style={{
+              position:'absolute', inset:0, borderRadius:'50% 50% 45% 45%',
+              background:`radial-gradient(ellipse at 50% 40%, rgba(0,191,165,0.10) 0%, transparent 70%)`,
+            }}/>
+            <ParaWoman/>
+          </div>
         </div>
-
-        <h1 style={{
-          fontSize:'clamp(1.9rem, 5vw, 3.1rem)', fontWeight:900, color:C.navy,
-          lineHeight:1.18, letterSpacing:'-0.025em', margin:'0 0 1.1rem',
-        }}>
-          Found something weird in your stool or on your skin?{' '}
-          <span style={{ color:C.teal }}>Get AI analysis in 60 seconds</span>
-          {' '}— no lab, no wait.
-        </h1>
-
-        <p style={{
-          fontSize:'clamp(1rem,2.5vw,1.2rem)', color:C.gray,
-          margin:'0 0 2rem', lineHeight:1.6,
-        }}>
-          PARA, your friendly guide, is ready. G&apos;day!
-        </p>
-
-        <button onClick={openModal} style={{
-          padding:'16px 44px', background:C.teal, color:'white',
-          border:'none', borderRadius:14, fontSize:'1.1rem', fontWeight:800,
-          cursor:'pointer', letterSpacing:'0.01em',
-          boxShadow:'0 6px 24px rgba(0,191,165,0.35)', transition:'all 0.15s',
-        }}
-        onMouseEnter={e=>{e.target.style.background=C.tealDark;e.target.style.transform='translateY(-2px)';}}
-        onMouseLeave={e=>{e.target.style.background=C.teal;e.target.style.transform='none';}}
-        >
-          Upload Photo Now — Free
-        </button>
-
-        <p style={{ fontSize:'0.8rem', color:C.grayMid, marginTop:'0.75rem' }}>
-          No credit card needed · First analysis free ·{' '}
-          <strong style={{ color:C.tealDark }}>BETA3FREE</strong> = 3 free analyses
-        </p>
-      </section>
-
-      {/* ── PREVIEW CARDS — teaser + sample ─────────────────────────── */}
-      <section style={{
-        maxWidth:900, margin:'0 auto 4rem', padding:'0 1.5rem',
-        display:'flex', gap:'1.25rem', alignItems:'flex-start',
-        flexWrap:'wrap', justifyContent:'center',
-      }}>
-        <ParaTeaser onClick={openModal}/>
-        <SamplePreview/>
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
