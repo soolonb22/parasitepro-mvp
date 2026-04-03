@@ -6,7 +6,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 
-const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 const PRIVACY_CONSENT_KEY = 'parasite_privacy_accepted';
 

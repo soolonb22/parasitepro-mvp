@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Microscope, Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Lock } from 'lucide-react';
 
-const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const ResetPasswordPage = () => {

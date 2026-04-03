@@ -9,7 +9,7 @@ import {
   ArrowLeft, Loader, TrendingUp, Zap
 } from 'lucide-react';
 
-const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_BASE = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const StatCard = ({ icon, label, value, sub = null, color = 'var(--amber)' }) => (

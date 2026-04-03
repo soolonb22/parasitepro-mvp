@@ -15,7 +15,7 @@ import ParasiteProfile from '../components/ParasiteProfile';
 import DeepDiveModal from '../components/DeepDiveModal';
 import ParasiteBot from '../components/ParasiteBot';
 
-const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const URGENCY_MAP = {

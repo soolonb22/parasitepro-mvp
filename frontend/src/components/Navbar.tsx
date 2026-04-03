@@ -1,7 +1,6 @@
 // src/components/Navbar.tsx
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import ParaGuide from './ParaGuide';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -43,7 +42,6 @@ const Navbar: React.FC = () => {
 
         {/* PARA + Analyse Button */}
         <div className="hidden md:flex items-center gap-6">
-          <ParaGuide variant="inline" />
           <Link
             to="/upload"
             className="bg-teal-600 text-white px-6 py-3 rounded-3xl flex items-center gap-2 hover:bg-teal-700 transition"
@@ -78,8 +76,7 @@ const Navbar: React.FC = () => {
             ))}
 
             <div className="pt-6 border-t">
-              <ParaGuide variant="inline" />
-              <Link
+                  <Link
                 to="/upload"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="mt-6 block bg-teal-600 text-white text-center py-4 rounded-3xl font-medium"

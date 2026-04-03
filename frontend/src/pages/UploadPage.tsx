@@ -1,7 +1,6 @@
 // src/pages/UploadPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ParaGuide from '../components/ParaGuide';
 import AnalysingScreen from '../components/AnalysingScreen';
 
 const UploadPage: React.FC = () => {
@@ -107,10 +106,7 @@ const UploadPage: React.FC = () => {
 
         {/* PARA Guidance */}
         <div className="mt-8 flex justify-center">
-          <ParaGuide 
-            variant="inline" 
-            message="For best results, make sure the area is well-lit and in focus." 
-          />
+          <p className="text-sm text-center" style={{color:"var(--text-muted)"}}>💡 For best results, make sure the area is well-lit and in focus.</p>
         </div>
 
         {/* Start Analysis Button */}

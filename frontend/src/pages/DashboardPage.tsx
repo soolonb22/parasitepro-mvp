@@ -1,6 +1,5 @@
 // src/pages/DashboardPage.tsx
 import React from 'react';
-import ParaGuide from '../components/ParaGuide';
 
 const DashboardPage: React.FC = () => {
   const recentAnalyses = [
@@ -16,7 +15,6 @@ const DashboardPage: React.FC = () => {
           <h1 className="text-4xl font-semibold text-navy">Welcome back</h1>
           <p className="text-slate-600 mt-2">Here's what PARA found in your recent analyses</p>
         </div>
-        <ParaGuide variant="inline" />
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -68,7 +66,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Quick New Analysis */}
       <div className="mt-16 bg-white rounded-3xl p-10 text-center">
-        <ParaGuide variant="inline" message="Ready for another check?" />
+        <p className="text-lg font-medium mb-2" style={{color:"var(--text-secondary)"}}>Ready for another check?</p>
         <button className="mt-8 bg-teal-600 text-white px-16 py-6 rounded-3xl text-xl font-semibold hover:bg-teal-700 transition">
           Start New Analysis
         </button>
