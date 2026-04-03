@@ -18,56 +18,110 @@ const C = {
 
 /* ─── PARA — line-art sketch figure with wide-brim hat (exact match to mockup) ── */
 const ParaWoman = ({ style = {} }) => (
-  <svg viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style={{ display: 'block', width: '100%', height: '100%', ...style }}>
+  <svg viewBox="0 0 400 580" fill="none" xmlns="http://www.w3.org/2000/svg"
+    style={{ display:'block', width:'100%', height:'100%', ...style }}>
 
-    {/* Wide brim hat — flat, sketchy, with slight tilt */}
-    {/* Brim — wide oval */}
-    <ellipse cx="168" cy="122" rx="105" ry="14" stroke="#0F2733" strokeWidth="3.5" fill="none"
-      strokeLinecap="round" transform="rotate(-3 168 122)"/>
-    {/* Crown — trapezoidal top */}
-    <path d="M105 122 Q112 72 168 68 Q224 72 232 122"
-      stroke="#0F2733" strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-    {/* Hat crown top */}
-    <path d="M112 75 Q168 60 225 75" stroke="#0F2733" strokeWidth="2.5" fill="none"
-      strokeLinecap="round" opacity="0.5"/>
-    {/* Hat indent crease */}
-    <path d="M130 95 Q168 88 206 95" stroke="#0F2733" strokeWidth="2" fill="none"
-      strokeLinecap="round" strokeDasharray="4 3" opacity="0.4"/>
+    {/* ── Body / torso ── */}
+    <path d="M130 340 Q118 400 110 520 L290 520 Q282 400 270 340 Q248 358 200 360 Q152 358 130 340Z"
+      fill="#4A7A6A" opacity="0.9"/>
+    {/* Shirt fold lines */}
+    <path d="M178 380 Q200 395 222 380" stroke="#2D5A4A" strokeWidth="1.5" fill="none" opacity="0.4"/>
+    <path d="M172 420 Q200 438 228 420" stroke="#2D5A4A" strokeWidth="1.5" fill="none" opacity="0.3"/>
+    {/* Collar / V-neck */}
+    <path d="M168 328 Q200 348 232 328 L240 348 Q200 372 160 348Z" fill="#3A6858" opacity="0.95"/>
+    <path d="M192 348 L200 410 L208 348" stroke="#2D5A4A" strokeWidth="2" fill="none" opacity="0.5"/>
 
-    {/* Head / face — simple oval, no face features per mockup */}
-    <ellipse cx="168" cy="178" rx="44" ry="50" stroke="#0F2733" strokeWidth="3"
-      fill="none" strokeLinecap="round"/>
+    {/* ── Neck ── */}
+    <rect x="186" y="272" width="28" height="62" rx="14" fill="#C8956A"/>
+    {/* Neck shadow */}
+    <path d="M186 285 Q192 310 186 334" stroke="#B07A52" strokeWidth="2" fill="none" opacity="0.4"/>
 
-    {/* Neck */}
-    <path d="M152 225 L152 248 M184 225 L184 248"
-      stroke="#0F2733" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+    {/* ── Left arm ── */}
+    <path d="M132 342 Q100 378 88 450 Q92 458 106 454 Q116 396 148 358Z" fill="#4A7A6A" opacity="0.9"/>
+    <ellipse cx="96" cy="457" rx="14" ry="9" fill="#C8956A" transform="rotate(-15 96 457)"/>
 
-    {/* Collar / shirt top */}
-    <path d="M140 248 Q168 256 196 248 L208 272 Q168 278 128 272 Z"
-      stroke="#0F2733" strokeWidth="2.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* ── Right arm ── */}
+    <path d="M268 342 Q300 374 312 448 Q306 456 292 452 Q284 394 252 358Z" fill="#4A7A6A" opacity="0.9"/>
+    <ellipse cx="304" cy="451" rx="14" ry="9" fill="#C8956A" transform="rotate(15 304 451)"/>
 
-    {/* Shoulders & body */}
-    <path d="M108 270 Q88 278 75 310 Q68 340 72 380 L265 380 Q268 340 260 310 Q248 278 228 270"
-      stroke="#0F2733" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* ── Hair behind head ── */}
+    <path d="M128 210 Q118 288 134 340 Q155 355 178 350 L178 272 Q148 265 128 210Z"
+      fill="#5C3820"/>
+    <path d="M272 210 Q282 288 266 340 Q245 355 222 350 L222 272 Q252 265 272 210Z"
+      fill="#5C3820"/>
+    {/* Hair flowing longer */}
+    <path d="M128 210 Q112 260 118 330 Q126 345 138 340"
+      fill="#6B4428" opacity="0.7"/>
+    <path d="M272 210 Q288 260 282 330 Q274 345 262 340"
+      fill="#6B4428" opacity="0.7"/>
 
-    {/* Left arm */}
-    <path d="M108 272 Q82 300 74 350"
-      stroke="#0F2733" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    {/* Left hand hint */}
-    <path d="M70 352 Q68 362 74 365 Q80 360 78 350"
-      stroke="#0F2733" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* ── Head ── */}
+    <ellipse cx="200" cy="188" rx="68" ry="78" fill="#D4A07A"/>
+    {/* Face highlight */}
+    <ellipse cx="188" cy="175" rx="28" ry="32" fill="#E0B08A" opacity="0.35"/>
 
-    {/* Right arm */}
-    <path d="M228 272 Q254 300 262 348"
-      stroke="#0F2733" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    {/* Right hand hint */}
-    <path d="M264 350 Q266 360 260 364 Q254 358 256 348"
-      stroke="#0F2733" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* ── Face features ── */}
+    {/* Eyebrows */}
+    <path d="M162 155 Q175 148 188 152" stroke="#5C3820" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M212 152 Q225 148 238 155" stroke="#5C3820" strokeWidth="3" fill="none" strokeLinecap="round"/>
 
-    {/* Shirt buttons line */}
-    <path d="M168 278 L168 376" stroke="#0F2733" strokeWidth="1.5"
-      fill="none" strokeLinecap="round" strokeDasharray="3 5" opacity="0.35"/>
+    {/* Eyes — almond shaped */}
+    <path d="M158 168 Q172 160 186 168 Q172 178 158 168Z" fill="white"/>
+    <path d="M214 168 Q228 160 242 168 Q228 178 214 168Z" fill="white"/>
+    {/* Irises */}
+    <circle cx="172" cy="169" r="7" fill="#3D2510"/>
+    <circle cx="228" cy="169" r="7" fill="#3D2510"/>
+    {/* Pupils */}
+    <circle cx="173" cy="170" r="4" fill="#1A0A05"/>
+    <circle cx="229" cy="170" r="4" fill="#1A0A05"/>
+    {/* Eye shine */}
+    <circle cx="175" cy="167" r="2.2" fill="white"/>
+    <circle cx="231" cy="167" r="2.2" fill="white"/>
+    {/* Lower lash lines */}
+    <path d="M158 170 Q172 176 186 170" stroke="#3D2510" strokeWidth="1" fill="none" opacity="0.4"/>
+    <path d="M214 170 Q228 176 242 170" stroke="#3D2510" strokeWidth="1" fill="none" opacity="0.4"/>
+
+    {/* Nose */}
+    <path d="M196 186 Q200 202 204 186" stroke="#B07A52" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6"/>
+    <path d="M190 204 Q200 210 210 204" stroke="#B07A52" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5"/>
+
+    {/* Lips */}
+    <path d="M182 220 Q200 212 218 220 Q210 228 200 230 Q190 228 182 220Z" fill="#C27060"/>
+    <path d="M182 220 Q200 225 218 220" fill="none" stroke="#A85848" strokeWidth="1" opacity="0.5"/>
+    {/* Lip highlight */}
+    <path d="M192 219 Q200 215 208 219" stroke="rgba(255,200,180,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+
+    {/* Cheeks */}
+    <ellipse cx="162" cy="202" rx="16" ry="10" fill="#E8A080" opacity="0.28"/>
+    <ellipse cx="238" cy="202" rx="16" ry="10" fill="#E8A080" opacity="0.28"/>
+
+    {/* ── Hair front ── */}
+    <path d="M132 188 Q136 145 165 132 Q182 126 200 128 Q218 126 235 132 Q264 145 268 188"
+      fill="#6B4428"/>
+    <path d="M132 188 Q128 165 136 142 Q148 116 180 108 Q200 104 220 108 Q252 116 264 142 Q272 165 268 188"
+      fill="#7A4E30"/>
+    {/* Hair parting detail */}
+    <path d="M200 108 Q196 128 192 155" stroke="#5C3820" strokeWidth="1.5" fill="none" opacity="0.3"/>
+
+    {/* ── Wide-brim hat — main brim ── */}
+    <ellipse cx="200" cy="118" rx="145" ry="22" fill="#6AAB84"/>
+    <ellipse cx="200" cy="114" rx="145" ry="22" fill="#7DC498"/>
+    {/* Brim shadow underside */}
+    <ellipse cx="200" cy="124" rx="145" ry="10" fill="#4A8A64" opacity="0.4"/>
+
+    {/* Hat crown */}
+    <path d="M110 116 Q116 52 200 46 Q284 52 290 116Z" fill="#7DC498"/>
+    <path d="M114 116 Q120 56 200 50 Q280 56 286 116Z" fill="#8ED4A8"/>
+    {/* Crown top curve */}
+    <path d="M140 65 Q200 48 260 65" stroke="rgba(255,255,255,0.15)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+
+    {/* Hat band */}
+    <rect x="114" y="106" width="172" height="12" rx="3" fill="#4A8A64"/>
+    {/* Band highlight */}
+    <path d="M120 108 Q200 104 280 108" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+
+    {/* Brim front edge highlight */}
+    <path d="M66 116 Q200 108 334 116" stroke="rgba(255,255,255,0.18)" strokeWidth="2" fill="none" strokeLinecap="round"/>
   </svg>
 );
 
@@ -351,117 +405,118 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* ── HERO — exact match to mockup ──────────────────────────────── */}
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section style={{
         background: C.heroBg,
         borderRadius: 24,
         margin: '0 1rem 0',
-        padding: 'clamp(2.5rem,5vw,4rem) clamp(1.5rem,4vw,3.5rem)',
         position: 'relative',
         overflow: 'hidden',
+        minHeight: 'clamp(360px, 55vw, 560px)',
       }}>
-        {/* Subtle texture overlay */}
+        {/* ── PARA woman — absolute right, large watermark ── */}
         <div style={{
-          position:'absolute', inset:0, borderRadius:24,
-          background:'radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.06) 0%, transparent 60%)',
-          pointerEvents:'none',
-        }}/>
-
-        <div style={{
-          position:'relative',
-          display:'grid',
-          gridTemplateColumns:'1fr auto',
-          gap:'clamp(1rem,4vw,3rem)',
-          alignItems:'center',
-          maxWidth:1040,
-          margin:'0 auto',
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          width: 'clamp(280px, 52%, 580px)',
+          height: '100%',
+          opacity: 0.28,
+          pointerEvents: 'none',
         }}>
+          <ParaWoman style={{ width:'100%', height:'100%', objectFit:'contain', objectPosition:'bottom right' }}/>
+        </div>
 
-          {/* LEFT col */}
-          <div>
-
-            {/* Big headline — 2 lines like mockup */}
-            <h1 style={{
-              fontSize:'clamp(2.4rem,5.5vw,4rem)', fontWeight:800, color:C.heroText,
-              lineHeight:1.08, letterSpacing:'-0.03em', margin:'0 0 1rem',
-              maxWidth:560,
-            }}>
-              Found something concerning in your stool?
-            </h1>
-
-            {/* Subtitle */}
-            <p style={{
-              fontSize:'clamp(1rem,2vw,1.25rem)', color:C.heroText,
-              opacity:0.75, margin:'0 0 2rem', lineHeight:1.5,
-              maxWidth:480, fontWeight:400,
-            }}>
-              Get fast AI-powered analysis in 60 seconds — no lab visit required
-            </p>
-
-            {/* CTA buttons — row */}
-            <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'center', marginBottom:'2rem' }}>
-
-              {/* Primary — teal fill */}
-              <button
-                onClick={() => navigate(user ? '/upload' : '/signup?promo=BETA3FREE')}
-                style={{
-                  padding:'16px 32px',
-                  background: C.heroBtnTeal,
-                  color:'white',
-                  border:'none',
-                  borderRadius:14,
-                  fontSize:'1.05rem',
-                  fontWeight:700,
-                  cursor:'pointer',
-                  letterSpacing:'0.01em',
-                  transition:'all 0.15s',
-                  boxShadow:'0 4px 20px rgba(0,0,0,0.18)',
-                }}
-                onMouseEnter={e=>{e.currentTarget.style.background='#145047';e.currentTarget.style.transform='translateY(-2px)';}}
-                onMouseLeave={e=>{e.currentTarget.style.background=C.heroBtnTeal;e.currentTarget.style.transform='none';}}
-              >
-                Upload Photo for Analysis
-              </button>
-
-              {/* Secondary — outlined */}
-              <button
-                onClick={() => navigate(user ? '/dashboard' : '/signup')}
-                style={{
-                  padding:'15px 32px',
-                  background:'transparent',
-                  color: C.heroText,
-                  border:`2px solid ${C.heroText}`,
-                  borderRadius:14,
-                  fontSize:'1.05rem',
-                  fontWeight:700,
-                  cursor:'pointer',
-                  transition:'all 0.15s',
-                  opacity:0.85,
-                }}
-                onMouseEnter={e=>{e.currentTarget.style.background='rgba(15,39,51,0.1)';e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.opacity='1';}}
-                onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.transform='none';e.currentTarget.style.opacity='0.85';}}
-              >
-                Export to My Health Record
-              </button>
-            </div>
-
-            {/* Trust bar — inline dots */}
-            <p style={{
-              fontSize:'0.85rem', color:C.heroText, opacity:0.6,
-              margin:0, fontWeight:500, letterSpacing:'0.01em',
-            }}>
-              Built in Australia &nbsp;•&nbsp; Privacy First &nbsp;•&nbsp; Educational Tool Only
-            </p>
-          </div>
-
-          {/* RIGHT col — line-art figure */}
-          <div style={{
-            width:'clamp(160px,24vw,300px)',
-            height:'clamp(220px,34vw,420px)',
-            flexShrink:0,
+        {/* ── Text + CTAs — positioned over the full width ── */}
+        <div style={{
+          position: 'relative',
+          zIndex: 1,
+          padding: 'clamp(2.5rem,5vw,4rem) clamp(1.75rem,4vw,3.5rem)',
+          maxWidth: 1040,
+          margin: '0 auto',
+        }}>
+          {/* Headline — full width, very large */}
+          <h1 style={{
+            fontSize: 'clamp(2.6rem, 6.5vw, 4.8rem)',
+            fontWeight: 800,
+            color: C.heroText,
+            lineHeight: 1.06,
+            letterSpacing: '-0.035em',
+            margin: '0 0 clamp(1.5rem,3vw,2.5rem)',
+            maxWidth: 820,
           }}>
-            <ParaWoman/>
+            Found something<br/>
+            concerning in your stool?<br/>
+            <span style={{ fontSize:'clamp(1.8rem,4.5vw,3.4rem)', fontWeight:700, opacity:0.88 }}>
+              Get fast AI-powered analysis in{' '}
+              60 seconds – no lab visit required
+            </span>
+          </h1>
+
+          {/* Two dark buttons — left and right spaced */}
+          <div style={{
+            display: 'flex',
+            gap: 'clamp(0.75rem,2vw,1.25rem)',
+            flexWrap: 'wrap',
+            marginBottom: 'clamp(1.5rem,3vw,2rem)',
+          }}>
+            {/* Primary — dark black */}
+            <button
+              onClick={() => navigate(user ? '/upload' : '/signup?promo=BETA3FREE')}
+              style={{
+                padding: 'clamp(13px,1.8vw,18px) clamp(22px,3vw,40px)',
+                background: '#0F2733',
+                color: 'white',
+                border: 'none',
+                borderRadius: 14,
+                fontSize: 'clamp(0.9rem,1.6vw,1.05rem)',
+                fontWeight: 700,
+                cursor: 'pointer',
+                letterSpacing: '0.01em',
+                transition: 'all 0.15s',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.28)',
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.background='#1A3D4F';e.currentTarget.style.transform='translateY(-2px)';}}
+              onMouseLeave={e=>{e.currentTarget.style.background='#0F2733';e.currentTarget.style.transform='none';}}
+            >
+              Upload Photo for Analysis
+            </button>
+
+            {/* Secondary — also dark, "Export report to My Health Record" */}
+            <button
+              onClick={openModal}
+              style={{
+                padding: 'clamp(13px,1.8vw,18px) clamp(22px,3vw,40px)',
+                background: '#0F2733',
+                color: 'white',
+                border: 'none',
+                borderRadius: 14,
+                fontSize: 'clamp(0.9rem,1.6vw,1.05rem)',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.28)',
+                lineHeight: 1.3,
+                textAlign: 'center',
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.background='#1A3D4F';e.currentTarget.style.transform='translateY(-2px)';}}
+              onMouseLeave={e=>{e.currentTarget.style.background='#0F2733';e.currentTarget.style.transform='none';}}
+            >
+              Export report to<br/>My Health Record
+            </button>
           </div>
+
+          {/* Trust bar */}
+          <p style={{
+            fontSize: '0.83rem',
+            color: C.heroText,
+            opacity: 0.55,
+            margin: 0,
+            fontWeight: 500,
+            letterSpacing: '0.01em',
+          }}>
+            Built in Australia &nbsp;•&nbsp; Privacy First &nbsp;•&nbsp; Educational Tool Only
+          </p>
         </div>
       </section>
 
