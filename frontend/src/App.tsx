@@ -45,6 +45,7 @@ import SeoGiardiaPage from './pages/SeoGiardiaPage';
 import FoodDiaryPage from './pages/FoodDiaryPage';
 import TreatmentTrackerPage from './pages/TreatmentTrackerPage';
 import SharedResultsPage from './pages/SharedResultsPage';
+import GPReportPage from './pages/GPReportPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -313,6 +314,7 @@ function App() {
 
           {/* Shared/public result */}
           <Route path="/results/shared/:token" element={<SharedResultsPage />} />
+          <Route path="/gp-report/:id" element={<ProtectedRoute><GPReportPage /></ProtectedRoute>} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
 
           {/* Protected */}

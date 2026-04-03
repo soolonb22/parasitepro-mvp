@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Loader, AlertTriangle, CheckCircle, AlertCircle,
   Microscope, ClipboardList, BookOpen, Pill, Leaf, MessageSquare,
-  ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Activity,
+  ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Activity, FileText,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -592,6 +592,30 @@ const AnalysisResultsPage = () => {
               </div>
             </div>
           )}
+
+          {/* GP Report CTA */}
+          <div className="pp-card p-5 flex items-start justify-between gap-4"
+            style={{ border: '1px solid rgba(27,107,95,0.3)', background: 'rgba(27,107,95,0.05)' }}>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(27,107,95,0.15)', border: '1px solid rgba(27,107,95,0.3)' }}>
+                <FileText size={17} style={{ color: '#1B6B5F' }} />
+              </div>
+              <div>
+                <p className="font-heading font-bold text-sm mb-0.5" style={{ color: 'var(--text-primary)' }}>
+                  GP-Ready Report
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  Clean, printable clinical report — designed to share with your doctor. Includes all findings, differential diagnoses, and recommended tests.
+                </p>
+              </div>
+            </div>
+            <button onClick={() => navigate(`/gp-report/${id}`)}
+              className="flex-shrink-0 flex items-center gap-1.5"
+              style={{ padding: '9px 16px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 8, fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              <FileText size={13} /> View Report
+            </button>
+          </div>
 
           {/* Feedback */}
           {!feedbackDone ? (
