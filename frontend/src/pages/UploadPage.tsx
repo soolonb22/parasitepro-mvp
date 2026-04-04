@@ -1,6 +1,7 @@
 // src/pages/UploadPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ParaGuide from '../components/ParaGuide';
 import AnalysingScreen from '../components/AnalysingScreen';
 
 const UploadPage: React.FC = () => {
@@ -36,7 +37,7 @@ const UploadPage: React.FC = () => {
 
   const handleAnalysisComplete = () => {
     setIsAnalysing(false);
-    navigate('/report');   // Change this to your actual report route
+    navigate('/report');
   };
 
   if (isAnalysing) {
@@ -46,9 +47,9 @@ const UploadPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 py-12">
       <div className="max-w-3xl mx-auto px-6">
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-semibold text-navy">Upload Your Sample</h1>
-          <p className="mt-3 text-slate-600">Choose whether this is for you or your pet</p>
+          <p className="mt-3 text-slate-600">Choose Human or Pet mode</p>
         </div>
 
         {/* Human / Pet Toggle */}
@@ -56,20 +57,16 @@ const UploadPage: React.FC = () => {
           <div className="inline-flex bg-slate-100 rounded-3xl p-1.5">
             <button
               onClick={() => setMode('human')}
-              className={`px-10 py-3.5 rounded-3xl font-medium transition-all ${
-                mode === 'human' 
-                  ? 'bg-white shadow text-navy' 
-                  : 'text-slate-600 hover:bg-white/60'
+              className={`px-12 py-4 rounded-3xl font-medium transition-all ${
+                mode === 'human' ? 'bg-white shadow text-navy' : 'text-slate-600 hover:bg-white/60'
               }`}
             >
               Human
             </button>
             <button
               onClick={() => setMode('pet')}
-              className={`px-10 py-3.5 rounded-3xl font-medium transition-all ${
-                mode === 'pet' 
-                  ? 'bg-white shadow text-navy' 
-                  : 'text-slate-600 hover:bg-white/60'
+              className={`px-12 py-4 rounded-3xl font-medium transition-all ${
+                mode === 'pet' ? 'bg-white shadow text-navy' : 'text-slate-600 hover:bg-white/60'
               }`}
             >
               Pet (Dogs, Cats, etc.)
@@ -83,13 +80,12 @@ const UploadPage: React.FC = () => {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => document.getElementById('fileInput')?.click()}
-          className={`border-4 border-dashed rounded-3xl p-16 text-center cursor-pointer transition-all
+          className={`border-4 border-dashed rounded-3xl p-20 text-center cursor-pointer transition-all
             ${isDragging ? 'border-teal-500 bg-teal-50' : 'border-slate-300 hover:border-teal-400'}`}
         >
           <div className="mx-auto w-20 h-20 bg-teal-100 rounded-2xl flex items-center justify-center mb-6">
-            <i className="fas fa-cloud-upload-alt text-4xl text-teal-600"></i>
+            <i className="fas fa-cloud-upload-alt text-5xl text-teal-600"></i>
           </div>
-          
           <p className="text-xl font-medium text-navy">
             {selectedFile ? selectedFile.name : "Drop your photo here or click to upload"}
           </p>
@@ -104,12 +100,13 @@ const UploadPage: React.FC = () => {
           />
         </div>
 
-        {/* PARA Guidance */}
         <div className="mt-8 flex justify-center">
-          <p className="text-sm text-center" style={{color:"var(--text-muted)"}}>💡 For best results, make sure the area is well-lit and in focus.</p>
+          <ParaGuide 
+            variant="inline" 
+            message="For best results, make sure the area is well-lit and in focus." 
+          />
         </div>
 
-        {/* Start Analysis Button */}
         <div className="mt-12 flex justify-center">
           <button
             onClick={startAnalysis}
@@ -123,10 +120,6 @@ const UploadPage: React.FC = () => {
             Analyse with PARA
           </button>
         </div>
-
-        <p className="text-center text-xs text-slate-500 mt-6">
-          This is an educational tool only. Not a medical diagnosis.
-        </p>
       </div>
     </div>
   );
