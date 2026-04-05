@@ -3,7 +3,7 @@ import multer from 'multer';
 import { body, param, query, validationResult } from 'express-validator';
 import pool, { withTransaction } from '../config/database';
 import { uploadImage } from '../config/cloudinary';
-import { analyzeImage } from '../services/aiAnalysis';
+import { analyzeImage, UserContext } from '../services/aiAnalysis';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
@@ -31,7 +31,7 @@ const upload = multer({
 router.post(
   '/upload',
   authenticateToken,
-  upload.single('image'),
+  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'enhancedImage', maxCount: 1 }]),
   [
     body('sampleType')
       .optional()
@@ -55,13 +55,19 @@ router.post(
         return;
       }
 
-      if (!req.file) {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+      const originalFile = files?.['image']?.[0];
+      const enhancedFile = files?.['enhancedImage']?.[0];
+      if (!originalFile) {
         res.status(400).json({ error: 'Upload failed', details: { message: 'No image file uploaded' } });
         return;
       }
 
       const userId = req.userId!;
-      const { sampleType, collectionDate, location } = req.body;
+      const { sampleType, collectionDate, location, userContext: userContextRaw } = req.body;
+      const userContext: UserContext | undefined = userContextRaw
+        ? (() => { try { return JSON.parse(userContextRaw); } catch { return undefined; } })()
+        : undefined;
 
       const userResult = await pool.query('SELECT image_credits FROM users WHERE id = $1', [userId]);
 
@@ -81,7 +87,7 @@ router.post(
 
       console.log('📤 Uploading image to Cloudinary...');
 
-      const { url, thumbnailUrl, publicId } = await uploadImage(req.file.buffer, {
+      const { url, thumbnailUrl, publicId } = await uploadImage(originalFile.buffer, {
         folder: `parasitepro/user-${userId}`,
         public_id: `analysis-${Date.now()}`,
       });
@@ -101,7 +107,22 @@ router.post(
       const analysisId = analysisResult.id;
       console.log('🔬 Starting AI analysis for:', analysisId);
 
-      analyzeImage(url, sampleType)
+      // Upload enhanced image to Cloudinary if provided
+      let enhancedUrl: string | undefined;
+      if (enhancedFile) {
+        try {
+          const { url: eUrl } = await uploadImage(enhancedFile.buffer, {
+            folder: `parasitepro/user-${userId}`,
+            public_id: `analysis-${Date.now()}-enhanced`,
+          });
+          enhancedUrl = eUrl;
+          console.log('✅ Enhanced image uploaded:', enhancedUrl);
+        } catch (err) {
+          console.warn('⚠️  Enhanced image upload failed, proceeding with original only:', err);
+        }
+      }
+
+      analyzeImage(url, sampleType, userContext, enhancedUrl)
         .then(async (aiResult) => {
           const { detections, summary, overallAssessment, visualFindings, urgencyLevel, imageQuality,
                   differentialDiagnoses, recommendedActions, healthRisks, treatmentOptions,
