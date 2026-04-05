@@ -19,9 +19,9 @@ const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 // ─── Urgency config ──────────────────────────────────────────────────────────
 const URGENCY_MAP = {
-  emergency: { label: 'Emergency', sublabel: 'Seek emergency care immediately',      bg: '#FEE2E2', color: '#991B1B', border: '#FCA5A5', hBg: '#991B1B', hText: '#fff' },
-  high:      { label: 'Urgent',    sublabel: 'See a doctor within 24-48 hours',      bg: '#FECACA', color: '#B91C1C', border: '#FCA5A5', hBg: '#64748B', hText: '#fff' },
-  moderate:  { label: 'Moderate',  sublabel: 'Seek medical advice within 1-2 weeks', bg: '#FEF3C7', color: '#92400E', border: '#FDE68A', hBg: '#64748B', hText: '#fff' },
+  emergency: { label: 'Seek care now',  sublabel: 'Please seek medical care immediately — call 000 or go to your nearest emergency department. Do not wait.',                                                                                                       bg: '#FEE2E2', color: '#991B1B', border: '#FCA5A5', hBg: '#991B1B', hText: '#fff' },
+  high:      { label: 'See your GP',    sublabel: "Heads up — based on what I'm seeing, I'd encourage you not to wait on this one. Please see a GP or medical professional as soon as you can. I've prepared a summary you can take with you right now.", bg: '#FECACA', color: '#B91C1C', border: '#FCA5A5', hBg: '#64748B', hText: '#fff' },
+  moderate:  { label: 'Moderate',  sublabel: 'Worth seeing your GP within the next 1-2 weeks. I have prepared a summary to take with you.', bg: '#FEF3C7', color: '#92400E', border: '#FDE68A', hBg: '#64748B', hText: '#fff' },
   low:       { label: 'Low Risk',  sublabel: 'Monitor, no immediate action needed',  bg: '#DCFCE7', color: '#166534', border: '#86EFAC', hBg: '#64748B', hText: '#fff' },
 };
 const getUrgency = (level) => URGENCY_MAP[level?.toLowerCase()] || URGENCY_MAP.low;
@@ -77,7 +77,7 @@ const AnnotatedImage = ({ imageUrl, detectionCount = 1 }) => {
 // ─── Disclaimer banner ────────────────────────────────────────────────────────
 const DisclaimerBanner = () => (
   <div className="grid grid-cols-2 gap-3 mb-5">
-    {['This report is not a diagnosis', 'Consult a medical professional for confirmation'].map(text => (
+    {['This assessment is for educational purposes only', 'Consult a medical professional for confirmation'].map(text => (
       <div key={text} className="text-center py-3 px-4 rounded-xl font-bold"
         style={{ border: '2.5px solid rgba(255,255,255,0.7)', color: 'rgba(255,255,255,0.92)',
                  fontSize: '0.85rem', letterSpacing: '0.01em', background: 'rgba(255,255,255,0.05)' }}>
@@ -134,7 +134,7 @@ const ReportCard = ({ analysis }) => {
   const primaryDet = analysis.detections?.[0];
   const confidence = primaryDet ? Math.round(primaryDet.confidenceScore * 100) : null;
   const confColor  = confidence >= 80 ? '#15803d' : confidence >= 55 ? '#b45309' : '#b91c1c';
-  const confLabel  = confidence >= 80 ? 'High' : confidence >= 55 ? 'Moderate' : 'Low';
+  const confLabel  = confidence >= 80 ? 'Strong match' : confidence >= 55 ? 'Moderate confidence' : 'Harder to be certain';
 
   const diffRows = [
     ...(analysis.detections || []).map(d => ({
@@ -199,7 +199,7 @@ const ReportCard = ({ analysis }) => {
               </div>
             </div>
             <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #86EFAC' }}>
-              <div className="px-3 py-1.5 text-center text-xs font-semibold" style={{ background: '#14532D', color: '#86EFAC' }}>Confidence</div>
+              <div className="px-3 py-1.5 text-center text-xs font-semibold" style={{ background: '#14532D', color: '#86EFAC' }}>Match strength</div>
               <div className="px-3 py-4 text-center" style={{ background: '#F0FDF4' }}>
                 <p className="font-display font-bold leading-none" style={{ fontSize: '2rem', color: confColor }}>
                   {confidence !== null ? `${confidence}%` : '—'}
@@ -367,7 +367,7 @@ const AnalysisResultsPage = () => {
     <div style={{ background: '#2E4A52', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="text-center">
         <Loader size={28} className="animate-spin mx-auto mb-3" style={{ color: 'var(--amber)' }} />
-        <p className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>Loading report…</p>
+        <p className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>Fetching your report…</p>
       </div>
     </div>
   );
@@ -376,7 +376,7 @@ const AnalysisResultsPage = () => {
     <div style={{ background: '#2E4A52', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="text-center">
         <AlertTriangle size={28} className="mx-auto mb-3" style={{ color: '#EF4444' }} />
-        <p className="mb-4" style={{ color: 'var(--text-primary)' }}>Analysis not found.</p>
+        <p className="mb-4" style={{ color: 'var(--text-primary)' }}>I couldn't find that report. It may still be processing — try refreshing in a moment.</p>
         <button onClick={() => navigate('/dashboard')} className="pp-btn-ghost">Back to Dashboard</button>
       </div>
     </div>
@@ -395,7 +395,7 @@ const AnalysisResultsPage = () => {
         <h2 className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>Analysing Specimen</h2>
         <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Our AI is examining your image. This takes 10–20 seconds.</p>
         <div className="pp-card p-4 space-y-2 text-left">
-          {['Uploading to secure analysis pipeline…','Applying clinical vision model…','Cross-referencing parasite database…','Generating clinical report…'].map((step, i) => (
+          {['Uploading to PARA…','I\'m examining your image now…','Cross-referencing patterns and organisms…','Pulling your report together…'].map((step, i) => (
             <div key={i} className="flex items-center gap-2 text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
               <Loader size={10} className="animate-spin flex-shrink-0" style={{ color: 'var(--amber)' }} />{step}
             </div>
@@ -455,8 +455,8 @@ const AnalysisResultsPage = () => {
               <FileText size={17} style={{ color: '#5AB89A' }} />
             </div>
             <div>
-              <p className="font-heading font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Take this to your GP</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Print or share a clean clinical report — designed for your doctor, not a diagnosis.</p>
+              <p className="font-heading font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Your GP report is ready</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>This summarises everything I found in a format your doctor can actually use. Bring it to your next appointment — it gives them a head start.</p>
             </div>
           </div>
 
@@ -662,9 +662,9 @@ const AnalysisResultsPage = () => {
           <div className="pp-card p-5 flex items-center justify-between" style={{ border: '1px solid rgba(217,119,6,0.2)', background: 'rgba(217,119,6,0.04)' }}>
             <div>
               <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Track your progress</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Log symptoms, track treatment, generate a doctor report.</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Want to track how you\'re feeling over the next few days? Takes 30 seconds and gives your GP more to work with.</p>
             </div>
-            <button onClick={() => setJournal(true)} className="pp-btn-primary ml-4 flex-shrink-0" style={{ padding: '9px 16px', fontSize: '13px' }}>Start Journal</button>
+            <button onClick={() => setJournal(true)} className="pp-btn-primary ml-4 flex-shrink-0" style={{ padding: '9px 16px', fontSize: '13px' }}>Start tracking</button>
           </div>
 
           {/* Final disclaimer */}
@@ -701,7 +701,7 @@ const AnalysisResultsPage = () => {
             {/* Steps */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '1.5rem' }}>
               {[
-                { n: '1', title: 'Download your PDF report', desc: 'Click "Download PDF for GP" to save the clinical report to your device.' },
+                { n: '1', title: 'Download your PDF', desc: 'Hit "Download PDF for GP" below — your report will save to your device, ready to share.' },
                 { n: '2', title: 'Log into My Health Record', desc: 'Visit myhr.gov.au or open the My Health Record app and sign in with myGov.' },
                 { n: '3', title: 'Upload the document', desc: 'Go to Documents → Upload a document → select the PDF you downloaded.' },
                 { n: '4', title: 'Share access with your GP', desc: 'Your GP can now view the report at your next appointment.' },

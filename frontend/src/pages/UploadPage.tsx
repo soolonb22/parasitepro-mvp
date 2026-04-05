@@ -3,6 +3,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import AnalysingScreen from '../components/AnalysingScreen';
+import { PARA } from '../utils/para-copy';
 
 const API_URL = (() => {
   const b = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -142,11 +143,27 @@ interface FormState {
   q9_notes: string;
 }
 
-const INIT: FormState = {
-  q1_sampleType: '', q2_location: '', q2_locationOther: '',
-  q3_duration: '', q4_subject: '', q5_travel: [],
-  q6_symptoms: [], q6_symptomsOther: '', q7_captureMethod: '', q8_size: '', q9_notes: '',
-};
+const STORAGE_KEY = 'para_onboarding_form';
+
+function loadForm(): FormState {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {
+    q1_sampleType: '', q2_location: '', q2_locationOther: '',
+    q3_duration: '', q4_subject: '', q5_travel: [],
+    q6_symptoms: [], q6_symptomsOther: '', q7_captureMethod: '', q8_size: '', q9_notes: '',
+  };
+}
+
+function saveForm(f: FormState) {
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(f)); } catch {}
+}
+
+function clearForm() {
+  try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+}
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 const PillBtn: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
@@ -196,8 +213,11 @@ export default function UploadPage() {
   const [enhancedFile, setEnhancedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [enhancedPreviewUrl, setEnhancedPreviewUrl] = useState('');
-  const [form, setForm] = useState<FormState>(INIT);
+  const [form, setForm] = useState<FormState>(loadForm);
   const [error, setError] = useState('');
+
+  // Persist form to sessionStorage on every change
+  React.useEffect(() => { saveForm(form); }, [form]);
 
   // ── File handling ─────────────────────────────────────────────────────────
   const handleFile = useCallback(async (file: File) => {
@@ -271,6 +291,7 @@ export default function UploadPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
+      clearForm();
       navigate(`/analysis/${data.analysisId}`);
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -575,7 +596,7 @@ export default function UploadPage() {
 
           {/* Actions */}
           <div className="flex items-center gap-3 pb-12">
-            <button onClick={() => { setStep('drop'); setForm(INIT); }}
+            <button onClick={() => { setStep('drop'); const blank: FormState = { q1_sampleType: '', q2_location: '', q2_locationOther: '', q3_duration: '', q4_subject: '', q5_travel: [], q6_symptoms: [], q6_symptomsOther: '', q7_captureMethod: '', q8_size: '', q9_notes: '' }; setForm(blank); clearForm(); }}
               className="px-5 py-4 rounded-2xl text-sm font-medium transition-all"
               style={{ background: 'var(--bg-surface)', color: 'var(--text-muted)', border: '1px solid var(--bg-border)' }}>
               ← Change photo

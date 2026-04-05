@@ -1,75 +1,162 @@
 // src/pages/DashboardPage.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
+import axios from 'axios';
+import { PARA } from '../utils/para-copy';
+
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
+
+const URGENCY_STYLES: Record<string, { bg: string; color: string; label: string }> = {
+  low:       { bg: '#D1FAE5', color: '#065F46', label: 'Low risk' },
+  moderate:  { bg: '#FEF3C7', color: '#92400E', label: 'Moderate' },
+  high:      { bg: '#FEE2E2', color: '#991B1B', label: 'See GP' },
+  emergency: { bg: '#FEE2E2', color: '#7F1D1D', label: 'Urgent' },
+};
 
 const DashboardPage: React.FC = () => {
-  const recentAnalyses = [
-    { id: 1, type: "Human - Stool", date: "2 days ago", result: "Moderate" },
-    { id: 2, type: "Pet - Cat", date: "1 week ago", result: "Low" },
-    { id: 3, type: "Human - Skin", date: "3 weeks ago", result: "Low" },
-  ];
+  const navigate = useNavigate();
+  const { user, accessToken } = useAuthStore();
+  const [analyses, setAnalyses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    axios.get(`${API_URL}/analysis`, { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then(r => setAnalyses(r.data.analyses || []))
+      .catch(() => setAnalyses([]))
+      .finally(() => setLoading(false));
+  }, [accessToken]);
+
+  const credits = user?.imageCredits ?? 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <div className="flex justify-between items-center mb-12">
-        <div>
-          <h1 className="text-4xl font-semibold text-navy">Welcome back</h1>
-          <p className="text-slate-600 mt-2">Here's what PARA found in your recent analyses</p>
-        </div>
-      </div>
+    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+      <div className="max-w-5xl mx-auto px-6 py-12">
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Credits Card */}
-        <div className="bg-white rounded-3xl p-8 border border-teal-200">
-          <div className="flex justify-between">
-            <div>
-              <p className="text-sm text-slate-500">Remaining Credits</p>
-              <p className="text-6xl font-bold text-teal-600 mt-2">12</p>
-            </div>
-            <div className="text-6xl">🪙</div>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+          <div>
+            <h1 className="font-display font-bold text-3xl" style={{ color: 'var(--text-primary)' }}>
+              {user?.firstName ? `Hey ${user.firstName}!` : 'Welcome back!'}
+            </h1>
+            <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+              {analyses.length > 0 ? PARA.dashboard.welcomeSub : 'Ready when you are.'}
+            </p>
           </div>
-          <button className="mt-8 w-full py-4 bg-teal-600 text-white rounded-2xl font-medium">
-            Buy More Credits
+          <button
+            onClick={() => navigate('/upload')}
+            className="px-6 py-3 rounded-xl font-display font-bold text-sm flex items-center gap-2 transition-all"
+            style={{ background: 'var(--amber)', color: '#000' }}>
+            🔬 New analysis
           </button>
         </div>
 
-        {/* Recent Analyses */}
-        <div className="md:col-span-2 bg-white rounded-3xl p-8">
-          <h3 className="font-semibold text-navy mb-6">Recent Analyses</h3>
-          
-          <div className="space-y-6">
-            {recentAnalyses.map((analysis) => (
-              <div key={analysis.id} className="flex items-center justify-between border-b pb-6 last:border-none last:pb-0">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-2xl">
-                    📸
-                  </div>
-                  <div>
-                    <p className="font-medium">{analysis.type}</p>
-                    <p className="text-sm text-slate-500">{analysis.date}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className={`inline-block px-4 py-1 rounded-full text-sm font-medium
-                    ${analysis.result === 'Low' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
-                    {analysis.result}
-                  </span>
-                </div>
+        <div className="grid md:grid-cols-3 gap-6">
+
+          {/* Credits card */}
+          <div className="rounded-2xl p-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--text-muted)' }}>
+              Credits remaining
+            </p>
+            <p className="font-display font-bold text-5xl mb-1" style={{ color: 'var(--amber-bright)' }}>
+              {credits}
+            </p>
+            <p className="text-xs mb-5" style={{ color: 'var(--text-muted)' }}>
+              {credits === 0
+                ? "You've used them all! Top up to keep going."
+                : credits === 1
+                ? 'One left — make it count!'
+                : 'Each credit = one full deep analysis'}
+            </p>
+            <button
+              onClick={() => navigate('/pricing')}
+              className="w-full py-3 rounded-xl font-medium text-sm transition-all"
+              style={{ background: 'rgba(217,119,6,0.12)', color: 'var(--amber-bright)', border: '1px solid rgba(217,119,6,0.3)' }}>
+              Get more credits
+            </button>
+          </div>
+
+          {/* Recent analyses */}
+          <div className="md:col-span-2 rounded-2xl p-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
+            <h3 className="font-display font-semibold text-base mb-5" style={{ color: 'var(--text-primary)' }}>
+              Recent analyses
+            </h3>
+
+            {loading ? (
+              <div className="space-y-3">
+                {[1,2,3].map(i => (
+                  <div key={i} className="h-14 rounded-xl animate-pulse" style={{ background: 'var(--bg-elevated)' }} />
+                ))}
               </div>
-            ))}
+            ) : analyses.length === 0 ? (
+              /* ── Empty state ── */
+              <div className="text-center py-10">
+                <div className="text-4xl mb-3">🔬</div>
+                <p className="font-display font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
+                  {PARA.dashboard.emptyHead}
+                </p>
+                <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+                  {PARA.dashboard.emptySub}
+                </p>
+                <button
+                  onClick={() => navigate('/upload')}
+                  className="px-8 py-3 rounded-xl font-bold text-sm transition-all"
+                  style={{ background: 'var(--amber)', color: '#000' }}>
+                  {PARA.dashboard.emptyCta}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {analyses.map((a: any) => {
+                  const u = URGENCY_STYLES[a.urgencyLevel] || URGENCY_STYLES.low;
+                  return (
+                    <button
+                      key={a.id}
+                      onClick={() => navigate(`/analysis/${a.id}`)}
+                      className="w-full flex items-center gap-4 p-3 rounded-xl transition-all text-left"
+                      style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 text-lg"
+                        style={{ background: 'var(--bg-base)' }}>
+                        📸
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                          {a.sampleType ? a.sampleType.charAt(0).toUpperCase() + a.sampleType.slice(1) + ' sample' : 'Sample analysis'}
+                        </p>
+                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                          {new Date(a.uploadedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {a.status === 'processing' ? ' · Processing…' : ''}
+                        </p>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0"
+                        style={{ background: u.bg, color: u.color }}>
+                        {u.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-
-          <button className="mt-10 w-full py-5 border-2 border-navy text-navy rounded-3xl font-medium hover:bg-navy hover:text-white transition">
-            View All Analyses
-          </button>
         </div>
-      </div>
 
-      {/* Quick New Analysis */}
-      <div className="mt-16 bg-white rounded-3xl p-10 text-center">
-        <p className="text-lg font-medium mb-2" style={{color:"var(--text-secondary)"}}>Ready for another check?</p>
-        <button className="mt-8 bg-teal-600 text-white px-16 py-6 rounded-3xl text-xl font-semibold hover:bg-teal-700 transition">
-          Start New Analysis
-        </button>
+        {/* Quick links */}
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { icon: '📚', label: 'Encyclopedia', path: '/encyclopedia' },
+            { icon: '🗺️', label: 'Travel risk map', path: '/travel-risk' },
+            { icon: '📓', label: 'Symptom journal', path: '/symptom-journal' },
+            { icon: '🎯', label: 'Sample report', path: '/sample-report' },
+          ].map(({ icon, label, path }) => (
+            <button key={path} onClick={() => navigate(path)}
+              className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all"
+              style={{ background: 'var(--bg-surface)', color: 'var(--text-secondary)', border: '1px solid var(--bg-border)' }}>
+              <span>{icon}</span>{label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

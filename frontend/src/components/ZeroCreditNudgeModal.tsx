@@ -14,14 +14,14 @@ const BUNDLES = [
 
 const COPY = {
   results: {
-    hook: "Your report's ready. Your credits aren't.",
-    sub: "That analysis just showed you what's worth investigating. Don't stop now — check the rest of the family.",
+    hook: "You've used up your free analysis!",
+    sub: "Ready to keep going? A pack of credits gets you back in action in under a minute - and honestly, now that we've started, you'll want the full picture.",
     proofLabel: 'Analysis just completed',
     proofSub:   'Your educational report is ready to review',
   },
   upload: {
-    hook: "You're out of credits.",
-    sub: "You came back — that means the first report was worth it. Top up and keep going.",
+    hook: "You're out of credits!",
+    sub: "You came back - which means the first report was worth it. Top up and let's keep going. You're asking the right questions.",
     proofLabel: 'Previous analysis on file',
     proofSub:   'Your report history is saved and waiting',
   },
@@ -165,7 +165,7 @@ const ZeroCreditNudgeModal = ({ isOpen, onClose, context = 'results', accessToke
               cursor:loading?'not-allowed':'pointer',transition:'background .15s',marginBottom:7,
             }}
           >
-            {loading ? 'Redirecting to checkout…' : `Get ${selectedBundle?.credits} credits — ${selectedBundle?.price}`}
+            {loading ? 'Taking you to checkout...' : `Get ${selectedBundle?.credits} credits - ${selectedBundle?.price}`}
           </button>
           <button
             onClick={onClose}
