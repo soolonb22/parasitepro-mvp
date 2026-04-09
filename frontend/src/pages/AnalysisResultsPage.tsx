@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Loader, AlertTriangle, CheckCircle, AlertCircle,
@@ -13,6 +13,7 @@ import JournalPromptModal from '../components/JournalPromptModal';
 import DeepDiveModal from '../components/DeepDiveModal';
 import ParasiteBot from '../components/ParasiteBot';
 import ParasiteProfile from '../components/ParasiteProfile';
+import PostAnalysisUpsell from '../components/PostAnalysisUpsell';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -329,6 +330,8 @@ const AnalysisResultsPage = () => {
   const [showDeepDive, setDeepDive]     = useState(false);
   const [userCredits, setUserCredits]   = useState(0);
   const [showMHR, setShowMHR]           = useState(false);
+  const [showUpsell, setShowUpsell]     = useState(false);
+  const upsellShown                     = useRef(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -341,6 +344,15 @@ const AnalysisResultsPage = () => {
       const t = setTimeout(() => { setJournal(true); setJournalShown(true); }, 3000); return () => clearTimeout(t);
     }
   }, [analysis?.status]);
+
+  // Show the upsell once, 6s after completion, only when the user has no credits left.
+  useEffect(() => {
+    if (!analysis || analysis.status !== 'completed' || upsellShown.current) return;
+    if (userCredits > 0) return;
+    upsellShown.current = true;
+    const t = setTimeout(() => setShowUpsell(true), 6000);
+    return () => clearTimeout(t);
+  }, [analysis?.status, userCredits]);
 
   const fetchAnalysis = async () => {
     try {
@@ -749,6 +761,7 @@ const AnalysisResultsPage = () => {
       {showJournalPrompt && (
         <JournalPromptModal isOpen={showJournalPrompt} analysisId={id} detections={analysis.detections} onClose={() => setJournal(false)} />
       )}
+      {showUpsell && <PostAnalysisUpsell onClose={() => setShowUpsell(false)} />}
       <ParasiteBot />
     </div>
   );
