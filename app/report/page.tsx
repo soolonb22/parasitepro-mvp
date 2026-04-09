@@ -1,4 +1,5 @@
-// app/report/page.tsx
+// app/report/page.tsx  ← Replace your entire file with this
+
 import { Suspense } from 'react';
 
 interface ReportData {
@@ -9,10 +10,8 @@ interface ReportData {
 }
 
 export default function ReportPage({ searchParams }: { searchParams: Promise<{ data?: string }> }) {
-  // Next.js App Router best practice: await searchParams
   const params = await searchParams;
   let report: ReportData | null = null;
-
   if (params.data) {
     try {
       report = JSON.parse(decodeURIComponent(params.data));
@@ -21,7 +20,6 @@ export default function ReportPage({ searchParams }: { searchParams: Promise<{ d
     }
   }
 
-  // Default fallback for testing
   if (!report) {
     report = {
       text: "PARA analysed the visual patterns in your photo. Common textures or shapes were noted that may be worth mentioning to your GP for further checks. This is educational information only to help you prepare for your appointment.",
@@ -30,7 +28,7 @@ export default function ReportPage({ searchParams }: { searchParams: Promise<{ d
     };
   }
 
-  const urgencyColor = 
+  const urgencyColor =
     report.urgency === 'Low' ? 'text-green-500' :
     report.urgency === 'Moderate' ? 'text-orange-500' : 'text-red-500';
 
@@ -42,7 +40,7 @@ export default function ReportPage({ searchParams }: { searchParams: Promise<{ d
       </div>
 
       <div className="bg-white text-black rounded-3xl p-8 shadow-xl">
-        {/* PARA Mascot greeting - match your mockup */}
+        {/* PARA Mascot */}
         <div className="flex items-center gap-4 mb-8 bg-teal-50 p-4 rounded-2xl">
           <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-4xl">🧠</div>
           <div>
@@ -51,7 +49,7 @@ export default function ReportPage({ searchParams }: { searchParams: Promise<{ d
           </div>
         </div>
 
-        {/* Urgency flag - colour-coded like your mockup */}
+        {/* Urgency */}
         <div className={`text-6xl font-bold mb-6 ${urgencyColor}`}>
           {report.urgency}
         </div>
@@ -64,27 +62,43 @@ export default function ReportPage({ searchParams }: { searchParams: Promise<{ d
         <div className="bg-teal-50 border border-teal-200 p-6 rounded-2xl mb-8">
           <h3 className="font-semibold text-xl mb-3">What to tell your GP (copy & paste)</h3>
           <p className="text-sm text-gray-700 mb-4">
-            “I used an educational AI tool called Parasite Pro to look at a photo. It noted [briefly describe what PARA said]. I’d like to discuss this with you.”
+            “I used an educational AI tool called Parasite Pro to look at a photo. It noted {report.text.substring(0, 120)}... I’d like to discuss this with you.”
           </p>
-          <button 
-            onClick={() => navigator.clipboard.writeText(`I used Parasite Pro educational tool...`)}
+          <button
+            onClick={() => navigator.clipboard.writeText(`I used Parasite Pro educational tool. It noted ${report.text.substring(0, 150)}...`)}
             className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-xl w-full"
           >
             Copy script to clipboard
           </button>
         </div>
 
-        {/* Action buttons - match homepage style */}
+        {/* NEW: Helpful next steps – retention & monetisation hooks */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <a href="/tips" 
+             className="block bg-emerald-50 hover:bg-emerald-100 p-6 rounded-3xl text-center transition text-black">
+            📚 Free QLD Tips Library
+          </a>
+          <a href="/refer" 
+             className="block bg-emerald-50 hover:bg-emerald-100 p-6 rounded-3xl text-center transition text-black">
+            🤝 Refer a Mate – Get Free Credit
+          </a>
+          <a href="/subscribe" 
+             className="block bg-emerald-50 hover:bg-emerald-100 p-6 rounded-3xl text-center transition text-black">
+            🔄 $6/mo – Unlimited History + Tips
+          </a>
+        </div>
+
+        {/* Action buttons */}
         <div className="space-y-4">
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl w-full text-lg font-medium">
             Export to My Health Record
           </button>
           
-          <button 
-            onClick={() => alert('Save feature coming soon — we’ll connect this to accounts next')}
+          <button
+            onClick={() => alert('Save feature coming soon — connect to Supabase accounts next')}
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl w-full text-lg font-medium"
           >
-            Save this report to my free account
+            💾 Save this report to my account
           </button>
 
           <button className="bg-black border border-white text-white px-8 py-4 rounded-2xl w-full text-lg font-medium">
@@ -93,11 +107,13 @@ export default function ReportPage({ searchParams }: { searchParams: Promise<{ d
         </div>
       </div>
 
-      {/* Strong disclaimer footer - required for TGA/AHPRA compliance */}
+      {/* Strong TGA/AHPRA disclaimer – kept exactly as you had it, plus extra line for new features */}
       <div className="mt-12 text-center text-xs text-gray-400 leading-relaxed">
         <p className="font-medium">Educational tool only — not a medical diagnosis</p>
-        <p>ParasitePro provides structured educational reports based on visual patterns to help you prepare for GP visits. It does not provide medical diagnoses, prescribe treatments, or replace professional medical advice.</p>
-        <p className="mt-2">Complies with TGA Software as a Medical Device guidelines and AHPRA advertising standards. Built in Australia • Privacy First.</p>
+        <p>ParasitePro provides structured educational reports based on visual patterns to help you prepare for GP visits. 
+           It does not provide medical diagnoses, prescribe treatments, or replace professional medical advice.</p>
+        <p className="mt-2">Complies with TGA Software as a Medical Device guidelines and AHPRA advertising standards. 
+           Built in Australia • Privacy First.</p>
         <p className="mt-4">If you feel unwell, call 000 immediately.</p>
       </div>
     </div>
