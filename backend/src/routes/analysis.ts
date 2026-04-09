@@ -275,7 +275,7 @@ router.get(
       const status = req.query.status as string | undefined;
       const sampleType = req.query.sampleType as string | undefined;
 
-      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
+      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, a.urgency_level, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
       const queryParams: any[] = [userId];
       let paramIndex = 2;
 
@@ -301,7 +301,7 @@ router.get(
         analyses: analysesResult.rows.map((a) => ({
           id: a.id, thumbnailUrl: a.thumbnail_url, status: a.status, sampleType: a.sample_type,
           uploadedAt: a.uploaded_at, processingCompletedAt: a.processing_completed_at,
-          detectionCount: parseInt(a.detection_count),
+          urgencyLevel: a.urgency_level, detectionCount: parseInt(a.detection_count),
         })),
         total, limit, offset,
       });

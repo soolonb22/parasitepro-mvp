@@ -23,7 +23,7 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (!accessToken) return;
-    axios.get(`${API_URL}/analysis`, { headers: { Authorization: `Bearer ${accessToken}` } })
+    axios.get(`${API_URL}/analysis/user/history?limit=20`, { headers: { Authorization: `Bearer ${accessToken}` } })
       .then(r => setAnalyses(r.data.analyses || []))
       .catch(() => setAnalyses([]))
       .finally(() => setLoading(false));
@@ -111,29 +111,50 @@ const DashboardPage: React.FC = () => {
               <div className="space-y-3">
                 {analyses.map((a: any) => {
                   const u = URGENCY_STYLES[a.urgencyLevel] || URGENCY_STYLES.low;
+                  const sampleLabel = a.sampleType
+                    ? a.sampleType.charAt(0).toUpperCase() + a.sampleType.slice(1) + ' sample'
+                    : 'Sample analysis';
                   return (
                     <button
                       key={a.id}
                       onClick={() => navigate(`/analysis/${a.id}`)}
-                      className="w-full flex items-center gap-4 p-3 rounded-xl transition-all text-left"
+                      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
                       style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 text-lg"
-                        style={{ background: 'var(--bg-base)' }}>
-                        📸
+
+                      {/* Thumbnail */}
+                      <div className="w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden"
+                        style={{ background: 'var(--bg-base)', border: '1px solid var(--bg-border)' }}>
+                        {a.thumbnailUrl
+                          ? <img src={a.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                          : <span className="w-full h-full flex items-center justify-center text-xl">🔬</span>
+                        }
                       </div>
+
+                      {/* Text */}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-                          {a.sampleType ? a.sampleType.charAt(0).toUpperCase() + a.sampleType.slice(1) + ' sample' : 'Sample analysis'}
+                          {sampleLabel}
                         </p>
                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                           {new Date(a.uploadedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          {a.status === 'processing' ? ' · Processing…' : ''}
+                          {a.status === 'processing' && ' · Processing…'}
+                          {a.detectionCount > 0 && ` · ${a.detectionCount} region${a.detectionCount !== 1 ? 's' : ''} flagged`}
                         </p>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0"
-                        style={{ background: u.bg, color: u.color }}>
-                        {u.label}
-                      </span>
+
+                      {/* Urgency badge */}
+                      {a.status === 'completed' && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0"
+                          style={{ background: u.bg, color: u.color }}>
+                          {u.label}
+                        </span>
+                      )}
+                      {a.status === 'processing' && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0"
+                          style={{ background: 'rgba(217,119,6,0.12)', color: 'var(--amber-bright)' }}>
+                          Processing
+                        </span>
+                      )}
                     </button>
                   );
                 })}
