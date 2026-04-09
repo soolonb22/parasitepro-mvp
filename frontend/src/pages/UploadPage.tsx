@@ -1,5 +1,5 @@
 // UploadPage.tsx — Deep Assessment with Canvas Preprocessing + Full Onboarding Form
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import AnalysingScreen from '../components/AnalysingScreen';
@@ -216,6 +216,48 @@ export default function UploadPage() {
   const [form, setForm] = useState<FormState>(loadForm);
   const [error, setError] = useState('');
 
+  // ── Photo quality feedback ─────────────────────────────────────────────────
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [dropPreviewUrl, setDropPreviewUrl] = useState('');
+  const [qualityFeedback, setQualityFeedback] = useState<{ message: string; status: 'good' | 'warn' } | null>(null);
+  const dropPreviewRef = useRef('');
+
+  useEffect(() => {
+    return () => { if (dropPreviewRef.current) URL.revokeObjectURL(dropPreviewRef.current); };
+  }, []);
+
+  const analyzeQuality = useCallback((img: HTMLImageElement): { message: string; status: 'good' | 'warn' } => {
+    const canvas = document.createElement('canvas');
+    const sampleW = Math.min(img.naturalWidth, 300);
+    const sampleH = Math.min(img.naturalHeight, 300);
+    canvas.width = sampleW; canvas.height = sampleH;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0, sampleW, sampleH);
+    const d = ctx.getImageData(0, 0, sampleW, sampleH).data;
+    let brightness = 0;
+    for (let i = 0; i < d.length; i += 4)
+      brightness += d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+    brightness = (brightness / (d.length / 4)) / 255 * 100;
+
+    if (img.naturalWidth < 800 || img.naturalHeight < 600)
+      return { message: '⚠️ Low resolution — try a closer, clearer shot for best results.', status: 'warn' };
+    if (brightness < 30)
+      return { message: '🔦 Too dark — better lighting or flash will improve accuracy.', status: 'warn' };
+    return { message: '✅ Great photo — good lighting and resolution.', status: 'good' };
+  }, []);
+
+  const handleFileSelect = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) { setError('Please upload an image file (JPG or PNG).'); return; }
+    setError('');
+    if (dropPreviewRef.current) URL.revokeObjectURL(dropPreviewRef.current);
+    const url = URL.createObjectURL(file);
+    dropPreviewRef.current = url;
+    const img = new Image();
+    img.onload = () => { setPendingFile(file); setDropPreviewUrl(url); setQualityFeedback(analyzeQuality(img)); };
+    img.onerror = () => { setPendingFile(file); setDropPreviewUrl(url); setQualityFeedback(null); };
+    img.src = url;
+  }, [analyzeQuality]);
+
   // Persist form to sessionStorage on every change
   React.useEffect(() => { saveForm(form); }, [form]);
 
@@ -240,7 +282,7 @@ export default function UploadPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault(); setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
+    if (file) handleFileSelect(file);
   };
 
   const toggleMulti = (key: 'q5_travel' | 'q6_symptoms', val: string) =>
@@ -333,26 +375,79 @@ export default function UploadPage() {
           )}
         </div>
 
-        <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className="rounded-3xl border-2 border-dashed p-16 text-center cursor-pointer transition-all"
-          style={{
-            borderColor: isDragging ? 'var(--amber)' : 'var(--bg-border)',
-            background: isDragging ? 'rgba(217,119,6,0.05)' : 'var(--bg-surface)',
-          }}>
-          <div className="text-5xl mb-4">📷</div>
-          <p className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>
-            Drop your photo here, or click to browse
-          </p>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            JPG or PNG · up to 10MB · well-lit close-ups work best
-          </p>
-          <input ref={fileInputRef} type="file" accept="image/jpeg,image/png" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
-        </div>
+        {/* Hidden file input — capture="environment" opens rear camera on mobile */}
+        <input ref={fileInputRef} type="file" accept="image/jpeg,image/png" capture="environment" className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); e.target.value = ''; }} />
+
+        {pendingFile ? (
+          /* ── Preview + quality feedback ─────────────────────────────────── */
+          <div className="rounded-3xl overflow-hidden" style={{ border: '1px solid var(--bg-border)', background: 'var(--bg-surface)' }}>
+            <div className="relative">
+              <img src={dropPreviewUrl} alt="Your photo"
+                className="w-full object-cover" style={{ maxHeight: 320 }} />
+              <button
+                onClick={() => { setPendingFile(null); setDropPreviewUrl(''); setQualityFeedback(null); fileInputRef.current?.click(); }}
+                className="absolute top-3 right-3 text-xs font-semibold px-3 py-1.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.55)', color: '#fff', backdropFilter: 'blur(4px)' }}>
+                Change photo
+              </button>
+            </div>
+
+            {/* Quality feedback banner */}
+            {qualityFeedback && (
+              <div className="px-5 py-3 text-sm font-medium"
+                style={{
+                  background: qualityFeedback.status === 'good' ? 'rgba(16,185,129,0.1)' : 'rgba(217,119,6,0.1)',
+                  color: qualityFeedback.status === 'good' ? '#10B981' : 'var(--amber-bright)',
+                  borderTop: `1px solid ${qualityFeedback.status === 'good' ? 'rgba(16,185,129,0.25)' : 'rgba(217,119,6,0.25)'}`,
+                }}>
+                {qualityFeedback.message}
+              </div>
+            )}
+
+            {/* Good / bad examples hint */}
+            <div className="px-5 pb-4 pt-3 grid grid-cols-2 gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
+              <span>✅ Bright, in-focus, full sample visible</span>
+              <span>❌ Dark, blurry, or extreme close-up</span>
+            </div>
+
+            {/* Action buttons */}
+            <div className="px-5 pb-5 flex gap-3">
+              <button
+                onClick={() => { setPendingFile(null); setDropPreviewUrl(''); setQualityFeedback(null); }}
+                className="px-5 py-3 rounded-2xl text-sm font-medium transition-all"
+                style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--bg-border)' }}>
+                ← Try again
+              </button>
+              <button
+                onClick={() => { if (pendingFile) handleFile(pendingFile); }}
+                className="flex-1 py-3 rounded-2xl font-display font-bold text-base transition-all"
+                style={{ background: 'var(--amber)', color: '#000' }}>
+                {qualityFeedback?.status === 'warn' ? 'Continue anyway →' : 'Looks good, continue →'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* ── Default drop zone ───────────────────────────────────────────── */
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-3xl border-2 border-dashed p-16 text-center cursor-pointer transition-all"
+            style={{
+              borderColor: isDragging ? 'var(--amber)' : 'var(--bg-border)',
+              background: isDragging ? 'rgba(217,119,6,0.05)' : 'var(--bg-surface)',
+            }}>
+            <div className="text-5xl mb-4">📷</div>
+            <p className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>
+              Take a photo or upload from gallery
+            </p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              JPG or PNG · up to 10MB · well-lit close-ups work best
+            </p>
+          </div>
+        )}
 
         {error && (
           <p className="mt-4 text-sm text-center rounded-xl p-3"
@@ -361,20 +456,22 @@ export default function UploadPage() {
           </p>
         )}
 
-        <div className="mt-8 grid grid-cols-3 gap-3">
-          {[
-            { icon: '✨', label: 'Auto-enhanced', detail: 'Sharpened + colour corrected before analysis' },
-            { icon: '🧠', label: 'Deep AI', detail: 'Claude Vision examines every pixel' },
-            { icon: '📋', label: 'GP-ready report', detail: 'Findings formatted for your doctor' },
-          ].map(({ icon, label, detail }) => (
-            <div key={label} className="rounded-2xl p-4 text-center"
-              style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
-              <div className="text-2xl mb-1">{icon}</div>
-              <p className="text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{label}</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{detail}</p>
-            </div>
-          ))}
-        </div>
+        {!pendingFile && (
+          <div className="mt-8 grid grid-cols-3 gap-3">
+            {[
+              { icon: '✨', label: 'Auto-enhanced', detail: 'Sharpened + colour corrected before analysis' },
+              { icon: '🧠', label: 'Deep AI', detail: 'Claude Vision examines every pixel' },
+              { icon: '📋', label: 'GP-ready report', detail: 'Findings formatted for your doctor' },
+            ].map(({ icon, label, detail }) => (
+              <div key={label} className="rounded-2xl p-4 text-center"
+                style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
+                <div className="text-2xl mb-1">{icon}</div>
+                <p className="text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{label}</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{detail}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         <p className="mt-8 text-xs text-center" style={{ color: 'var(--text-muted)' }}>
           ⚠️ Educational tool only · Not a medical diagnosis · Always consult a GP for health concerns
