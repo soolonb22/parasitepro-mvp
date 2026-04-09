@@ -256,7 +256,7 @@ router.post('/reset-password', async (req: Request, res: Response): Promise<void
 router.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const result = await query(
-      'SELECT id, email, first_name, last_name, image_credits, is_admin FROM users WHERE id = $1',
+      'SELECT id, email, first_name, last_name, image_credits, is_admin, subscription_status FROM users WHERE id = $1',
       [req.userId]
     );
     if (result.rows.length === 0) { res.status(404).json({ error: 'User not found' }); return; }
@@ -268,6 +268,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Pr
       lastName: u.last_name,
       imageCredits: u.image_credits,
       isAdmin: u.is_admin,
+      subscriptionStatus: u.subscription_status || 'free',
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch profile' });
