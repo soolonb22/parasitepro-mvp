@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import SEO from '../components/SEO';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import axios from 'axios';
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 const SignupPage = () => {
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -23,6 +24,13 @@ const SignupPage = () => {
   const [sessionId] = useState(() => `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`);
   const { signup } = useAuth();
   const navigate = useNavigate();
+
+  // Read ?ref= from URL (referral link) and persist in sessionStorage
+  const refCode = searchParams.get('ref') || sessionStorage.getItem('referral_code') || '';
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) sessionStorage.setItem('referral_code', ref);
+  }, [searchParams]);
 
   useEffect(() => {
     axios.post('/api/auth/track-funnel', { step: 'page_view', sessionId }).catch(() => {});
@@ -77,14 +85,16 @@ const SignupPage = () => {
       const recaptchaToken = await getRecaptchaToken();
       
       const result = await signup(
-        formData.email, 
-        formData.password, 
-        formData.firstName, 
-        formData.lastName, 
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName,
         formData.promoCode,
+        refCode || undefined,
         recaptchaToken,
         sessionId
       );
+      if (refCode) sessionStorage.removeItem('referral_code');
       
       if (result?.requiresVerification) {
         setShowVerificationMessage(true);

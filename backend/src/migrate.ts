@@ -113,6 +113,21 @@ export async function runMigrations(): Promise<void> {
       -- One-time: grant 20 test credits to admin account
       UPDATE users SET image_credits = 20
       WHERE email = 'importantalerts26@gmail.com' AND image_credits = 0;
+
+      -- Referral system
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code VARCHAR(8) UNIQUE;
+
+      CREATE TABLE IF NOT EXISTS referrals (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        referrer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        referred_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'converted')),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        converted_at TIMESTAMPTZ,
+        UNIQUE(referred_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_id);
+      CREATE INDEX IF NOT EXISTS idx_referrals_referred ON referrals(referred_id);
     `);
 
     console.log('✅ Database migrations complete');

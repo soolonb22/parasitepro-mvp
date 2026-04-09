@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 import { PARA } from '../utils/para-copy';
+import ReferralSection from '../components/ReferralSection';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -20,6 +21,7 @@ const DashboardPage: React.FC = () => {
   const { user, accessToken } = useAuthStore();
   const [analyses, setAnalyses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [referral, setReferral] = useState<{ referralCode?: string; referralCount: number; creditsEarned: number } | null>(null);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -27,6 +29,9 @@ const DashboardPage: React.FC = () => {
       .then(r => setAnalyses(r.data.analyses || []))
       .catch(() => setAnalyses([]))
       .finally(() => setLoading(false));
+    axios.get(`${API_URL}/auth/referral`, { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then(r => setReferral(r.data))
+      .catch(() => {});
   }, [accessToken]);
 
   const credits = user?.imageCredits ?? 0;
@@ -162,6 +167,18 @@ const DashboardPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Referral */}
+        {user && referral && (
+          <div className="mt-6">
+            <ReferralSection
+              userId={user.id}
+              referralCode={referral.referralCode}
+              referralCount={referral.referralCount}
+              creditsEarned={referral.creditsEarned}
+            />
+          </div>
+        )}
 
         {/* Quick links */}
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">

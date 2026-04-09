@@ -151,6 +151,34 @@ router.post(
             );
           });
           console.log('✅ Analysis saved to database:', analysisId);
+
+          // ── Referral credit: grant 1 credit each on first completed analysis ──
+          try {
+            const firstCheck = await pool.query(
+              `SELECT COUNT(*) FROM analyses WHERE user_id = $1 AND status = 'completed'`,
+              [userId]
+            );
+            if (parseInt(firstCheck.rows[0].count) === 1) {
+              const referral = await pool.query(
+                `SELECT id, referrer_id FROM referrals WHERE referred_id = $1 AND status = 'pending'`,
+                [userId]
+              );
+              if (referral.rows.length > 0) {
+                const { id: referralId, referrer_id: referrerId } = referral.rows[0];
+                await withTransaction(async (client) => {
+                  await client.query(`UPDATE users SET image_credits = image_credits + 1 WHERE id = $1`, [referrerId]);
+                  await client.query(`UPDATE users SET image_credits = image_credits + 1 WHERE id = $1`, [userId]);
+                  await client.query(
+                    `UPDATE referrals SET status = 'converted', converted_at = NOW() WHERE id = $1`,
+                    [referralId]
+                  );
+                });
+                console.log(`🎁 Referral converted — 1 credit each: ${referrerId} (referrer) + ${userId} (referred)`);
+              }
+            }
+          } catch (refErr) {
+            console.error('Referral credit error (non-fatal):', refErr);
+          }
         })
         .catch(async (error) => {
           console.error('❌ AI analysis failed:', error);
