@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import ParasiteBot, { LandingPARA } from './components/ParasiteBot';
+import Footer from './components/Footer';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 // ── Core pages ────────────────────────────────────────────────────────────────
@@ -278,6 +279,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+const AUTH_PATHS = ['/login', '/signup', '/forgot-password', '/reset-password'];
+function FooterWrapper() {
+  const { pathname } = useLocation();
+  if (AUTH_PATHS.some(p => pathname.startsWith(p))) return null;
+  return <Footer />;
+}
+
 function App() {
   return (
     <HelmetProvider>
@@ -355,6 +363,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <FooterWrapper />
       </BrowserRouter>
     </HelmetProvider>
   );
