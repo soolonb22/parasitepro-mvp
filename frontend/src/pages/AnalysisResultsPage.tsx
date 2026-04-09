@@ -332,6 +332,7 @@ const AnalysisResultsPage = () => {
   const [showMHR, setShowMHR]           = useState(false);
   const [showUpsell, setShowUpsell]     = useState(false);
   const upsellShown                     = useRef(false);
+  const [copied, setCopied]             = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -500,6 +501,66 @@ const AnalysisResultsPage = () => {
             ⚠️ This report is for educational purposes only and does not constitute a medical diagnosis. Always consult a qualified healthcare professional.
           </p>
         </div>
+
+        {/* ── GP Quick Copy ──────────────────────────────────────────────── */}
+        {(() => {
+          const primary   = analysis.detections?.[0];
+          const urgency   = analysis.urgencyLevel || 'low';
+          const urgencyTxt = { emergency: 'URGENT — emergency care needed', high: 'high urgency — please see me soon', moderate: 'moderate urgency', low: 'low urgency' }[urgency] || urgency;
+          const finding   = primary?.commonName ? `${primary.commonName}${primary.scientificName ? ` (${primary.scientificName})` : ''}` : 'a potential parasite or unusual organism';
+          const confidence = primary ? ` with ${Math.round(primary.confidenceScore * 100)}% confidence` : '';
+          const tests     = analysis.gpTestingList?.slice(0, 3).join(', ');
+          const gpText = [
+            `Hi, I'm a patient of yours. I used the AI tool at notworms.com to screen a ${analysis.sampleType || 'sample'} I was concerned about.`,
+            `It flagged ${finding}${confidence} and rated the urgency as ${urgencyTxt}.`,
+            tests ? `It suggested asking about: ${tests}.` : null,
+            `I have a full clinical report ready — happy to bring it in or email a PDF.`,
+          ].filter(Boolean).join(' ');
+
+          return (
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '18px 20px', marginTop: 14 }}>
+              <div className="flex items-center justify-between mb-3 gap-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare size={15} style={{ color: '#5AB89A', flexShrink: 0 }} />
+                  <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                    Quick message to send your GP
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(gpText).then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2500);
+                    });
+                  }}
+                  style={{
+                    padding: '6px 14px', borderRadius: 8, fontSize: '0.78rem', fontWeight: 700,
+                    background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.08)',
+                    color: copied ? '#10B981' : 'var(--text-secondary)',
+                    border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.12)'}`,
+                    cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s',
+                  }}
+                >
+                  {copied ? '✓ Copied' : 'Copy'}
+                </button>
+              </div>
+              <textarea
+                readOnly
+                value={gpText}
+                rows={4}
+                style={{
+                  width: '100%', resize: 'none', background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10,
+                  padding: '12px 14px', fontSize: '0.82rem', lineHeight: 1.6,
+                  color: 'rgba(255,255,255,0.7)', fontFamily: 'inherit', boxSizing: 'border-box',
+                }}
+              />
+              <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+                Paste into a text, email, or patient portal message. Your GP gets the context before you even walk in.
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Extended details */}
         <div className="mt-6 space-y-3">
