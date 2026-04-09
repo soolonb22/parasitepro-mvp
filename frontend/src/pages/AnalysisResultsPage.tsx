@@ -740,6 +740,19 @@ const AnalysisResultsPage = () => {
             <button onClick={() => setJournal(true)} className="pp-btn-primary ml-4 flex-shrink-0" style={{ padding: '9px 16px', fontSize: '13px' }}>Start tracking</button>
           </div>
 
+          {/* Education library CTA */}
+          <div className="pp-card p-5 flex items-center justify-between gap-4" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
+            <div>
+              <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>📚 Want more tips?</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Browse our free education library — QLD wet-season risks, pet worms, and more.</p>
+            </div>
+            <a href="/resources"
+              className="flex-shrink-0 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all"
+              style={{ background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              Browse library →
+            </a>
+          </div>
+
           {/* Final disclaimer */}
           <div className="flex items-start gap-2 text-xs px-1" style={{ color: 'var(--text-muted)' }}>
             <AlertTriangle size={11} style={{ marginTop: '2px', flexShrink: 0 }} />
