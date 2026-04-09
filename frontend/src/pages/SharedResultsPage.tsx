@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
 
@@ -44,7 +43,7 @@ export default function SharedResultsPage() {
   if (loading) {
     return (
       <div>
-        <Navbar />
+
         <div className="container" style={{ padding: '4rem 1.5rem', textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔐</div>
           <p>Loading shared analysis...</p>
@@ -57,7 +56,7 @@ export default function SharedResultsPage() {
     return (
       <div>
         <SEO title="Shared Analysis - Parasite Identification Pro" />
-        <Navbar />
+
         <div className="container" style={{ padding: '4rem 1.5rem', textAlign: 'center', maxWidth: '500px' }}>
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚠️</div>
           <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Unable to View Analysis</h1>
@@ -80,7 +79,7 @@ export default function SharedResultsPage() {
         title="Shared Analysis - Parasite Identification Pro"
         description="View shared health analysis results"
       />
-      <Navbar />
+
       
       <div className="container" style={{ padding: '2rem 1.5rem', maxWidth: '900px' }}>
         <div style={{ 

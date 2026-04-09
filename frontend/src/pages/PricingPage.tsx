@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 import UrgencyTimer from '../components/UrgencyTimer';
 import MoneyBackGuarantee from '../components/MoneyBackGuarantee';
@@ -91,7 +90,7 @@ const PricingPage = () => {
   return (
     <div className="pp-page" style={{ minHeight:'100vh' }}>
       <SEO title="Pricing — ParasitePro | Credit Bundles AUD" description="AI parasite analysis credits. Pay only for what you use — credits never expire." canonical="/pricing" />
-      <Navbar />
+
       <div style={{ maxWidth:860, margin:'0 auto', padding:'48px 24px' }}>
         <button onClick={() => navigate(user ? '/dashboard' : '/')} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, marginBottom:32, fontFamily:'var(--font-body)' }}>
           <ArrowLeft size={15} /> {user ? 'Dashboard' : 'Home'}
