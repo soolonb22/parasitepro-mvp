@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { getApiUrl } from '../api';
 import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
 interface FoodEntry {
@@ -89,7 +88,7 @@ export default function FoodDiaryPage() {
   if (loading) {
     return (
       <div>
-        <Navbar />
+
         <div className="container" style={{ padding: '2rem', textAlign: 'center' }}>
           <p>Loading food diary...</p>
         </div>
@@ -103,7 +102,7 @@ export default function FoodDiaryPage() {
         title="Food & Supplement Diary - Parasite Identification Pro"
         description="Track your diet and supplements to identify triggers and what helps"
       />
-      <Navbar />
+
       
       <div className="mobile-container" style={{ maxWidth: '1000px' }}>
         <div className="page-header-flex">

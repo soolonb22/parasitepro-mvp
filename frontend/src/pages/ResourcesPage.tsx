@@ -86,6 +86,18 @@ const articles = [
     excerpt: 'Most things in your stool are not parasites. Here\'s a calm, evidence-based guide to knowing when concern is warranted — and when it isn\'t.',
     href: '/resources/when-to-worry-about-parasites',
   },
+  {
+    thumb: PARA_LOGO,
+    title: 'Parasites in Tropical Queensland After Heavy Rain',
+    excerpt: 'What to watch for in Mackay, Cairns, and North QLD during the wet season — common signs, real risk factors, and when to get checked.',
+    href: '/queensland-parasites',
+  },
+  {
+    thumb: PARA_LOGO,
+    title: 'Pet Worms vs Human Worms — Zoonotic Risks',
+    excerpt: 'Your dog or cat has worms… could it affect the family? Simple facts about cross-species transmission for responsible Australian pet owners.',
+    href: '/dog-worms',
+  },
 ];
 
 const ResourcesPage = () => {

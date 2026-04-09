@@ -151,6 +151,34 @@ router.post(
             );
           });
           console.log('✅ Analysis saved to database:', analysisId);
+
+          // ── Referral credit: grant 1 credit each on first completed analysis ──
+          try {
+            const firstCheck = await pool.query(
+              `SELECT COUNT(*) FROM analyses WHERE user_id = $1 AND status = 'completed'`,
+              [userId]
+            );
+            if (parseInt(firstCheck.rows[0].count) === 1) {
+              const referral = await pool.query(
+                `SELECT id, referrer_id FROM referrals WHERE referred_id = $1 AND status = 'pending'`,
+                [userId]
+              );
+              if (referral.rows.length > 0) {
+                const { id: referralId, referrer_id: referrerId } = referral.rows[0];
+                await withTransaction(async (client) => {
+                  await client.query(`UPDATE users SET image_credits = image_credits + 1 WHERE id = $1`, [referrerId]);
+                  await client.query(`UPDATE users SET image_credits = image_credits + 1 WHERE id = $1`, [userId]);
+                  await client.query(
+                    `UPDATE referrals SET status = 'converted', converted_at = NOW() WHERE id = $1`,
+                    [referralId]
+                  );
+                });
+                console.log(`🎁 Referral converted — 1 credit each: ${referrerId} (referrer) + ${userId} (referred)`);
+              }
+            }
+          } catch (refErr) {
+            console.error('Referral credit error (non-fatal):', refErr);
+          }
         })
         .catch(async (error) => {
           console.error('❌ AI analysis failed:', error);
@@ -275,7 +303,7 @@ router.get(
       const status = req.query.status as string | undefined;
       const sampleType = req.query.sampleType as string | undefined;
 
-      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
+      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, a.urgency_level, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
       const queryParams: any[] = [userId];
       let paramIndex = 2;
 
@@ -301,7 +329,7 @@ router.get(
         analyses: analysesResult.rows.map((a) => ({
           id: a.id, thumbnailUrl: a.thumbnail_url, status: a.status, sampleType: a.sample_type,
           uploadedAt: a.uploaded_at, processingCompletedAt: a.processing_completed_at,
-          detectionCount: parseInt(a.detection_count),
+          urgencyLevel: a.urgency_level, detectionCount: parseInt(a.detection_count),
         })),
         total, limit, offset,
       });

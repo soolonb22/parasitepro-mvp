@@ -4,7 +4,6 @@ import { getApiUrl } from '../api';
 import { useAuthStore } from '../store/authStore';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
 interface Protocol {
@@ -120,7 +119,7 @@ export default function TreatmentTrackerPage() {
   if (loading) {
     return (
       <div>
-        <Navbar />
+
         <div className="container" style={{ padding: '2rem', textAlign: 'center' }}>
           <p>Loading your treatment protocols...</p>
         </div>
@@ -134,7 +133,7 @@ export default function TreatmentTrackerPage() {
         title="Treatment Protocol Tracker - Parasite Identification Pro"
         description="Track your natural treatment protocols and daily adherence"
       />
-      <Navbar />
+
       
       <div className="mobile-container" style={{ maxWidth: '1000px' }}>
         <div className="page-header-flex">

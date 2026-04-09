@@ -17,7 +17,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
 // ─────────────────────────────────────────────
@@ -705,7 +704,7 @@ export default function ScientificLibraryPage() {
         title="Scientific Pathogen Library — ParasitePro"
         description="Comprehensive reference database of 44 pathogens — parasites, bacteria, viruses, and fungi — with clinical profiles, history, and Australian relevance."
       />
-      <Navbar />
+
 
       {/* ── HEADER ── */}
       <div style={{

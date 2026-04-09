@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 import UrgencyTimer from '../components/UrgencyTimer';
 import MoneyBackGuarantee from '../components/MoneyBackGuarantee';
@@ -35,6 +34,7 @@ const PricingPage = () => {
   const [couponInput, setCouponInput] = useState('');
   const [couponMessage, setCouponMessage] = useState('');
   const [showMobilePurchase, setShowMobilePurchase] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
 
   const bundles = [
     { id:'bundle_5',  name:'5 Credits',  price:'AUD $19.99', credits:5,  perCredit:'$4.00', popular:false },
@@ -65,6 +65,20 @@ const PricingPage = () => {
     }
   };
 
+  const handleSubscribe = async () => {
+    if (!user) { navigate('/login'); return; }
+    if (isNativePlatform()) { setShowMobilePurchase(true); return; }
+    setSubLoading(true);
+    setError('');
+    try {
+      const res = await axios.post(`${API_URL}/payment/create-subscription-session`, {}, { headers: { Authorization: `Bearer ${accessToken}` } });
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setError(err.response?.data?.error || 'Subscription failed — please try again.');
+      setSubLoading(false);
+    }
+  };
+
   const handleApplyCoupon = () => {
     if (couponInput.trim()) {
       setCouponMessage(`Coupon "${couponInput.trim().toUpperCase()}" will be applied at checkout`);
@@ -76,7 +90,7 @@ const PricingPage = () => {
   return (
     <div className="pp-page" style={{ minHeight:'100vh' }}>
       <SEO title="Pricing — ParasitePro | Credit Bundles AUD" description="AI parasite analysis credits. Pay only for what you use — credits never expire." canonical="/pricing" />
-      <Navbar />
+
       <div style={{ maxWidth:860, margin:'0 auto', padding:'48px 24px' }}>
         <button onClick={() => navigate(user ? '/dashboard' : '/')} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, marginBottom:32, fontFamily:'var(--font-body)' }}>
           <ArrowLeft size={15} /> {user ? 'Dashboard' : 'Home'}
@@ -94,6 +108,51 @@ const PricingPage = () => {
         <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.12) 0%,rgba(99,102,241,0.12) 100%)', border:'1px solid rgba(124,58,237,0.25)', borderRadius:12, padding:'16px 20px', marginBottom:32, textAlign:'center' }}>
           <span style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'#a78bfa', letterSpacing:'0.06em' }}>BETA TESTER? </span>
           <span style={{ color:'var(--text-secondary)', fontSize:14 }}>Use code <code style={{ color:'var(--amber)', fontFamily:'var(--font-mono)', background:'rgba(217,119,6,0.1)', padding:'2px 6px', borderRadius:4 }}>BETA3FREE</code> at signup for 3 free credits</span>
+        </div>
+
+        {/* ── Monthly membership ── */}
+        <div className="pp-card" style={{ padding:'28px 32px', marginBottom:32, border:'1px solid rgba(16,185,129,0.3)', position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', top:0, right:0, background:'rgba(16,185,129,0.08)', width:160, height:160, borderRadius:'0 0 0 160px', pointerEvents:'none' }} />
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-start', justifyContent:'space-between', gap:24, position:'relative' }}>
+            <div style={{ flex:'1 1 300px' }}>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'3px 10px', borderRadius:20, background:'rgba(16,185,129,0.12)', border:'1px solid rgba(16,185,129,0.3)', marginBottom:12 }}>
+                <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'#10B981', letterSpacing:'0.06em' }}>MONTHLY MEMBERSHIP</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'baseline', gap:6, marginBottom:6 }}>
+                <span style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:34, color:'var(--text-primary)' }}>AUD $6</span>
+                <span style={{ color:'var(--text-muted)', fontSize:14 }}>/month</span>
+              </div>
+              <p style={{ color:'var(--text-secondary)', fontSize:13, marginBottom:16, lineHeight:1.5 }}>Support the development of this free tool and get a few handy extras along the way.</p>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 16px' }}>
+                {[
+                  'Monthly QLD tropical parasite tips email',
+                  'Priority email support',
+                  'Pro member badge on your profile',
+                  'Early access to new features',
+                ].map(f => (
+                  <div key={f} style={{ display:'flex', alignItems:'flex-start', gap:8, fontSize:13, color:'var(--text-secondary)' }}>
+                    <Check size={13} style={{ color:'#10B981', flexShrink:0, marginTop:2 }} />{f}
+                  </div>
+                ))}
+              </div>
+              <p style={{ marginTop:12, fontSize:12, color:'var(--text-muted)' }}>Cancel any time. Analysis credits are separate and never expire.</p>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10, flex:'0 0 auto' }}>
+              <button
+                onClick={handleSubscribe}
+                disabled={subLoading}
+                style={{ padding:'13px 32px', borderRadius:10, background:'#10B981', color:'#fff', fontWeight:700, fontSize:14, border:'none', cursor:'pointer', opacity: subLoading ? 0.7 : 1, whiteSpace:'nowrap' }}>
+                {subLoading ? 'Redirecting…' : 'Subscribe — $6/mo'}
+              </button>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--text-muted)' }}>Stripe secure · cancel anytime</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:28 }}>
+          <div style={{ flex:1, height:1, background:'var(--bg-border)' }} />
+          <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--text-muted)', letterSpacing:'0.06em', whiteSpace:'nowrap' }}>OR BUY CREDITS ONE-OFF</span>
+          <div style={{ flex:1, height:1, background:'var(--bg-border)' }} />
         </div>
 
         {error && (

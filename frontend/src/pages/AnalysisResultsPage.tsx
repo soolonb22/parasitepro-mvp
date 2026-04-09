@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Loader, AlertTriangle, CheckCircle, AlertCircle,
@@ -13,6 +13,7 @@ import JournalPromptModal from '../components/JournalPromptModal';
 import DeepDiveModal from '../components/DeepDiveModal';
 import ParasiteBot from '../components/ParasiteBot';
 import ParasiteProfile from '../components/ParasiteProfile';
+import PostAnalysisUpsell from '../components/PostAnalysisUpsell';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -329,6 +330,9 @@ const AnalysisResultsPage = () => {
   const [showDeepDive, setDeepDive]     = useState(false);
   const [userCredits, setUserCredits]   = useState(0);
   const [showMHR, setShowMHR]           = useState(false);
+  const [showUpsell, setShowUpsell]     = useState(false);
+  const upsellShown                     = useRef(false);
+  const [copied, setCopied]             = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -341,6 +345,15 @@ const AnalysisResultsPage = () => {
       const t = setTimeout(() => { setJournal(true); setJournalShown(true); }, 3000); return () => clearTimeout(t);
     }
   }, [analysis?.status]);
+
+  // Show the upsell once, 6s after completion, only when the user has no credits left.
+  useEffect(() => {
+    if (!analysis || analysis.status !== 'completed' || upsellShown.current) return;
+    if (userCredits > 0) return;
+    upsellShown.current = true;
+    const t = setTimeout(() => setShowUpsell(true), 6000);
+    return () => clearTimeout(t);
+  }, [analysis?.status, userCredits]);
 
   const fetchAnalysis = async () => {
     try {
@@ -488,6 +501,66 @@ const AnalysisResultsPage = () => {
             ⚠️ This report is for educational purposes only and does not constitute a medical diagnosis. Always consult a qualified healthcare professional.
           </p>
         </div>
+
+        {/* ── GP Quick Copy ──────────────────────────────────────────────── */}
+        {(() => {
+          const primary   = analysis.detections?.[0];
+          const urgency   = analysis.urgencyLevel || 'low';
+          const urgencyTxt = { emergency: 'URGENT — emergency care needed', high: 'high urgency — please see me soon', moderate: 'moderate urgency', low: 'low urgency' }[urgency] || urgency;
+          const finding   = primary?.commonName ? `${primary.commonName}${primary.scientificName ? ` (${primary.scientificName})` : ''}` : 'a potential parasite or unusual organism';
+          const confidence = primary ? ` with ${Math.round(primary.confidenceScore * 100)}% confidence` : '';
+          const tests     = analysis.gpTestingList?.slice(0, 3).join(', ');
+          const gpText = [
+            `Hi, I'm a patient of yours. I used the AI tool at notworms.com to screen a ${analysis.sampleType || 'sample'} I was concerned about.`,
+            `It flagged ${finding}${confidence} and rated the urgency as ${urgencyTxt}.`,
+            tests ? `It suggested asking about: ${tests}.` : null,
+            `I have a full clinical report ready — happy to bring it in or email a PDF.`,
+          ].filter(Boolean).join(' ');
+
+          return (
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '18px 20px', marginTop: 14 }}>
+              <div className="flex items-center justify-between mb-3 gap-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare size={15} style={{ color: '#5AB89A', flexShrink: 0 }} />
+                  <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                    Quick message to send your GP
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(gpText).then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2500);
+                    });
+                  }}
+                  style={{
+                    padding: '6px 14px', borderRadius: 8, fontSize: '0.78rem', fontWeight: 700,
+                    background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.08)',
+                    color: copied ? '#10B981' : 'var(--text-secondary)',
+                    border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.12)'}`,
+                    cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s',
+                  }}
+                >
+                  {copied ? '✓ Copied' : 'Copy'}
+                </button>
+              </div>
+              <textarea
+                readOnly
+                value={gpText}
+                rows={4}
+                style={{
+                  width: '100%', resize: 'none', background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10,
+                  padding: '12px 14px', fontSize: '0.82rem', lineHeight: 1.6,
+                  color: 'rgba(255,255,255,0.7)', fontFamily: 'inherit', boxSizing: 'border-box',
+                }}
+              />
+              <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+                Paste into a text, email, or patient portal message. Your GP gets the context before you even walk in.
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Extended details */}
         <div className="mt-6 space-y-3">
@@ -667,6 +740,25 @@ const AnalysisResultsPage = () => {
             <button onClick={() => setJournal(true)} className="pp-btn-primary ml-4 flex-shrink-0" style={{ padding: '9px 16px', fontSize: '13px' }}>Start tracking</button>
           </div>
 
+          {/* What's next — 3-card grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+            {[
+              { icon: '📚', title: 'Free QLD Tips Library',         sub: 'Wet-season risks, pet worms & more',    href: '/resources' },
+              { icon: '🤝', title: 'Refer a Mate',                  sub: 'Earn free credits for every referral',   href: '/dashboard' },
+              { icon: '🔄', title: '$6/mo Membership',              sub: 'Monthly tips email + priority support',  href: '/pricing' },
+            ].map(({ icon, title, sub, href }) => (
+              <a key={href + title} href={href}
+                className="pp-card p-5 flex flex-col gap-1.5 transition-all"
+                style={{ textDecoration: 'none', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}>
+                <span style={{ fontSize: 22 }}>{icon}</span>
+                <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)', margin: 0 }}>{title}</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)', margin: 0 }}>{sub}</p>
+              </a>
+            ))}
+          </div>
+
           {/* Final disclaimer */}
           <div className="flex items-start gap-2 text-xs px-1" style={{ color: 'var(--text-muted)' }}>
             <AlertTriangle size={11} style={{ marginTop: '2px', flexShrink: 0 }} />
@@ -749,6 +841,7 @@ const AnalysisResultsPage = () => {
       {showJournalPrompt && (
         <JournalPromptModal isOpen={showJournalPrompt} analysisId={id} detections={analysis.detections} onClose={() => setJournal(false)} />
       )}
+      {showUpsell && <PostAnalysisUpsell onClose={() => setShowUpsell(false)} />}
       <ParasiteBot />
     </div>
   );

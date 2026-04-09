@@ -79,6 +79,42 @@ router.get('/verify-session', authenticateToken, async (req: AuthRequest, res: R
   }
 });
 
+// ── POST /api/payment/create-subscription-session ────────────────────────────
+router.post('/create-subscription-session', authenticateToken,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    const userId = req.userId!;
+    const subPriceId = process.env.STRIPE_SUB_PRICE_ID;
+    if (!subPriceId) { res.status(500).json({ error: 'Subscription not configured' }); return; }
+
+    try {
+      const userRow = await pool.query('SELECT email, stripe_customer_id FROM users WHERE id = $1', [userId]);
+      const user = userRow.rows[0];
+      if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+
+      const sessionParams: Stripe.Checkout.SessionCreateParams = {
+        mode: 'subscription',
+        line_items: [{ price: subPriceId, quantity: 1 }],
+        success_url: `${FRONTEND_URL}/dashboard?subscribed=1`,
+        cancel_url: `${FRONTEND_URL}/pricing?cancelled=1`,
+        metadata: { userId },
+      };
+
+      if (user.stripe_customer_id) {
+        sessionParams.customer = user.stripe_customer_id;
+      } else {
+        sessionParams.customer_email = user.email;
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionParams);
+      console.log(`✅ Subscription checkout session: ${session.id} — user ${userId}`);
+      res.json({ sessionUrl: session.url });
+    } catch (error) {
+      console.error('Create subscription session error:', error);
+      res.status(500).json({ error: 'Failed to create subscription session' });
+    }
+  }
+);
+
 // ── POST /api/payment/webhook ─────────────────────────────────────────────────
 router.post('/webhook', express.raw({ type: 'application/json' }),
   async (req: Request, res: Response): Promise<void> => {
@@ -99,74 +135,110 @@ router.post('/webhook', express.raw({ type: 'application/json' }),
     try {
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
-        if (session.payment_status !== 'paid') { res.json({ received: true }); return; }
 
-        const userId = session.metadata?.userId;
-        const credits = parseInt(session.metadata?.credits || '0');
+        if (session.mode === 'subscription') {
+          // ── New subscription activated ──────────────────────────
+          const userId = session.metadata?.userId;
+          if (!userId) { console.error('❌ No userId in subscription session metadata:', session.id); res.json({ received: true }); return; }
 
-        if (!userId || !credits) { console.error('❌ Missing metadata:', session.id); res.json({ received: true }); return; }
-
-        const existing = await pool.query('SELECT id FROM payments WHERE stripe_payment_intent_id = $1', [session.id]);
-        if (existing.rows.length > 0) { res.json({ received: true }); return; }
-
-        await withTransaction(async (client) => {
-          await client.query('UPDATE users SET image_credits = image_credits + $1 WHERE id = $2', [credits, userId]);
-          await client.query(
-            `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, credits_purchased, status)
-             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [userId, session.id, session.amount_total, session.currency, credits, 'succeeded']
+          await pool.query(
+            `UPDATE users SET subscription_status = 'active', stripe_customer_id = $1, stripe_subscription_id = $2 WHERE id = $3`,
+            [session.customer, session.subscription, userId]
           );
-        });
+          console.log(`✅ Subscription activated — user ${userId}`);
 
-        console.log(`✅ Webhook: ${credits} credits granted → user ${userId}`);
+        } else {
+          // ── One-time credit purchase ────────────────────────────
+          if (session.payment_status !== 'paid') { res.json({ received: true }); return; }
 
-        // ── Notify Fallon of new purchase ─────────────────────────
-        if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-          try {
-            const buyerRow = await pool.query('SELECT email, first_name, last_name FROM users WHERE id = $1', [userId]);
-            const buyer = buyerRow.rows[0];
-            const buyerName = buyer ? `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || buyer.email : userId;
-            const buyerEmail = buyer?.email || 'unknown';
-            const amountAud = ((session.amount_total || 0) / 100).toFixed(2);
-            const nodemailer = await import('nodemailer');
-            const transporter = nodemailer.default.createTransport({
-              host: process.env.SMTP_HOST,
-              port: parseInt(process.env.SMTP_PORT || '587'),
-              secure: process.env.SMTP_SECURE === 'true',
-              auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-            });
-            await transporter.sendMail({
-              from: process.env.SMTP_FROM || 'ParasitePro <noreply@notworms.com>',
-              to: 'importantalerts26@gmail.com',
-              subject: `💰 New Purchase — $${amountAud} AUD (${credits} credits)`,
-              html: `
-                <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0E0F11;color:#F5F0E8;border-radius:12px;">
-                  <h2 style="color:#D97706;margin:0 0 4px 0;">💰 New Purchase on ParasitePro!</h2>
-                  <p style="color:#6B7280;font-size:13px;margin:0 0 24px 0;">notworms.com</p>
-                  <table style="width:100%;border-collapse:collapse;">
-                    <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Customer</td>
-                        <td style="padding:10px 0;border-bottom:1px solid #1F2937;font-weight:600;">${buyerName}</td></tr>
-                    <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Email</td>
-                        <td style="padding:10px 0;border-bottom:1px solid #1F2937;">${buyerEmail}</td></tr>
-                    <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Amount</td>
-                        <td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#D97706;font-size:20px;font-weight:700;">$${amountAud} AUD</td></tr>
-                    <tr><td style="padding:10px 0;color:#9CA3AF;">Credits</td>
-                        <td style="padding:10px 0;font-weight:600;">${credits} credits</td></tr>
-                  </table>
-                  <a href="https://www.notworms.com/admin" style="display:inline-block;margin-top:24px;background:#D97706;color:#0E0F11;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">View Admin Dashboard →</a>
-                  <p style="margin-top:16px;font-size:12px;color:#4B5563;">Remember: If this is a first-time buyer from your launch offer, message them back with their 2 bonus credits 💛</p>
-                </div>
-              `,
-            });
-            console.log(`📧 Purchase notification sent to Fallon for user ${buyerEmail}`);
-          } catch (emailErr) {
-            console.error('⚠️ Purchase notification email failed (non-fatal):', emailErr);
+          const userId = session.metadata?.userId;
+          const credits = parseInt(session.metadata?.credits || '0');
+
+          if (!userId || !credits) { console.error('❌ Missing metadata:', session.id); res.json({ received: true }); return; }
+
+          const existing = await pool.query('SELECT id FROM payments WHERE stripe_payment_intent_id = $1', [session.id]);
+          if (existing.rows.length > 0) { res.json({ received: true }); return; }
+
+          await withTransaction(async (client) => {
+            await client.query('UPDATE users SET image_credits = image_credits + $1 WHERE id = $2', [credits, userId]);
+            await client.query(
+              `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, credits_purchased, status)
+               VALUES ($1, $2, $3, $4, $5, $6)`,
+              [userId, session.id, session.amount_total, session.currency, credits, 'succeeded']
+            );
+          });
+
+          console.log(`✅ Webhook: ${credits} credits granted → user ${userId}`);
+
+          // ── Notify Fallon of new purchase ─────────────────────────
+          if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+            try {
+              const buyerRow = await pool.query('SELECT email, first_name, last_name FROM users WHERE id = $1', [userId]);
+              const buyer = buyerRow.rows[0];
+              const buyerName = buyer ? `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || buyer.email : userId;
+              const buyerEmail = buyer?.email || 'unknown';
+              const amountAud = ((session.amount_total || 0) / 100).toFixed(2);
+              const nodemailer = await import('nodemailer');
+              const transporter = nodemailer.default.createTransport({
+                host: process.env.SMTP_HOST,
+                port: parseInt(process.env.SMTP_PORT || '587'),
+                secure: process.env.SMTP_SECURE === 'true',
+                auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+              });
+              await transporter.sendMail({
+                from: process.env.SMTP_FROM || 'ParasitePro <noreply@notworms.com>',
+                to: 'importantalerts26@gmail.com',
+                subject: `💰 New Purchase — $${amountAud} AUD (${credits} credits)`,
+                html: `
+                  <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0E0F11;color:#F5F0E8;border-radius:12px;">
+                    <h2 style="color:#D97706;margin:0 0 4px 0;">💰 New Purchase on ParasitePro!</h2>
+                    <p style="color:#6B7280;font-size:13px;margin:0 0 24px 0;">notworms.com</p>
+                    <table style="width:100%;border-collapse:collapse;">
+                      <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Customer</td>
+                          <td style="padding:10px 0;border-bottom:1px solid #1F2937;font-weight:600;">${buyerName}</td></tr>
+                      <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Email</td>
+                          <td style="padding:10px 0;border-bottom:1px solid #1F2937;">${buyerEmail}</td></tr>
+                      <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Amount</td>
+                          <td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#D97706;font-size:20px;font-weight:700;">$${amountAud} AUD</td></tr>
+                      <tr><td style="padding:10px 0;color:#9CA3AF;">Credits</td>
+                          <td style="padding:10px 0;font-weight:600;">${credits} credits</td></tr>
+                    </table>
+                    <a href="https://www.notworms.com/admin" style="display:inline-block;margin-top:24px;background:#D97706;color:#0E0F11;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">View Admin Dashboard →</a>
+                    <p style="margin-top:16px;font-size:12px;color:#4B5563;">Remember: If this is a first-time buyer from your launch offer, message them back with their 2 bonus credits 💛</p>
+                  </div>
+                `,
+              });
+              console.log(`📧 Purchase notification sent to Fallon for user ${buyerEmail}`);
+            } catch (emailErr) {
+              console.error('⚠️ Purchase notification email failed (non-fatal):', emailErr);
+            }
           }
         }
+
+      } else if (event.type === 'customer.subscription.updated') {
+        const sub = event.data.object as Stripe.Subscription;
+        const newStatus = sub.status === 'active' ? 'active'
+          : sub.status === 'past_due' ? 'past_due'
+          : sub.status === 'canceled' ? 'cancelled'
+          : 'free';
+        await pool.query(
+          `UPDATE users SET subscription_status = $1 WHERE stripe_customer_id = $2`,
+          [newStatus, sub.customer]
+        );
+        console.log(`✅ Subscription updated → ${newStatus} for customer ${sub.customer}`);
+
+      } else if (event.type === 'customer.subscription.deleted') {
+        const sub = event.data.object as Stripe.Subscription;
+        await pool.query(
+          `UPDATE users SET subscription_status = 'cancelled', stripe_subscription_id = NULL WHERE stripe_customer_id = $1`,
+          [sub.customer]
+        );
+        console.log(`✅ Subscription cancelled for customer ${sub.customer}`);
 
       } else {
         console.log('Unhandled event:', event.type);
       }
+
       res.json({ received: true });
     } catch (error) {
       console.error('Webhook error:', error);

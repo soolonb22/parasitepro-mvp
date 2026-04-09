@@ -4,6 +4,13 @@ import crypto from 'crypto';
 import { query } from '../config/database';
 import { generateAccessToken, authenticateToken, AuthRequest } from '../middleware/auth';
 
+// Generate a short, unambiguous 6-char uppercase referral code
+function generateReferralCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // excludes O, 0, I, 1
+  const bytes = crypto.randomBytes(6);
+  return Array.from(bytes).map(b => chars[b % chars.length]).join('');
+}
+
 const router = express.Router();
 
 // Valid promo codes — add new ones here any time
@@ -14,7 +21,7 @@ const PROMO_CODES: Record<string, number> = {
 
 router.post('/signup', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, firstName, lastName, promoCode } = req.body;
+    const { email, password, firstName, lastName, promoCode, refCode } = req.body;
 
     const existingUser = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
@@ -29,15 +36,39 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
 
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Generate a unique referral code for the new user (retry on collision)
+    let referralCode = generateReferralCode();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const clash = await query('SELECT id FROM users WHERE referral_code = $1', [referralCode]);
+      if (clash.rows.length === 0) break;
+      referralCode = generateReferralCode();
+    }
+
     const result = await query(
-      'INSERT INTO users (email, password_hash, first_name, last_name, image_credits) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, first_name, last_name, image_credits',
-      [email, passwordHash, firstName || null, lastName || null, startingCredits]
+      'INSERT INTO users (email, password_hash, first_name, last_name, image_credits, referral_code) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, email, first_name, last_name, image_credits, referral_code',
+      [email, passwordHash, firstName || null, lastName || null, startingCredits, referralCode]
     );
 
     const user = result.rows[0];
-    const accessToken = generateAccessToken(user.id, user.email);
 
-    console.log(`✅ User registered: ${user.email} | credits: ${user.image_credits}${promoCredits > 0 ? ' (promo: ' + code + ')' : ''}`);
+    // If a valid refCode was supplied, create a pending referral record
+    if (refCode) {
+      try {
+        const referrer = await query('SELECT id FROM users WHERE referral_code = $1', [refCode.trim().toUpperCase()]);
+        if (referrer.rows.length > 0 && referrer.rows[0].id !== user.id) {
+          await query(
+            'INSERT INTO referrals (referrer_id, referred_id) VALUES ($1, $2) ON CONFLICT (referred_id) DO NOTHING',
+            [referrer.rows[0].id, user.id]
+          );
+          console.log(`🤝 Referral linked: ${referrer.rows[0].id} → ${user.id}`);
+        }
+      } catch (refErr) {
+        console.error('Referral link error (non-fatal):', refErr);
+      }
+    }
+
+    const accessToken = generateAccessToken(user.id, user.email);
+    console.log(`✅ User registered: ${user.email} | credits: ${user.image_credits}${promoCredits > 0 ? ' (promo: ' + code + ')' : ''}${refCode ? ' (referred)' : ''}`);
 
     res.status(201).json({
       user: {
@@ -45,7 +76,8 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
-        imageCredits: user.image_credits
+        imageCredits: user.image_credits,
+        referralCode: user.referral_code,
       },
       accessToken,
       promoApplied: promoCredits > 0,
@@ -224,7 +256,7 @@ router.post('/reset-password', async (req: Request, res: Response): Promise<void
 router.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const result = await query(
-      'SELECT id, email, first_name, last_name, image_credits, is_admin FROM users WHERE id = $1',
+      'SELECT id, email, first_name, last_name, image_credits, is_admin, subscription_status FROM users WHERE id = $1',
       [req.userId]
     );
     if (result.rows.length === 0) { res.status(404).json({ error: 'User not found' }); return; }
@@ -236,9 +268,38 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Pr
       lastName: u.last_name,
       imageCredits: u.image_credits,
       isAdmin: u.is_admin,
+      subscriptionStatus: u.subscription_status || 'free',
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// ── GET /api/auth/referral ────────────────────────────────────────────────────
+router.get('/referral', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.userId!;
+    const result = await query(
+      `SELECT u.referral_code,
+        COUNT(r.id) FILTER (WHERE r.status = 'pending')   AS pending_count,
+        COUNT(r.id) FILTER (WHERE r.status = 'converted') AS converted_count
+       FROM users u
+       LEFT JOIN referrals r ON r.referrer_id = u.id
+       WHERE u.id = $1
+       GROUP BY u.referral_code`,
+      [userId]
+    );
+    if (result.rows.length === 0) { res.status(404).json({ error: 'User not found' }); return; }
+    const row = result.rows[0];
+    res.json({
+      referralCode:   row.referral_code,
+      referralCount:  parseInt(row.pending_count || '0') + parseInt(row.converted_count || '0'),
+      convertedCount: parseInt(row.converted_count || '0'),
+      creditsEarned:  parseInt(row.converted_count || '0'),
+    });
+  } catch (error) {
+    console.error('Referral stats error:', error);
+    res.status(500).json({ error: 'Failed to retrieve referral data' });
   }
 });
 
