@@ -239,11 +239,11 @@ export default function UploadPage() {
       brightness += d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
     brightness = (brightness / (d.length / 4)) / 255 * 100;
 
-    if (img.naturalWidth < 800 || img.naturalHeight < 600)
-      return { message: '⚠️ Low resolution — try a closer, clearer shot for best results.', status: 'warn' };
-    if (brightness < 30)
-      return { message: '🔦 Too dark — better lighting or flash will improve accuracy.', status: 'warn' };
-    return { message: '✅ Great photo — good lighting and resolution.', status: 'good' };
+    if (img.naturalWidth < 900)
+      return { message: '📏 Photo a bit small — get closer (but keep it in focus) for better results.', status: 'warn' };
+    if (brightness < 35)
+      return { message: '🔦 Too dark — common in Queensland overcast or indoor light. Try natural daylight or flash and retake.', status: 'warn' };
+    return { message: '✅ Excellent photo! Great lighting and focus — ready for PARA to analyse visual patterns.', status: 'good' };
   }, []);
 
   const handleFileSelect = useCallback((file: File) => {
@@ -407,8 +407,8 @@ export default function UploadPage() {
 
             {/* Good / bad examples hint */}
             <div className="px-5 pb-4 pt-3 grid grid-cols-2 gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <span>✅ Bright, in-focus, full sample visible</span>
-              <span>❌ Dark, blurry, or extreme close-up</span>
+              <span>✅ Bright natural light, whole sample visible, steady hand</span>
+              <span>❌ Dark (common in QLD rainy season), blurry, or too zoomed in</span>
             </div>
 
             {/* Action buttons */}
