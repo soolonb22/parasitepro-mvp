@@ -740,17 +740,23 @@ const AnalysisResultsPage = () => {
             <button onClick={() => setJournal(true)} className="pp-btn-primary ml-4 flex-shrink-0" style={{ padding: '9px 16px', fontSize: '13px' }}>Start tracking</button>
           </div>
 
-          {/* Education library CTA */}
-          <div className="pp-card p-5 flex items-center justify-between gap-4" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
-            <div>
-              <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>📚 Want more tips?</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Browse our free education library — QLD wet-season risks, pet worms, and more.</p>
-            </div>
-            <a href="/resources"
-              className="flex-shrink-0 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all"
-              style={{ background: 'rgba(255,255,255,0.07)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              Browse library →
-            </a>
+          {/* What's next — 3-card grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+            {[
+              { icon: '📚', title: 'Free QLD Tips Library',         sub: 'Wet-season risks, pet worms & more',    href: '/resources' },
+              { icon: '🤝', title: 'Refer a Mate',                  sub: 'Earn free credits for every referral',   href: '/dashboard' },
+              { icon: '🔄', title: '$6/mo Membership',              sub: 'Monthly tips email + priority support',  href: '/pricing' },
+            ].map(({ icon, title, sub, href }) => (
+              <a key={href + title} href={href}
+                className="pp-card p-5 flex flex-col gap-1.5 transition-all"
+                style={{ textDecoration: 'none', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}>
+                <span style={{ fontSize: 22 }}>{icon}</span>
+                <p className="font-heading font-semibold text-sm" style={{ color: 'var(--text-primary)', margin: 0 }}>{title}</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)', margin: 0 }}>{sub}</p>
+              </a>
+            ))}
           </div>
 
           {/* Final disclaimer */}
