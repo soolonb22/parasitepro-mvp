@@ -741,7 +741,7 @@ const AnalysisResultsPage = () => {
                 { n: '4', title: 'Add a note (optional)', desc: 'Label it "ParasitePro educational report – for GP discussion" so your doctor has context.' },
                 { n: '5', title: 'Share access with your GP', desc: 'Your GP can now view the report at your next appointment.' },
               ].map(step => (
-                <div key={step.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: step.highlight ? '10px', background: step.highlight ? 'rgba(27,107,95,0.15)' : 'transparent', borderRadius: step.highlight ? 10 : 0, border: step.highlight ? '1px solid rgba(27,107,95,0.3)' : 'none' }}>
+                <div key={step.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: step.highlight ? '10px' : '0', background: step.highlight ? 'rgba(27,107,95,0.15)' : 'transparent', borderRadius: step.highlight ? 10 : 0, border: step.highlight ? '1px solid rgba(27,107,95,0.3)' : 'none' }}>
                   <div style={{ width: 26, height: 26, borderRadius: '50%', background: step.highlight ? '#1B6B5F' : 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.75rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{step.n}</div>
                   <div>
                     <p style={{ color: step.highlight ? '#5AB89A' : 'rgba(255,255,255,0.9)', fontSize: '0.82rem', fontWeight: 600, margin: '0 0 2px' }}>{step.title}</p>
