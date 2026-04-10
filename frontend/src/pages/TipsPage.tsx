@@ -197,61 +197,25 @@ export default function TipsPage() {
             <h2 className="text-2xl md:text-3xl font-semibold">Common Skin Rash Visual Patterns</h2>
           </div>
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
-            <p>
-              Skin changes can have many causes — parasitic, fungal, bacterial, allergic, or inflammatory. In Queensland's tropical climate,
-              outdoor exposure, soil contact, flooding, and travel increase the range of possibilities. This page shares educational information
-              about visual patterns people commonly notice, to help you describe what you are seeing to your GP clearly.
-              It does not provide a diagnosis.
-            </p>
+            <p>Skin changes are very common and can have many different causes. This page shares general educational information about visual patterns people sometimes notice on their skin.</p>
 
-            <h3 className="text-lg font-semibold text-white mt-6">Visual patterns and what they can sometimes look like</h3>
-            <ul className="list-none pl-0 space-y-4">
-              <li>
-                <p className="text-white font-semibold mb-1">Trailing or winding line under the skin</p>
-                <p>A raised, winding track — sometimes described as a thin red or pink line moving across the skin. Often appears on the feet, ankles, or lower legs after contact with soil, sand, or grass. Can be itchy and may advance slightly each day.</p>
-              </li>
-              <li>
-                <p className="text-white font-semibold mb-1">Ring-shaped or circular patch</p>
-                <p>A round or oval area with a clearer centre and a more defined outer edge. May have scaling, redness, or slight raised texture at the border. Can appear on the torso, limbs, scalp, or groin. Multiple rings can appear at once.</p>
-              </li>
-              <li>
-                <p className="text-white font-semibold mb-1">Intensely itchy clustered bumps — especially at night</p>
-                <p>Small raised spots in groups, often between fingers, on wrists, waistband areas, or inner thighs. Nighttime itching that wakes you up is a key feature worth mentioning. May look like a rash but have a specific pattern related to skin folds.</p>
-              </li>
-              <li>
-                <p className="text-white font-semibold mb-1">Bite marks in a row or cluster</p>
-                <p>Multiple red dots in a line or group, often appearing overnight or after time outdoors. Common on exposed skin areas — arms, neck, ankles. May be flat or slightly raised with a central puncture point.</p>
-              </li>
-              <li>
-                <p className="text-white font-semibold mb-1">Swollen, red, or weeping area around a site</p>
-                <p>Localised swelling with warmth, redness spreading outward, or discharge. Can follow a bite, scratch, or soil contact. Worth same-day GP attention if the redness is spreading rapidly or accompanied by fever.</p>
-              </li>
+            <h3 className="text-lg font-semibold text-white mt-6">Things people sometimes observe</h3>
+            <ul className="list-disc pl-6 space-y-3">
+              <li>Small red spots, dots, or raised bumps that may or may not itch.</li>
+              <li>Dry, flaky, or scaly patches, especially on arms, legs, or torso.</li>
+              <li>Ring-shaped or line-like marks, particularly after contact with soil, animals, or plants.</li>
+              <li>Itchy areas that appear after time spent outdoors in Queensland's tropical or wet conditions.</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-white mt-6">QLD and tropical context</h3>
-            <p>
-              North Queensland's warm, humid conditions support a wider range of skin-affecting organisms than cooler climates.
-              Bare feet on creek banks, swimming in freshwater, gardening after rain, and contact with soil disturbed by flooding
-              all increase potential exposure. Skin changes appearing within days to weeks of these activities are worth documenting and discussing with your GP.
-            </p>
-
-            <h3 className="text-lg font-semibold text-white mt-6">Taking a useful photo for your GP visit</h3>
+            <h3 className="text-lg font-semibold text-white mt-6">Helpful information to prepare for your GP visit</h3>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Use natural daylight — avoid flash which flattens texture and colour</li>
-              <li>Take one close-up of the affected area and one wider shot showing its location on the body</li>
-              <li>Photograph it at its worst (e.g. after scratching, or first thing in the morning when itching is often most visible)</li>
-              <li>Place a coin or ruler next to the area to give your doctor a size reference</li>
-              <li>If the rash changes shape or spreads, photograph it daily so your GP can see the progression</li>
+              <li>Note when the rash first appeared and whether anything makes it better or worse (heat, scratching, washing, etc.).</li>
+              <li>Take clear, well-lit photos from a few different angles (use good natural light and the upload tips).</li>
+              <li>Mention any recent travel, time spent camping/bushwalking, pet contact, or new skincare/soap products.</li>
+              <li>Describe the location on the body and whether other family members or pets have similar spots.</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-white mt-6">Helpful details to tell your GP</h3>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>When it first appeared and whether it has changed shape, size, or colour</li>
-              <li>Whether it is itchy, painful, burning, or symptom-free</li>
-              <li>Any recent travel, outdoor activities (camping, beach, creek swimming, gardening), or pet contact</li>
-              <li>Whether anyone else in the household has a similar rash</li>
-              <li>Any recent changes to soaps, washing powder, or skincare products (to help rule out contact allergy)</li>
-            </ul>
+            <p className="text-sm text-gray-400 mt-6">This is general educational information only. It does not replace professional medical advice.</p>
           </div>
         </article>
 
