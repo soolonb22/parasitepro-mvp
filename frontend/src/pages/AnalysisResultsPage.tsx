@@ -489,12 +489,16 @@ const AnalysisResultsPage = () => {
 
             {/* Secondary — My Health Record */}
             <button
-              onClick={() => setShowMHR(true)}
+              onClick={() => {
+                // Open GP report in new tab so user can Save as PDF, then show instructions
+                window.open(`/gp-report/${id}`, '_blank', 'noopener');
+                setShowMHR(true);
+              }}
               style={{ flex: 1, minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 20px', background: 'transparent', color: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: 10, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.65)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
             >
-              <ExternalLink size={15} /> Share to My Health Record
+              <ExternalLink size={15} /> Export for My Health Record
             </button>
           </div>
 
@@ -724,36 +728,43 @@ const AnalysisResultsPage = () => {
                 <ExternalLink size={20} style={{ color: '#5AB89A' }} />
               </div>
               <div>
-                <h3 style={{ color: 'white', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>Share to My Health Record</h3>
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: 0 }}>Australia's national health record system</p>
+                <h3 style={{ color: 'white', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>📤 Export for My Health Record</h3>
+                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: 0 }}>Your PDF has opened in a new tab — follow these steps</p>
               </div>
             </div>
 
             {/* Steps */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '1.5rem' }}>
               {[
-                { n: '1', title: 'Download your PDF', desc: 'Hit "Download PDF for GP" below — your report will save to your device, ready to share.' },
-                { n: '2', title: 'Log into My Health Record', desc: 'Visit myhr.gov.au or open the My Health Record app and sign in with myGov.' },
-                { n: '3', title: 'Upload the document', desc: 'Go to Documents → Upload a document → select the PDF you downloaded.' },
-                { n: '4', title: 'Share access with your GP', desc: 'Your GP can now view the report at your next appointment.' },
+                { n: '1', title: 'Save the PDF', desc: 'In the new tab that just opened, click "Download / Print PDF" and save it to your device.', highlight: true },
+                { n: '2', title: 'Log into My Health Record', desc: 'Visit myhealthrecord.gov.au or open the app and sign in with myGov.' },
+                { n: '3', title: 'Upload the document', desc: 'Go to Documents → Upload a document → select the PDF you saved.' },
+                { n: '4', title: 'Add a note (optional)', desc: 'Label it "ParasitePro educational report – for GP discussion" so your doctor has context.' },
+                { n: '5', title: 'Share access with your GP', desc: 'Your GP can now view the report at your next appointment.' },
               ].map(step => (
-                <div key={step.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#1B6B5F', color: 'white', fontSize: '0.75rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{step.n}</div>
+                <div key={step.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: step.highlight ? '10px', background: step.highlight ? 'rgba(27,107,95,0.15)' : 'transparent', borderRadius: step.highlight ? 10 : 0, border: step.highlight ? '1px solid rgba(27,107,95,0.3)' : 'none' }}>
+                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: step.highlight ? '#1B6B5F' : 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.75rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{step.n}</div>
                   <div>
-                    <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.82rem', fontWeight: 600, margin: '0 0 2px' }}>{step.title}</p>
+                    <p style={{ color: step.highlight ? '#5AB89A' : 'rgba(255,255,255,0.9)', fontSize: '0.82rem', fontWeight: 600, margin: '0 0 2px' }}>{step.title}</p>
                     <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
+            {/* Educational notice */}
+            <div style={{ background: 'rgba(90,184,154,0.08)', border: '1px solid rgba(90,184,154,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: '1rem' }}>
+              <p style={{ color: '#5AB89A', fontSize: '0.78rem', fontWeight: 600, margin: '0 0 3px' }}>Educational report only</p>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.72rem', margin: 0, lineHeight: 1.5 }}>This helps you prepare information for your GP visit. It is not a diagnosis, medical record, or clinical document.</p>
+            </div>
+
             {/* Action buttons */}
             <div style={{ display: 'flex', gap: 10 }}>
               <button
-                onClick={() => { setShowMHR(false); navigate(`/gp-report/${id}`); }}
-                style={{ flex: 1, padding: '12px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                onClick={() => { window.open(`/gp-report/${id}`, '_blank', 'noopener'); }}
+                style={{ flex: 1, padding: '12px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               >
-                Download PDF First
+                <ExternalLink size={13} /> Re-open PDF tab
               </button>
               <a
                 href="https://www.myhealthrecord.gov.au"

@@ -228,10 +228,10 @@ export default function MyReportsPage() {
                       View full report →
                     </button>
                     <button
-                      onClick={() => navigate(`/gp-report/${report.id}`)}
+                      onClick={() => window.open(`/gp-report/${report.id}`, '_blank', 'noopener')}
                       className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
                       style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--bg-border)', cursor: 'pointer' }}>
-                      📄 GP PDF
+                      📤 Export for MHR
                     </button>
                   </div>
                 </div>
