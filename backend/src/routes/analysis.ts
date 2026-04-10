@@ -507,5 +507,39 @@ Draw on knowledge from WHO, CDC, NHMRC, Queensland Health, TGA, UpToDate, and pe
   }
 );
 
+// PATCH /:id/save  — toggle bookmark flag on an analysis
+router.patch(
+  '/:id/save',
+  authenticateToken,
+  [param('id').isUUID().withMessage('Invalid analysis ID')],
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const userId = req.userId!;
+      const { saved } = req.body; // boolean
+
+      // Ensure is_saved column exists (idempotent migration)
+      await pool.query(`
+        ALTER TABLE analyses ADD COLUMN IF NOT EXISTS is_saved BOOLEAN NOT NULL DEFAULT false
+      `);
+
+      const result = await pool.query(
+        `UPDATE analyses SET is_saved = $1 WHERE id = $2 AND user_id = $3 RETURNING id, is_saved`,
+        [!!saved, id, userId]
+      );
+
+      if (result.rows.length === 0) {
+        res.status(404).json({ error: 'Analysis not found or unauthorised' });
+        return;
+      }
+
+      res.json({ id: result.rows[0].id, isSaved: result.rows[0].is_saved });
+    } catch (err: any) {
+      console.error('Save toggle error:', err);
+      res.status(500).json({ error: 'Failed to update save status' });
+    }
+  }
+);
+
 export default router;
 

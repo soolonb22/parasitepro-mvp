@@ -329,6 +329,8 @@ const AnalysisResultsPage = () => {
   const [showDeepDive, setDeepDive]     = useState(false);
   const [userCredits, setUserCredits]   = useState(0);
   const [showMHR, setShowMHR]           = useState(false);
+  const [isSaved, setIsSaved]           = useState(false);
+  const [saving, setSaving]             = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -349,6 +351,7 @@ const AnalysisResultsPage = () => {
         axios.get(`${API_URL}/auth/profile`,   { headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => null),
       ]);
       setAnalysis(res.data);
+      if (res.data?.isSaved !== undefined) setIsSaved(res.data.isSaved);
       if (profileRes?.data?.imageCredits !== undefined) setUserCredits(profileRes.data.imageCredits);
     } catch { toast.error('Failed to load analysis'); }
     finally { setLoading(false); }
@@ -360,6 +363,18 @@ const AnalysisResultsPage = () => {
       setFeedbackDone(true);
       toast.success(helpful ? 'Glad it helped.' : 'Thanks for the feedback.');
     } catch { toast.error('Failed to submit feedback'); }
+  };
+
+  const toggleSave = async () => {
+    if (!accessToken) { toast.error('Please sign in to save reports.'); return; }
+    setSaving(true);
+    try {
+      const newVal = !isSaved;
+      await axios.patch(`${API_URL}/analysis/${id}/save`, { saved: newVal }, { headers: { Authorization: `Bearer ${accessToken}` } });
+      setIsSaved(newVal);
+      toast.success(newVal ? '✅ Report saved to your account!' : 'Report removed from saved.');
+    } catch { toast.error('Save failed – please try again.'); }
+    finally { setSaving(false); }
   };
 
   // Loading
@@ -483,7 +498,23 @@ const AnalysisResultsPage = () => {
             </button>
           </div>
 
-          {/* Disclaimer inline */}
+          {/* Save report button */}
+          <button
+            onClick={toggleSave}
+            disabled={saving}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: 8, padding: '13px 20px', borderRadius: 10, fontSize: '0.9rem', fontWeight: 600,
+              cursor: saving ? 'wait' : 'pointer', transition: 'all 0.15s', border: 'none',
+              background: isSaved ? 'rgba(27,107,95,0.25)' : 'rgba(255,255,255,0.07)',
+              color: isSaved ? '#4ade80' : 'rgba(255,255,255,0.8)',
+              outline: isSaved ? '1.5px solid #4ade80' : '1.5px solid rgba(255,255,255,0.2)',
+            }}
+            onMouseEnter={e => { if (!saving) e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = isSaved ? 'rgba(27,107,95,0.25)' : 'rgba(255,255,255,0.07)'; }}
+          >
+            {saving ? '⏳ Saving…' : isSaved ? '✅ Saved to my account' : '💾 Save this report to my account'}
+          </button>
           <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.5 }}>
             ⚠️ This report is for educational purposes only and does not constitute a medical diagnosis. Always consult a qualified healthcare professional.
           </p>
