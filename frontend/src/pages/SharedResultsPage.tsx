@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
+import { optimiseCloudinaryUrl } from '../utils/cloudinary';
 
 
 interface SharedData {
@@ -138,7 +139,7 @@ export default function SharedResultsPage() {
             {analysis.imageUrl && (
               <div style={{ width: '200px', flexShrink: 0 }}>
                 <img 
-                  src={analysis.imageUrl} 
+                  src={optimiseCloudinaryUrl(analysis.imageUrl, 400)}
                   alt="Analysis sample"
                   style={{ 
                     width: '100%', 

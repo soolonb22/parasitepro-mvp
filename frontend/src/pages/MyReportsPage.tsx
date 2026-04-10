@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { optimiseCloudinaryUrl } from '../utils/cloudinary';
 
 const API_URL = (() => {
   const b = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
@@ -180,7 +181,7 @@ export default function MyReportsPage() {
                     <div className="flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center text-4xl"
                       style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
                       {report.thumbnailUrl
-                        ? <img src={report.thumbnailUrl} alt="Report thumbnail" className="w-full h-full object-cover" />
+                        ? <img src={optimiseCloudinaryUrl(report.thumbnailUrl, 200, 'thumb')} alt="Report thumbnail" className="w-full h-full object-cover" />
                         : sampleIcon}
                     </div>
 

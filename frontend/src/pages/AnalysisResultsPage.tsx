@@ -38,7 +38,7 @@ const AnnotatedImage = ({ imageUrl, detectionCount = 1 }) => {
   const layout = BOX_LAYOUTS[Math.min(detectionCount - 1, BOX_LAYOUTS.length - 1)];
   return (
     <div className="relative w-full rounded-lg overflow-hidden" style={{ background: '#0d0d1a', aspectRatio: '4/3' }}>
-      {imageUrl && <img src={imageUrl} alt="Specimen" className="w-full h-full object-contain" />}
+      {imageUrl && <img src={optimiseCloudinaryUrl(imageUrl, 800)} alt="Specimen" className="w-full h-full object-contain" />}
 
       {/* Scan line */}
       <div className="absolute inset-x-0 h-px pointer-events-none animate-scan"
@@ -165,7 +165,7 @@ const ReportCard = ({ analysis }) => {
 
         {/* LEFT — image */}
         <div className="p-5 flex flex-col gap-3" style={{ background: '#EAEBE8', borderRight: '1px solid #D8D9D5' }}>
-          <AnnotatedImage imageUrl={analysis.imageUrl || analysis.thumbnailUrl} detectionCount={analysis.detections?.length || 1} />
+          <AnnotatedImage imageUrl={optimiseCloudinaryUrl(analysis.imageUrl || analysis.thumbnailUrl, 800)} detectionCount={analysis.detections?.length || 1} />
           <div className="flex items-center justify-between text-xs" style={{ color: '#888' }}>
             <span className="font-medium">
               {analysis.sampleType && analysis.sampleType !== 'auto'
