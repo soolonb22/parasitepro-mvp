@@ -147,6 +147,7 @@ const DashboardPage: React.FC = () => {
           {[
             { icon: '📚', label: 'Encyclopedia', path: '/encyclopedia' },
             { icon: '📖', label: 'Tips & Info', path: '/tips' },
+            { icon: '📋', label: 'My Reports', path: '/my-reports' },
             { icon: '🗺️', label: 'Travel risk map', path: '/travel-risk' },
             { icon: '📓', label: 'Symptom journal', path: '/symptom-journal' },
             { icon: '🎯', label: 'Sample report', path: '/sample-report' },

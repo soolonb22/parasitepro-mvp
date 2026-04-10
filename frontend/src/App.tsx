@@ -57,6 +57,7 @@ import BlogPage from './pages/BlogPage';
 import DemoExperience from './pages/DemoExperience';
 import EncyclopediaPage from './pages/EncyclopediaPage';
 import TipsPage from './pages/TipsPage';
+import MyReportsPage from './pages/MyReportsPage';
 import HealthFormsPage from './pages/HealthFormsPage';
 import NotificationSettingsPage from './pages/NotificationSettingsPage';
 import OnboardingSurvey from './pages/OnboardingSurvey';
@@ -354,6 +355,7 @@ function App() {
           <Route path="/scientific-library" element={<ScientificLibraryPage />} />
           <Route path="/encyclopedia" element={<EncyclopediaPage />} />
           <Route path="/tips" element={<TipsPage />} />
+          <Route path="/my-reports" element={<MyReportsPage />} />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

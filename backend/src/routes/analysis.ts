@@ -275,12 +275,14 @@ router.get(
       const status = req.query.status as string | undefined;
       const sampleType = req.query.sampleType as string | undefined;
 
-      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
+      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, a.is_saved, a.overall_assessment, a.urgency_level, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
       const queryParams: any[] = [userId];
       let paramIndex = 2;
 
       if (status) { queryText += ` AND a.status = $${paramIndex}`; queryParams.push(status); paramIndex++; }
       if (sampleType) { queryText += ` AND a.sample_type = $${paramIndex}`; queryParams.push(sampleType); paramIndex++; }
+      const savedOnly = req.query.saved === 'true';
+      if (savedOnly) { queryText += ` AND a.is_saved = true`; }
 
       queryText += ` GROUP BY a.id ORDER BY a.uploaded_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
       queryParams.push(limit, offset);
@@ -302,6 +304,9 @@ router.get(
           id: a.id, thumbnailUrl: a.thumbnail_url, status: a.status, sampleType: a.sample_type,
           uploadedAt: a.uploaded_at, processingCompletedAt: a.processing_completed_at,
           detectionCount: parseInt(a.detection_count),
+          isSaved: a.is_saved || false,
+          overallAssessment: a.overall_assessment || null,
+          urgencyLevel: a.urgency_level || null,
         })),
         total, limit, offset,
       });
