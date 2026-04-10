@@ -3,6 +3,11 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
+const API_URL = (() => {
+  const b = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+  return b.endsWith('/api') ? b : `${b}/api`;
+})();
+
 export default function EncyclopediaPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -32,7 +37,7 @@ export default function EncyclopediaPage() {
       if (filter.category) params.category = filter.category;
       if (filter.search) params.search = filter.search;
 
-      const response = await axios.get('/api/encyclopedia', { params });
+      const response = await axios.get(`${API_URL}/encyclopedia`, { params });
       setParasites(response.data.parasites);
     } catch (error) {
       console.error('Failed to fetch parasites:', error);
@@ -43,7 +48,7 @@ export default function EncyclopediaPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/encyclopedia/categories');
+      const response = await axios.get(`${API_URL}/encyclopedia/categories`);
       setCategories(response.data.categories);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
@@ -52,7 +57,7 @@ export default function EncyclopediaPage() {
 
   const fetchParasiteDetails = async (parasiteSlug) => {
     try {
-      const response = await axios.get(`/api/encyclopedia/${parasiteSlug}`);
+      const response = await axios.get(`${API_URL}/encyclopedia/${parasiteSlug}`);
       setSelectedParasite(response.data.parasite);
     } catch (error) {
       console.error('Failed to fetch parasite details:', error);
