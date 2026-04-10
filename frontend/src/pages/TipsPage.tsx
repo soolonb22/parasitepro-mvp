@@ -162,6 +162,66 @@ export default function TipsPage() {
           </div>
         </article>
 
+        {/* Article 6 - Bristol Stool Chart */}
+        <article className="mb-16 pb-16 border-b border-white/10">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="text-5xl">🟫</span>
+            <h2 className="text-2xl md:text-3xl font-semibold">Understanding the Bristol Stool Chart</h2>
+          </div>
+          <div className="space-y-5 text-gray-300 text-base leading-relaxed">
+            <p>
+              The Bristol Stool Chart is a general reference tool used by healthcare professionals to describe stool consistency.
+              It ranges from Type 1 (separate hard lumps) through to Type 7 (entirely liquid). This is educational information only.
+            </p>
+
+            <h3 className="text-lg font-semibold text-white mt-6">The seven types at a glance</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong className="text-white">Types 1–2:</strong> Hard, lumpy stools — often associated with slower transit time</li>
+              <li><strong className="text-white">Types 3–4:</strong> Smooth, sausage-shaped — generally considered typical</li>
+              <li><strong className="text-white">Types 5–6:</strong> Soft, fluffy, or mushy — may indicate faster transit</li>
+              <li><strong className="text-white">Type 7:</strong> Watery, no solid pieces — worth discussing with your GP if persistent</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold text-white mt-6">Useful things to note before your GP visit</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Which Bristol type most closely describes what you are seeing</li>
+              <li>How long the change has been happening and whether it comes and goes</li>
+              <li>Any unusual colour (pale, very dark, or greenish) alongside the change in consistency</li>
+              <li>Whether you have had any recent travel, dietary changes, or antibiotic use</li>
+            </ul>
+          </div>
+        </article>
+
+        {/* Article 7 - Skin Rash Patterns */}
+        <article className="mb-16 pb-16 border-b border-white/10">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="text-5xl">🩹</span>
+            <h2 className="text-2xl md:text-3xl font-semibold">Common Skin Rash Visual Patterns</h2>
+          </div>
+          <div className="space-y-5 text-gray-300 text-base leading-relaxed">
+            <p>
+              Skin changes can have many causes, including parasitic, fungal, bacterial, allergic, or inflammatory origins.
+              This page shares general educational information about visual patterns people sometimes notice, to help prepare for a GP appointment.
+            </p>
+
+            <h3 className="text-lg font-semibold text-white mt-6">Common visual patterns people describe</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong className="text-white">Trailing or linear marks:</strong> A winding, raised line under the skin — sometimes seen on feet or legs after beach or soil contact</li>
+              <li><strong className="text-white">Circular or ring-shaped patches:</strong> A round area with a clearer centre, with or without scaling</li>
+              <li><strong className="text-white">Clustered small bumps:</strong> Multiple raised spots in a localised area, sometimes intensely itchy at night</li>
+              <li><strong className="text-white">Red, inflamed bite marks:</strong> Multiple bites in a row or group, often on exposed areas</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold text-white mt-6">Helpful details to take to your GP</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>When the rash or mark first appeared and whether it has changed shape or size</li>
+              <li>Whether it is itchy, painful, warm to touch, or symptom-free</li>
+              <li>Any recent travel, outdoor activities (camping, beach, gardening), or pet contact</li>
+              <li>Clear close-up photos taken in natural light showing the full extent of the area</li>
+            </ul>
+          </div>
+        </article>
+
         {/* Upsell */}
         <div className="mt-12 bg-white/5 border border-emerald-500/30 rounded-3xl p-10 text-center">
           <h3 className="text-2xl md:text-3xl font-semibold mb-4">Enjoying these free guides?</h3>
