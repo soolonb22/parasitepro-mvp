@@ -76,7 +76,8 @@ const GPReportPage = () => {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading]   = useState(true);
   const [copying, setCopying]   = useState(false);
-  const [showMHR, setShowMHR]   = useState(false);
+  const [showMHR, setShowMHR]             = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -85,7 +86,11 @@ const GPReportPage = () => {
     if (!loading && analysis) {
       const params = new URLSearchParams(location.search);
       if (params.get('autoprint') === 'true') {
-        const t = setTimeout(() => window.print(), 800); // slight delay for render
+        const t = setTimeout(() => {
+          window.print();
+          // Show instructions modal after print dialog — 1.2s lets dialog open first
+          setTimeout(() => setShowInstructions(true), 1200);
+        }, 800);
         return () => clearTimeout(t);
       }
     }
@@ -483,6 +488,51 @@ const GPReportPage = () => {
             </div>
             <p style={{ color:'rgba(255,255,255,0.3)', fontSize:'0.68rem', marginTop:'1rem', textAlign:'center', lineHeight:1.5 }}>
               notworms.com is not affiliated with My Health Record or the Australian Digital Health Agency. This report is educational only.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── My Health Record instructions modal (fires after autoprint) ── */}
+      {showInstructions && (
+        <div
+          onClick={e => e.target === e.currentTarget && setShowInstructions(false)}
+          className="no-print"
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.82)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '1.5rem', backdropFilter: 'blur(6px)' }}
+        >
+          <div style={{ background: '#fff', color: '#111', borderRadius: 24, maxWidth: 440, width: '100%', padding: '2rem', boxShadow: '0 32px 80px rgba(0,0,0,0.5)' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.25rem' }}>
+              ✅ PDF ready for My Health Record
+            </h3>
+
+            <ol style={{ paddingLeft: '1.25rem', margin: '0 0 1.5rem', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[
+                'The print dialog has opened — choose "Save as PDF" in the settings.',
+                'Name the file something clear, e.g. "ParasitePro_Report_2025.pdf".',
+                <>Log into <a href="https://www.myhealthrecord.gov.au" target="_blank" rel="noopener noreferrer" style={{ color: '#1d6fa4', textDecoration: 'underline' }}>My Health Record</a> or open the app.</>,
+                'Go to Documents → Upload → select the PDF you just saved.',
+                'Optional: add a note — "ParasitePro educational report – for discussion with my GP".',
+              ].map((step, i) => (
+                <li key={i} style={{ fontSize: '0.85rem', lineHeight: 1.55, color: '#222' }}>{step}</li>
+              ))}
+            </ol>
+
+            <div style={{ background: '#f0faf6', border: '1px solid #b2ddc8', borderRadius: 12, padding: '12px 14px', marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1B6B5F', margin: '0 0 3px' }}>Educational report only</p>
+              <p style={{ fontSize: '0.73rem', color: '#444', margin: 0, lineHeight: 1.5 }}>
+                This report helps you prepare for your GP visit. It is not a medical diagnosis, clinical record, or treatment advice.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowInstructions(false)}
+              style={{ width: '100%', background: '#111', color: '#fff', border: 'none', borderRadius: 14, padding: '14px', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Got it, thanks
+            </button>
+
+            <p style={{ fontSize: '0.68rem', color: '#999', textAlign: 'center', marginTop: '0.75rem' }}>
+              notworms.com is not affiliated with My Health Record or the Australian Digital Health Agency.
             </p>
           </div>
         </div>
