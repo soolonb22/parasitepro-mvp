@@ -5,7 +5,7 @@ import { ArrowLeft, Download, Share2, Loader, AlertTriangle, Printer, ExternalLi
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
-import { optimiseCloudinaryUrl } from '../utils/cloudinary';
+import CldImage from '../components/CldImage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -241,7 +241,7 @@ const GPReportPage = () => {
               {/* Annotated image */}
               <div style={{ position:'relative', borderRadius:10, overflow:'hidden', background:'#0d0d1a', aspectRatio:'4/3' }}>
                 {(analysis.imageUrl || analysis.thumbnailUrl) && (
-                  <img src={optimiseCloudinaryUrl(analysis.imageUrl || analysis.thumbnailUrl, 800)} alt="Specimen" style={{ width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
+                  <CldImage src={analysis.imageUrl || analysis.thumbnailUrl} alt="Specimen" width={1200} mode="limit" priority={true} sizes="(max-width: 768px) 100vw, 800px" style={{ width:'100%', height:'100%', objectFit:'contain', display:'block' }} />
                 )}
                 {/* Scan line */}
                 <div style={{ position:'absolute', left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(34,197,94,0.9),transparent)', animation:'scan 2s ease-in-out infinite', pointerEvents:'none' }} />

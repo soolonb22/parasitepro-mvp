@@ -4,6 +4,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 import { optimiseCloudinaryUrl } from '../utils/cloudinary';
+import CldImage from '../components/CldImage';
 
 
 interface SharedData {
@@ -138,8 +139,10 @@ export default function SharedResultsPage() {
           <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
             {analysis.imageUrl && (
               <div style={{ width: '200px', flexShrink: 0 }}>
-                <img 
-                  src={optimiseCloudinaryUrl(analysis.imageUrl, 400)}
+                <CldImage 
+                  src={analysis.imageUrl}
+                  width={400}
+                  mode="limit"
                   alt="Analysis sample"
                   style={{ 
                     width: '100%', 
