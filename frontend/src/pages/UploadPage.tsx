@@ -79,7 +79,99 @@ async function preprocessImage(file: File): Promise<{
   });
 }
 
-// ─── FORM OPTIONS (exact spec) ─────────────────────────────────────────────────
+// ─── IMAGE QUALITY ANALYSIS ───────────────────────────────────────────────────
+interface QualityResult {
+  brightness: number;   // 0–255
+  resolution: { w: number; h: number };
+  blurScore: number;    // lower = blurrier (Laplacian variance)
+  status: 'good' | 'warn' | 'poor';
+  tips: string[];
+}
+
+function analyzeQuality(file: File): Promise<QualityResult> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const canvas = document.createElement('canvas');
+      // Sample at max 400px for speed
+      const scale = Math.min(1, 400 / Math.max(w, h));
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = imageData.data;
+      const len = d.length / 4;
+
+      // Brightness (luminance average)
+      let lumSum = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        lumSum += 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+      }
+      const brightness = lumSum / len;
+
+      // Blur score — Laplacian variance (higher = sharper)
+      const cw = canvas.width, ch = canvas.height;
+      let lapSum = 0, lapSumSq = 0, lapN = 0;
+      for (let y = 1; y < ch - 1; y++) {
+        for (let x = 1; x < cw - 1; x++) {
+          const idx = (y * cw + x) * 4;
+          const lap =
+            -d[((y-1)*cw+x)*4] - d[(y*cw+(x-1))*4] +
+            4*d[idx] -
+            d[(y*cw+(x+1))*4] - d[((y+1)*cw+x)*4];
+          lapSum += lap; lapSumSq += lap * lap; lapN++;
+        }
+      }
+      const lapMean = lapSum / lapN;
+      const blurScore = (lapSumSq / lapN) - (lapMean * lapMean);
+
+      // Build tips + status
+      const tips: string[] = [];
+      let badCount = 0;
+
+      if (brightness < 60) {
+        tips.push('🌧️ Too dark — common in Mackay wet season indoors. Move to a window or step outside.');
+        badCount++;
+      } else if (brightness < 100) {
+        tips.push('💡 A bit dim — brighter light will improve detail. Try natural light if you can.');
+        badCount += 0.5;
+      } else if (brightness > 220) {
+        tips.push('☀️ Slightly overexposed — step back from direct sunlight or turn off flash.');
+        badCount += 0.5;
+      }
+
+      if (w < 600 || h < 600) {
+        tips.push('📐 Low resolution — move your camera closer or use a higher-res setting.');
+        badCount++;
+      } else if (w < 900 || h < 900) {
+        tips.push('📐 Moderate resolution — closer is better for small subjects.');
+        badCount += 0.3;
+      }
+
+      if (blurScore < 50) {
+        tips.push('🔍 Image looks blurry — tap to focus before shooting, or wipe your camera lens.');
+        badCount++;
+      } else if (blurScore < 150) {
+        tips.push('🔍 Slightly out of focus — try tapping the subject on your screen before taking the shot.');
+        badCount += 0.3;
+      }
+
+      if (tips.length === 0) tips.push('✅ Great photo! Clear, well-lit, and in focus — ready for analysis.');
+
+      const status: QualityResult['status'] = badCount >= 1.5 ? 'poor' : badCount >= 0.5 ? 'warn' : 'good';
+      resolve({ brightness, resolution: { w, h }, blurScore, status, tips });
+    };
+    img.onerror = () => resolve({ brightness: 128, resolution: { w: 0, h: 0 }, blurScore: 200, status: 'good', tips: [] });
+    img.src = url;
+  });
+}
+
+
 const Q1_OPTIONS = [
   { value: 'stool', label: 'Stool / faecal matter' },
   { value: 'skin', label: 'Skin, rash, or lesion' },
@@ -215,6 +307,7 @@ export default function UploadPage() {
   const [enhancedPreviewUrl, setEnhancedPreviewUrl] = useState('');
   const [form, setForm] = useState<FormState>(loadForm);
   const [error, setError] = useState('');
+  const [quality, setQuality] = useState<QualityResult | null>(null);
 
   // Persist form to sessionStorage on every change
   React.useEffect(() => { saveForm(form); }, [form]);
@@ -224,13 +317,18 @@ export default function UploadPage() {
     if (!file.type.startsWith('image/')) { setError('Please upload an image file (JPG or PNG).'); return; }
     setError('');
     setStep('enhancing');
-    try {
-      const result = await preprocessImage(file);
+    // Run quality check in parallel with preprocessing
+    const [result, qual] = await Promise.all([
+      preprocessImage(file).catch(() => null),
+      analyzeQuality(file),
+    ]);
+    setQuality(qual);
+    if (result) {
       setOriginalFile(result.original);
       setEnhancedFile(result.enhanced);
       setPreviewUrl(result.previewUrl);
       setEnhancedPreviewUrl(result.enhancedPreviewUrl);
-    } catch {
+    } else {
       setOriginalFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
@@ -317,14 +415,16 @@ export default function UploadPage() {
 
   // ── Drop zone ──────────────────────────────────────────────────────────────
   if (step === 'drop') return (
-    <div className="min-h-screen py-16 px-4" style={{ background: 'var(--bg-base)' }}>
-      <div className="max-w-xl mx-auto">
-        <div className="text-center mb-10">
+    <div className="min-h-screen py-12 px-4" style={{ background: 'var(--bg-base)' }}>
+      <div className="max-w-xl mx-auto space-y-6">
+
+        {/* Header */}
+        <div className="text-center">
           <h1 className="font-display font-bold text-4xl mb-3" style={{ color: 'var(--text-primary)' }}>
-            Upload your photo
+            📸 Upload your photo
           </h1>
           <p style={{ color: 'var(--text-muted)' }}>
-            Drop your image below and I'll enhance it automatically, then guide you through a quick form before the analysis starts.
+            Take or upload a clear, well-lit close-up for the best educational report.
           </p>
           {user && (
             <p className="mt-3 text-sm font-medium" style={{ color: 'var(--amber-bright)' }}>
@@ -333,35 +433,106 @@ export default function UploadPage() {
           )}
         </div>
 
+        {/* Mobile camera + gallery buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => {
+              const inp = document.createElement('input');
+              inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+              inp.onchange = (e: any) => { const f = e.target.files?.[0]; if (f) handleFile(f); };
+              inp.click();
+            }}
+            className="rounded-2xl py-5 flex flex-col items-center gap-2 font-semibold transition-all active:scale-95"
+            style={{ background: 'var(--amber)', color: '#000', border: 'none' }}>
+            <span className="text-3xl">📷</span>
+            <span className="text-sm">Take a photo</span>
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-2xl py-5 flex flex-col items-center gap-2 font-semibold transition-all active:scale-95"
+            style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)', border: '1.5px solid var(--bg-border)' }}>
+            <span className="text-3xl">🖼️</span>
+            <span className="text-sm">Choose from gallery</span>
+          </button>
+        </div>
+
+        {/* Drag & drop zone */}
         <div
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className="rounded-3xl border-2 border-dashed p-16 text-center cursor-pointer transition-all"
+          className="rounded-3xl border-2 border-dashed p-10 text-center cursor-pointer transition-all hidden md:block"
           style={{
             borderColor: isDragging ? 'var(--amber)' : 'var(--bg-border)',
             background: isDragging ? 'rgba(217,119,6,0.05)' : 'var(--bg-surface)',
           }}>
-          <div className="text-5xl mb-4">📷</div>
-          <p className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>
-            Drop your photo here, or click to browse
+          <div className="text-4xl mb-3">⬆️</div>
+          <p className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+            Or drag and drop here
           </p>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            JPG or PNG · up to 10MB · well-lit close-ups work best
+            JPG or PNG · up to 10 MB
           </p>
-          <input ref={fileInputRef} type="file" accept="image/jpeg,image/png" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         </div>
+        <input ref={fileInputRef} type="file" accept="image/jpeg,image/png" className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
 
         {error && (
-          <p className="mt-4 text-sm text-center rounded-xl p-3"
+          <p className="text-sm text-center rounded-xl p-3"
             style={{ color: '#EF4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
             {error}
           </p>
         )}
 
-        <div className="mt-8 grid grid-cols-3 gap-3">
+        {/* Good / Bad photo examples */}
+        <div className="rounded-2xl p-5" style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
+          <p className="text-sm font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+            📚 What makes a good photo?
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="rounded-xl overflow-hidden mb-2 aspect-square flex items-center justify-center text-5xl"
+                style={{ background: 'rgba(34,197,94,0.08)', border: '2px solid rgba(34,197,94,0.3)' }}>
+                🟢
+              </div>
+              <p className="text-xs font-semibold mb-1" style={{ color: '#4ade80' }}>✅ Good</p>
+              <ul className="text-xs space-y-1" style={{ color: 'var(--text-muted)' }}>
+                <li>• Natural daylight</li>
+                <li>• Subject fills the frame</li>
+                <li>• Sharp &amp; in focus</li>
+                <li>• No flash glare</li>
+              </ul>
+            </div>
+            <div>
+              <div className="rounded-xl overflow-hidden mb-2 aspect-square flex items-center justify-center text-5xl"
+                style={{ background: 'rgba(239,68,68,0.08)', border: '2px solid rgba(239,68,68,0.3)' }}>
+                🔴
+              </div>
+              <p className="text-xs font-semibold mb-1" style={{ color: '#f87171' }}>❌ Avoid</p>
+              <ul className="text-xs space-y-1" style={{ color: 'var(--text-muted)' }}>
+                <li>• Dark or dimly lit</li>
+                <li>• Blurry or shaky</li>
+                <li>• Subject too small</li>
+                <li>• Heavy flash glare</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* QLD-specific tip */}
+        <div className="rounded-2xl p-4 flex gap-3"
+          style={{ background: 'rgba(217,119,6,0.07)', border: '1px solid rgba(217,119,6,0.25)' }}>
+          <span className="text-xl flex-shrink-0">🌴</span>
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            <strong style={{ color: 'var(--amber-bright)' }}>Mackay &amp; North QLD tip:</strong>{' '}
+            During the wet season, indoor light can be too dim for clear photos. Step outside under a covered verandah
+            or near a window — even 30 seconds of natural light makes a big difference to the report quality.
+          </p>
+        </div>
+
+        {/* Feature chips */}
+        <div className="grid grid-cols-3 gap-3">
           {[
             { icon: '✨', label: 'Auto-enhanced', detail: 'Sharpened + colour corrected before analysis' },
             { icon: '🧠', label: 'Deep AI', detail: 'Claude Vision examines every pixel' },
@@ -376,8 +547,12 @@ export default function UploadPage() {
           ))}
         </div>
 
-        <p className="mt-8 text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-          ⚠️ Educational tool only · Not a medical diagnosis · Always consult a GP for health concerns
+        {/* Full disclaimer */}
+        <p className="text-xs text-center leading-relaxed pb-4" style={{ color: 'var(--text-muted)' }}>
+          ⚠️ Educational tool only. ParasitePro provides structured educational reports to help you prepare for GP visits.
+          It does not provide medical diagnoses, prescribe treatments, or replace professional medical advice.
+          Complies with TGA Software as a Medical Device guidelines and AHPRA advertising standards.
+          In an emergency, call 000 immediately.
         </p>
       </div>
     </div>
@@ -387,6 +562,43 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: 'var(--bg-base)' }}>
       <div className="max-w-2xl mx-auto">
+
+        {/* Quality feedback banner */}
+        {quality && (
+          <div className="rounded-2xl p-4"
+            style={{
+              background: quality.status === 'good'
+                ? 'rgba(34,197,94,0.07)' : quality.status === 'warn'
+                ? 'rgba(234,179,8,0.07)' : 'rgba(239,68,68,0.07)',
+              border: `1.5px solid ${quality.status === 'good' ? 'rgba(34,197,94,0.3)' : quality.status === 'warn' ? 'rgba(234,179,8,0.3)' : 'rgba(239,68,68,0.3)'}`,
+            }}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">
+                {quality.status === 'good' ? '✅' : quality.status === 'warn' ? '⚠️' : '🔴'}
+              </span>
+              <p className="text-sm font-semibold"
+                style={{ color: quality.status === 'good' ? '#4ade80' : quality.status === 'warn' ? '#fbbf24' : '#f87171' }}>
+                Photo quality: {quality.status === 'good' ? 'Good' : quality.status === 'warn' ? 'Fair — could be better' : 'Poor — retake recommended'}
+              </p>
+              <span className="ml-auto text-xs" style={{ color: 'var(--text-muted)' }}>
+                {quality.resolution.w > 0 ? `${quality.resolution.w}×${quality.resolution.h}px` : ''}
+              </span>
+            </div>
+            <ul className="space-y-1">
+              {quality.tips.map((tip, i) => (
+                <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{tip}</li>
+              ))}
+            </ul>
+            {quality.status !== 'good' && (
+              <button
+                onClick={() => { setStep('drop'); setQuality(null); }}
+                className="mt-3 text-xs font-semibold underline"
+                style={{ color: 'var(--amber-bright)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                ← Retake photo
+              </button>
+            )}
+          </div>
+        )}
 
         {/* PARA intro */}
         <div className="rounded-2xl p-5 mb-8 flex gap-4"
