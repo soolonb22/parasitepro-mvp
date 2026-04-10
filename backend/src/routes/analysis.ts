@@ -275,7 +275,7 @@ router.get(
       const status = req.query.status as string | undefined;
       const sampleType = req.query.sampleType as string | undefined;
 
-      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, a.is_saved, a.overall_assessment, a.urgency_level, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
+      let queryText = `SELECT a.id, a.thumbnail_url, a.status, a.sample_type, a.uploaded_at, a.processing_completed_at, a.is_saved, a.overall_assessment, a.urgency_level, a.ai_summary, COUNT(d.id) as detection_count FROM analyses a LEFT JOIN detections d ON d.analysis_id = a.id WHERE a.user_id = $1`;
       const queryParams: any[] = [userId];
       let paramIndex = 2;
 
@@ -307,6 +307,7 @@ router.get(
           isSaved: a.is_saved || false,
           overallAssessment: a.overall_assessment || null,
           urgencyLevel: a.urgency_level || null,
+          aiSummary: a.ai_summary || null,
         })),
         total, limit, offset,
       });

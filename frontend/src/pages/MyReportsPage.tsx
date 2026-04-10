@@ -175,12 +175,12 @@ export default function MyReportsPage() {
                   className="rounded-2xl overflow-hidden transition-all"
                   style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
 
-                  <div className="flex gap-4 p-5">
-                    {/* Thumbnail */}
-                    <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center text-3xl"
+                  <div className="flex gap-5 p-5">
+                    {/* Thumbnail — 96×96 matching template */}
+                    <div className="flex-shrink-0 w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center text-4xl"
                       style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
                       {report.thumbnailUrl
-                        ? <img src={report.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                        ? <img src={report.thumbnailUrl} alt="Report thumbnail" className="w-full h-full object-cover" />
                         : sampleIcon}
                     </div>
 
@@ -189,7 +189,7 @@ export default function MyReportsPage() {
                       <div className="flex items-start justify-between gap-2 flex-wrap">
                         <div>
                           <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
-                            {formatDate(report.uploadedAt)} · {report.sampleType || 'Unknown type'}
+                            {formatDate(report.uploadedAt)} · <span className="capitalize">{report.sampleType || 'Unknown type'}</span>
                             {report.detectionCount > 0 && ` · ${report.detectionCount} finding${report.detectionCount !== 1 ? 's' : ''}`}
                           </p>
                           {urgency && (
@@ -209,13 +209,11 @@ export default function MyReportsPage() {
                         </button>
                       </div>
 
-                      {/* Summary snippet */}
-                      {report.overallAssessment && (
-                        <p className="text-sm leading-relaxed line-clamp-2"
-                          style={{ color: 'var(--text-secondary)' }}>
-                          {report.overallAssessment}
-                        </p>
-                      )}
+                      {/* Summary — aiSummary with overallAssessment fallback */}
+                      <p className="text-sm leading-relaxed line-clamp-2"
+                        style={{ color: 'var(--text-secondary)' }}>
+                        {report.aiSummary || report.overallAssessment || 'No summary available.'}
+                      </p>
                     </div>
                   </div>
 
