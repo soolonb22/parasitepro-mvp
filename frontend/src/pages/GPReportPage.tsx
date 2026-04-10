@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Download, Share2, Loader, AlertTriangle, Printer, ExternalLink, X } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -69,6 +69,7 @@ const Logo = () => (
 const GPReportPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { accessToken, user } = useAuthStore();
   const reportRef = useRef(null);
 
@@ -78,6 +79,17 @@ const GPReportPage = () => {
   const [showMHR, setShowMHR]   = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
+
+  // Auto-print when ?autoprint=true is present (My Health Record export flow)
+  useEffect(() => {
+    if (!loading && analysis) {
+      const params = new URLSearchParams(location.search);
+      if (params.get('autoprint') === 'true') {
+        const t = setTimeout(() => window.print(), 800); // slight delay for render
+        return () => clearTimeout(t);
+      }
+    }
+  }, [loading, analysis, location.search]);
 
   const fetchAnalysis = async () => {
     try {

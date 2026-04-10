@@ -490,8 +490,7 @@ const AnalysisResultsPage = () => {
             {/* Secondary — My Health Record */}
             <button
               onClick={() => {
-                // Open GP report in new tab so user can Save as PDF, then show instructions
-                window.open(`/gp-report/${id}`, '_blank', 'noopener');
+                window.open(`/gp-report/${id}?autoprint=true`, '_blank', 'noopener');
                 setShowMHR(true);
               }}
               style={{ flex: 1, minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 20px', background: 'transparent', color: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: 10, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}
@@ -761,7 +760,7 @@ const AnalysisResultsPage = () => {
             {/* Action buttons */}
             <div style={{ display: 'flex', gap: 10 }}>
               <button
-                onClick={() => { window.open(`/gp-report/${id}`, '_blank', 'noopener'); }}
+                onClick={() => { window.open(`/gp-report/${id}?autoprint=true`, '_blank', 'noopener'); }}
                 style={{ flex: 1, padding: '12px', background: '#1B6B5F', color: 'white', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
               >
                 <ExternalLink size={13} /> Re-open PDF tab

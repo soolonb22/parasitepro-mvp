@@ -228,7 +228,7 @@ export default function MyReportsPage() {
                       View full report →
                     </button>
                     <button
-                      onClick={() => window.open(`/gp-report/${report.id}`, '_blank', 'noopener')}
+                      onClick={() => window.open(`/gp-report/${report.id}?autoprint=true`, '_blank', 'noopener')}
                       className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
                       style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--bg-border)', cursor: 'pointer' }}>
                       📤 Export for MHR
