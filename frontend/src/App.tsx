@@ -56,6 +56,7 @@ import SeoGiardiaPage from './pages/SeoGiardiaPage';
 import BlogPage from './pages/BlogPage';
 import DemoExperience from './pages/DemoExperience';
 import EncyclopediaPage from './pages/EncyclopediaPage';
+import TipsPage from './pages/TipsPage';
 import HealthFormsPage from './pages/HealthFormsPage';
 import NotificationSettingsPage from './pages/NotificationSettingsPage';
 import OnboardingSurvey from './pages/OnboardingSurvey';
@@ -352,6 +353,7 @@ function App() {
           <Route path="/results/:id" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
           <Route path="/scientific-library" element={<ScientificLibraryPage />} />
           <Route path="/encyclopedia" element={<EncyclopediaPage />} />
+          <Route path="/tips" element={<TipsPage />} />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

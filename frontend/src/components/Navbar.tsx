@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/how-it-works', label: 'How It Works' },
     { path: '/resources', label: 'Resources' },
+    { path: '/tips', label: 'Tips & Info' },
     { path: '/privacy', label: 'Privacy' },
   ];
 

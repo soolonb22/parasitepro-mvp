@@ -146,6 +146,7 @@ const DashboardPage: React.FC = () => {
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { icon: '📚', label: 'Encyclopedia', path: '/encyclopedia' },
+            { icon: '📖', label: 'Tips & Info', path: '/tips' },
             { icon: '🗺️', label: 'Travel risk map', path: '/travel-risk' },
             { icon: '📓', label: 'Symptom journal', path: '/symptom-journal' },
             { icon: '🎯', label: 'Sample report', path: '/sample-report' },
