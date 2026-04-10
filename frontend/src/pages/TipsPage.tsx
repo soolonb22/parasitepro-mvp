@@ -169,59 +169,24 @@ export default function TipsPage() {
             <h2 className="text-2xl md:text-3xl font-semibold">Understanding the Bristol Stool Chart</h2>
           </div>
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
-            <p>
-              The Bristol Stool Chart is a clinical reference tool developed at the University of Bristol and widely used by GPs and gastroenterologists
-              to describe stool consistency. It has seven categories. Knowing which type describes what you are seeing is one of the most useful things
-              you can tell your doctor — it helps them understand how quickly food is moving through your digestive system.
-              This information is educational only.
-            </p>
+            <p>The Bristol Stool Chart is a simple visual tool doctors use to describe stool consistency. This educational information can help you communicate more clearly with your GP during a consultation.</p>
 
-            <h3 className="text-lg font-semibold text-white mt-6">The seven types explained</h3>
-            <ul className="list-none pl-0 space-y-3">
-              {[
-                ['Type 1', 'Separate hard lumps, like small pebbles or rabbit droppings. Hard to pass. Often associated with slow transit or low fluid intake.'],
-                ['Type 2', 'Sausage-shaped but lumpy. Still firm. May be difficult to pass.'],
-                ['Type 3', 'Sausage-shaped with cracks on the surface. Generally considered within the normal range.'],
-                ['Type 4', 'Smooth, soft sausage or snake shape. Most commonly described as typical.'],
-                ['Type 5', 'Soft blobs with clear-cut edges. Passes easily. May indicate slightly faster transit.'],
-                ['Type 6', 'Fluffy, mushy pieces with ragged edges. Soft but formless.'],
-                ['Type 7', 'Entirely liquid with no solid pieces. Watery diarrhoea.'],
-              ].map(([type, desc]) => (
-                <li key={type} className="flex gap-3">
-                  <span className="text-white font-semibold flex-shrink-0 w-16">{type}</span>
-                  <span>{desc}</span>
-                </li>
-              ))}
+            <h3 className="text-lg font-semibold text-white mt-6">The 7 types at a glance</h3>
+            <ul className="list-disc pl-6 space-y-3">
+              <li><strong className="text-white">Type 1–2 (Hard lumps or sausage-like):</strong> Often associated with slower movement through the gut.</li>
+              <li><strong className="text-white">Type 3–4 (Sausage-shaped with cracks or smooth):</strong> Generally considered normal, well-formed stools.</li>
+              <li><strong className="text-white">Type 5–7 (Soft blobs to entirely liquid):</strong> Can indicate faster transit through the gut.</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-white mt-6">What changes in stool type can indicate</h3>
-            <p>
-              A single unusual stool is rarely significant on its own. It is persistent changes — lasting more than a few days —
-              that are worth discussing with your GP. Factors like diet, hydration, travel, stress, medication, and
-              infections can all influence transit time and stool consistency.
-            </p>
+            <h3 className="text-lg font-semibold text-white mt-6">Helpful information to prepare for your GP visit</h3>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Types 1–2 persisting for several days may suggest constipation or slow transit</li>
-              <li>Types 6–7 persisting beyond 48 hours, or accompanied by cramping or fever, are worth a GP visit</li>
-              <li>Any blood, mucus, or unusual colour (pale, very dark, or green) alongside a change in type is worth mentioning promptly</li>
-              <li>Floating stools can sometimes indicate fat malabsorption — worth noting if it recurs</li>
+              <li>Note which type you see most often and whether it has changed recently.</li>
+              <li>Take clear photos in good natural light if you want to show your doctor (use the upload tips on the analysis page).</li>
+              <li>Mention how long the pattern has lasted, any associated feelings, diet changes, or travel.</li>
+              <li>Bring a simple note of the type number(s) you've observed.</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-white mt-6">QLD-specific context</h3>
-            <p>
-              In tropical Queensland, gut symptoms can follow exposure to water sources, food handling differences during the wet season,
-              or contact with soil and animals. Post-travel changes (particularly after Bali, SE Asia, or rural Queensland stays)
-              that match Types 6–7 and persist beyond a week are worth investigating with a stool test through your GP.
-            </p>
-
-            <h3 className="text-lg font-semibold text-white mt-6">What to tell your GP</h3>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Which Bristol type most closely matches what you are seeing — and for how long</li>
-              <li>Whether the change came on suddenly or gradually</li>
-              <li>Any unusual colour, odour, mucus, or visible material in the stool</li>
-              <li>Recent travel, dietary changes, new medications, or pet contact</li>
-              <li>Whether anyone else in the household has similar symptoms</li>
-            </ul>
+            <p className="text-sm text-gray-400 mt-6">This is general educational information only. It does not replace professional medical advice.</p>
           </div>
         </article>
 
