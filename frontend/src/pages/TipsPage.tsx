@@ -170,24 +170,57 @@ export default function TipsPage() {
           </div>
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
-              The Bristol Stool Chart is a general reference tool used by healthcare professionals to describe stool consistency.
-              It ranges from Type 1 (separate hard lumps) through to Type 7 (entirely liquid). This is educational information only.
+              The Bristol Stool Chart is a clinical reference tool developed at the University of Bristol and widely used by GPs and gastroenterologists
+              to describe stool consistency. It has seven categories. Knowing which type describes what you are seeing is one of the most useful things
+              you can tell your doctor — it helps them understand how quickly food is moving through your digestive system.
+              This information is educational only.
             </p>
 
-            <h3 className="text-lg font-semibold text-white mt-6">The seven types at a glance</h3>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong className="text-white">Types 1–2:</strong> Hard, lumpy stools — often associated with slower transit time</li>
-              <li><strong className="text-white">Types 3–4:</strong> Smooth, sausage-shaped — generally considered typical</li>
-              <li><strong className="text-white">Types 5–6:</strong> Soft, fluffy, or mushy — may indicate faster transit</li>
-              <li><strong className="text-white">Type 7:</strong> Watery, no solid pieces — worth discussing with your GP if persistent</li>
+            <h3 className="text-lg font-semibold text-white mt-6">The seven types explained</h3>
+            <ul className="list-none pl-0 space-y-3">
+              {[
+                ['Type 1', 'Separate hard lumps, like small pebbles or rabbit droppings. Hard to pass. Often associated with slow transit or low fluid intake.'],
+                ['Type 2', 'Sausage-shaped but lumpy. Still firm. May be difficult to pass.'],
+                ['Type 3', 'Sausage-shaped with cracks on the surface. Generally considered within the normal range.'],
+                ['Type 4', 'Smooth, soft sausage or snake shape. Most commonly described as typical.'],
+                ['Type 5', 'Soft blobs with clear-cut edges. Passes easily. May indicate slightly faster transit.'],
+                ['Type 6', 'Fluffy, mushy pieces with ragged edges. Soft but formless.'],
+                ['Type 7', 'Entirely liquid with no solid pieces. Watery diarrhoea.'],
+              ].map(([type, desc]) => (
+                <li key={type} className="flex gap-3">
+                  <span className="text-white font-semibold flex-shrink-0 w-16">{type}</span>
+                  <span>{desc}</span>
+                </li>
+              ))}
             </ul>
 
-            <h3 className="text-lg font-semibold text-white mt-6">Useful things to note before your GP visit</h3>
+            <h3 className="text-lg font-semibold text-white mt-6">What changes in stool type can indicate</h3>
+            <p>
+              A single unusual stool is rarely significant on its own. It is persistent changes — lasting more than a few days —
+              that are worth discussing with your GP. Factors like diet, hydration, travel, stress, medication, and
+              infections can all influence transit time and stool consistency.
+            </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Which Bristol type most closely describes what you are seeing</li>
-              <li>How long the change has been happening and whether it comes and goes</li>
-              <li>Any unusual colour (pale, very dark, or greenish) alongside the change in consistency</li>
-              <li>Whether you have had any recent travel, dietary changes, or antibiotic use</li>
+              <li>Types 1–2 persisting for several days may suggest constipation or slow transit</li>
+              <li>Types 6–7 persisting beyond 48 hours, or accompanied by cramping or fever, are worth a GP visit</li>
+              <li>Any blood, mucus, or unusual colour (pale, very dark, or green) alongside a change in type is worth mentioning promptly</li>
+              <li>Floating stools can sometimes indicate fat malabsorption — worth noting if it recurs</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold text-white mt-6">QLD-specific context</h3>
+            <p>
+              In tropical Queensland, gut symptoms can follow exposure to water sources, food handling differences during the wet season,
+              or contact with soil and animals. Post-travel changes (particularly after Bali, SE Asia, or rural Queensland stays)
+              that match Types 6–7 and persist beyond a week are worth investigating with a stool test through your GP.
+            </p>
+
+            <h3 className="text-lg font-semibold text-white mt-6">What to tell your GP</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Which Bristol type most closely matches what you are seeing — and for how long</li>
+              <li>Whether the change came on suddenly or gradually</li>
+              <li>Any unusual colour, odour, mucus, or visible material in the stool</li>
+              <li>Recent travel, dietary changes, new medications, or pet contact</li>
+              <li>Whether anyone else in the household has similar symptoms</li>
             </ul>
           </div>
         </article>
@@ -200,24 +233,59 @@ export default function TipsPage() {
           </div>
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
-              Skin changes can have many causes, including parasitic, fungal, bacterial, allergic, or inflammatory origins.
-              This page shares general educational information about visual patterns people sometimes notice, to help prepare for a GP appointment.
+              Skin changes can have many causes — parasitic, fungal, bacterial, allergic, or inflammatory. In Queensland's tropical climate,
+              outdoor exposure, soil contact, flooding, and travel increase the range of possibilities. This page shares educational information
+              about visual patterns people commonly notice, to help you describe what you are seeing to your GP clearly.
+              It does not provide a diagnosis.
             </p>
 
-            <h3 className="text-lg font-semibold text-white mt-6">Common visual patterns people describe</h3>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong className="text-white">Trailing or linear marks:</strong> A winding, raised line under the skin — sometimes seen on feet or legs after beach or soil contact</li>
-              <li><strong className="text-white">Circular or ring-shaped patches:</strong> A round area with a clearer centre, with or without scaling</li>
-              <li><strong className="text-white">Clustered small bumps:</strong> Multiple raised spots in a localised area, sometimes intensely itchy at night</li>
-              <li><strong className="text-white">Red, inflamed bite marks:</strong> Multiple bites in a row or group, often on exposed areas</li>
+            <h3 className="text-lg font-semibold text-white mt-6">Visual patterns and what they can sometimes look like</h3>
+            <ul className="list-none pl-0 space-y-4">
+              <li>
+                <p className="text-white font-semibold mb-1">Trailing or winding line under the skin</p>
+                <p>A raised, winding track — sometimes described as a thin red or pink line moving across the skin. Often appears on the feet, ankles, or lower legs after contact with soil, sand, or grass. Can be itchy and may advance slightly each day.</p>
+              </li>
+              <li>
+                <p className="text-white font-semibold mb-1">Ring-shaped or circular patch</p>
+                <p>A round or oval area with a clearer centre and a more defined outer edge. May have scaling, redness, or slight raised texture at the border. Can appear on the torso, limbs, scalp, or groin. Multiple rings can appear at once.</p>
+              </li>
+              <li>
+                <p className="text-white font-semibold mb-1">Intensely itchy clustered bumps — especially at night</p>
+                <p>Small raised spots in groups, often between fingers, on wrists, waistband areas, or inner thighs. Nighttime itching that wakes you up is a key feature worth mentioning. May look like a rash but have a specific pattern related to skin folds.</p>
+              </li>
+              <li>
+                <p className="text-white font-semibold mb-1">Bite marks in a row or cluster</p>
+                <p>Multiple red dots in a line or group, often appearing overnight or after time outdoors. Common on exposed skin areas — arms, neck, ankles. May be flat or slightly raised with a central puncture point.</p>
+              </li>
+              <li>
+                <p className="text-white font-semibold mb-1">Swollen, red, or weeping area around a site</p>
+                <p>Localised swelling with warmth, redness spreading outward, or discharge. Can follow a bite, scratch, or soil contact. Worth same-day GP attention if the redness is spreading rapidly or accompanied by fever.</p>
+              </li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-white mt-6">Helpful details to take to your GP</h3>
+            <h3 className="text-lg font-semibold text-white mt-6">QLD and tropical context</h3>
+            <p>
+              North Queensland's warm, humid conditions support a wider range of skin-affecting organisms than cooler climates.
+              Bare feet on creek banks, swimming in freshwater, gardening after rain, and contact with soil disturbed by flooding
+              all increase potential exposure. Skin changes appearing within days to weeks of these activities are worth documenting and discussing with your GP.
+            </p>
+
+            <h3 className="text-lg font-semibold text-white mt-6">Taking a useful photo for your GP visit</h3>
             <ul className="list-disc pl-6 space-y-2">
-              <li>When the rash or mark first appeared and whether it has changed shape or size</li>
-              <li>Whether it is itchy, painful, warm to touch, or symptom-free</li>
-              <li>Any recent travel, outdoor activities (camping, beach, gardening), or pet contact</li>
-              <li>Clear close-up photos taken in natural light showing the full extent of the area</li>
+              <li>Use natural daylight — avoid flash which flattens texture and colour</li>
+              <li>Take one close-up of the affected area and one wider shot showing its location on the body</li>
+              <li>Photograph it at its worst (e.g. after scratching, or first thing in the morning when itching is often most visible)</li>
+              <li>Place a coin or ruler next to the area to give your doctor a size reference</li>
+              <li>If the rash changes shape or spreads, photograph it daily so your GP can see the progression</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold text-white mt-6">Helpful details to tell your GP</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>When it first appeared and whether it has changed shape, size, or colour</li>
+              <li>Whether it is itchy, painful, burning, or symptom-free</li>
+              <li>Any recent travel, outdoor activities (camping, beach, creek swimming, gardening), or pet contact</li>
+              <li>Whether anyone else in the household has a similar rash</li>
+              <li>Any recent changes to soaps, washing powder, or skincare products (to help rule out contact allergy)</li>
             </ul>
           </div>
         </article>
