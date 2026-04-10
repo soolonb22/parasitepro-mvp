@@ -1,5 +1,3 @@
-// app/tips/page.tsx  ← Replace your current file with this full version
-
 export default function EncyclopediaPage() {
   return (
     <div className="min-h-screen bg-black text-white p-6">
