@@ -137,7 +137,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }),
             });
             await transporter.sendMail({
               from: process.env.SMTP_FROM || 'ParasitePro <noreply@notworms.com>',
-              to: 'importantalerts26@gmail.com',
+              to: process.env.OWNER_NOTIFY_EMAIL || 'importantalerts@gmail.com',
               subject: `💰 New Purchase — $${amountAud} AUD (${credits} credits)`,
               html: `
                 <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0E0F11;color:#F5F0E8;border-radius:12px;">

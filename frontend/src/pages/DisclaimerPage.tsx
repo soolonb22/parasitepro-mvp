@@ -116,7 +116,7 @@ const DisclaimerPage = () => {
         }}>
           <p style={{ color: '#166534', fontWeight: 500 }}>
             Have questions? Contact us at{' '}
-            <a href="mailto:fallonbarke4@gmail.com" style={{ color: '#0d9488' }}>fallonbarke4@gmail.com</a>
+            <a href="mailto:support@notworms.com" style={{ color: '#0d9488' }}>support@notworms.com</a>
           </p>
         </div>
       </div>

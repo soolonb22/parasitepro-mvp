@@ -261,7 +261,7 @@ export default function PromoLandingPage() {
           <div className="promo-footer-links">
             <Link to="/privacy">Privacy Policy</Link>
             <Link to="/terms">Terms of Service</Link>
-            <a href="mailto:fallonbarke4@gmail.com">Contact</a>
+            <a href="mailto:support@notworms.com">Contact</a>
           </div>
         </div>
       </footer>

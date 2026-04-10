@@ -14,7 +14,7 @@ const ContactPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const mailtoLink = `mailto:fallonbarke4@gmail.com?subject=${encodeURIComponent(formData.subject || 'Contact from ParasitePro')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+    const mailtoLink = `mailto:support@notworms.com?subject=${encodeURIComponent(formData.subject || 'Contact from ParasitePro')}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
     window.location.href = mailtoLink;
     setSubmitted(true);
   };
@@ -65,8 +65,8 @@ const ContactPage = () => {
               </div>
               <div>
                 <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#111827' }}>Email Us</h2>
-                <a href="mailto:fallonbarke4@gmail.com" style={{ color: '#0d9488', textDecoration: 'none' }}>
-                  fallonbarke4@gmail.com
+                <a href="mailto:support@notworms.com" style={{ color: '#0d9488', textDecoration: 'none' }}>
+                  support@notworms.com
                 </a>
               </div>
             </div>
@@ -115,7 +115,7 @@ const ContactPage = () => {
               </h3>
               <p style={{ color: '#6b7280' }}>
                 Your email client should have opened with a pre-filled message. If not, please email us directly at{' '}
-                <a href="mailto:fallonbarke4@gmail.com" style={{ color: '#0d9488' }}>fallonbarke4@gmail.com</a>
+                <a href="mailto:support@notworms.com" style={{ color: '#0d9488' }}>support@notworms.com</a>
               </p>
             </div>
           ) : (

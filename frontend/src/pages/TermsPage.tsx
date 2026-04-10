@@ -90,7 +90,7 @@ const TermsPage = () => {
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#111827', marginBottom: '0.75rem' }}>8. Contact</h2>
             <p style={{ color: '#4b5563', lineHeight: 1.7 }}>
               For questions about these Terms, please contact us at{' '}
-              <a href="mailto:fallonbarke4@gmail.com" style={{ color: '#0d9488' }}>fallonbarke4@gmail.com</a>
+              <a href="mailto:support@notworms.com" style={{ color: '#0d9488' }}>support@notworms.com</a>
             </p>
           </section>
         </div>
