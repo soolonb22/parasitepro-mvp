@@ -191,6 +191,11 @@ const PARA_AUDIO_MAP: Record<string, string> = {
   "Have you travelled to any":       '/audio/para-line-11.mp3',
   "Where do you currently live":     '/audio/para-line-12.mp3',
   "Do you have pets at home":        '/audio/para-line-13.mp3',
+  "Have you ever had a confirmed":    '/audio/para-line-14.mp3',
+  "Are you currently taking any":     '/audio/para-line-15.mp3',
+  "What type of sample or image":     '/audio/para-line-16.mp3',
+  // line 17 (how clear is your image) — Web Speech fallback intentional
+  // line 18 (you absolute legend) — Web Speech fallback until MP3 supplied
 };
 
 class AudioEngine {
