@@ -195,7 +195,7 @@ const PARA_AUDIO_MAP: Record<string, string> = {
   "Are you currently taking any":     '/audio/para-line-15.mp3',
   "What type of sample or image":     '/audio/para-line-16.mp3',
   // line 17 (how clear is your image) — Web Speech fallback intentional
-  // line 18 (you absolute legend) — Web Speech fallback until MP3 supplied
+  "You absolute legend":             '/audio/para-line-18.mp3',
 };
 
 class AudioEngine {
