@@ -168,14 +168,73 @@ class SpeechEngine {
   }
 
   static cancel() { window.speechSynthesis?.cancel(); }
+}
 
-  static async requestMic(): Promise<'granted' | 'denied' | 'unsupported'> {
-    if (!navigator.mediaDevices?.getUserMedia) return 'unsupported';
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((t: any) => t.stop());
-      return 'granted';
-    } catch { return 'denied'; }
+/* ══════════════════════════════════════════════════════════════
+   AUDIO ENGINE — plays pre-recorded Mimi MP3s for scripted lines,
+   falls back to SpeechEngine for anything dynamic.
+══════════════════════════════════════════════════════════════ */
+const PARA_AUDIO_MAP: Record<string, string> = {
+  // ── Landing page intro (lines 1–4) ──────────────────────────
+  "Got something that":              '/audio/para-line-01.mp3',
+  "Upload a photo of anything":      '/audio/para-line-02.mp3',
+  "One thing I want to be clear":    '/audio/para-line-03.mp3',
+  "Okay! Now here":                  '/audio/para-line-04.mp3',
+  // ── Welcome modal (line 5) ──────────────────────────────────
+  "G'day! I'm PARA, your personal":  '/audio/para-line-05.mp3',
+  // ── Intake questions (lines 6–13) ───────────────────────────
+  "Alright, let":                    '/audio/para-line-06.mp3',
+  "Got it! And how old":             '/audio/para-line-07.mp3',
+  "Thanks! What's your biological":   '/audio/para-line-08.mp3',
+  "Are you experiencing any of":     '/audio/para-line-09.mp3',
+  "How long have those symptoms":    '/audio/para-line-10.mp3',
+  "Have you travelled to any":       '/audio/para-line-11.mp3',
+  "Where do you currently live":     '/audio/para-line-12.mp3',
+  "Do you have pets at home":        '/audio/para-line-13.mp3',
+};
+
+class AudioEngine {
+  private static current: HTMLAudioElement | null = null;
+
+  static init(): void { SpeechEngine.init(); }
+
+  static getFile(text: string): string | null {
+    const t = text.trim();
+    for (const [key, file] of Object.entries(PARA_AUDIO_MAP)) {
+      if (t.startsWith(key)) return file;
+    }
+    return null;
+  }
+
+  static speak(text: string, opts: any = {}): void {
+    const file = this.getFile(text);
+    if (!file) { SpeechEngine.speak(text, opts); return; }
+    this.cancel();
+    const audio = new Audio(file);
+    this.current = audio;
+    audio.onplay  = () => opts.onStart?.();
+    audio.onended = () => { this.current = null; opts.onDone?.(); };
+    audio.onerror = () => { this.current = null; SpeechEngine.speak(text, opts); };
+    audio.play().catch(() => { this.current = null; SpeechEngine.speak(text, opts); });
+  }
+
+  static unlockAndSpeak(text: string, opts: any = {}): void {
+    this.speak(text, opts);
+  }
+
+  static cancel(): void {
+    if (this.current) {
+      this.current.pause();
+      this.current.currentTime = 0;
+      this.current = null;
+    }
+    SpeechEngine.cancel();
+  }
+
+  static clearPending(): void { SpeechEngine.clearPending(); }
+
+  static async requestMic(): Promise<string> {
+    return SpeechEngine.requestMic();
   }
 }
 
@@ -293,7 +352,7 @@ export function LandingPARA() {
   const autoAdvTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    SpeechEngine.init();
+    AudioEngine.init();
     if (sessionStorage.getItem('para_landing_seen')) return;
     const t = setTimeout(() => {
       setVisible(true);
@@ -304,7 +363,7 @@ export function LandingPARA() {
       setTimeout(() => setRobotY(0),   760);
       setTimeout(() => { if (!sig.current.cancelled) speakRef.current(0); }, 3200);
     }, 3000);
-    return () => { clearTimeout(t); sig.current.cancelled = true; SpeechEngine.cancel(); };
+    return () => { clearTimeout(t); sig.current.cancelled = true; AudioEngine.cancel(); };
   }, []);
 
   const speakLine = useCallback((idx: number) => {
@@ -320,10 +379,10 @@ export function LandingPARA() {
 
     if (!muted && voiceStarted) {
       const fallback = setTimeout(() => {
-        SpeechEngine.clearPending(); setSpeaking(false);
+        AudioEngine.clearPending(); setSpeaking(false);
         if (!sig.current.cancelled) speakRef.current(idx + 1);
       }, Math.max(2200, line.text.length * 25));
-      SpeechEngine.speak(line.text, {
+      AudioEngine.speak(line.text, {
         rate: 0.92, pitch: 1.05, signal: sig.current,
         onStart: () => clearTimeout(fallback),
         onDone: () => { clearTimeout(fallback); setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(idx + 1); }, 400); },
@@ -340,7 +399,7 @@ export function LandingPARA() {
     setVoiceStarted(true);
     if (autoAdvTimerRef.current) { clearTimeout(autoAdvTimerRef.current); autoAdvTimerRef.current = null; }
     sig.current.cancelled = false;
-    SpeechEngine.unlockAndSpeak(LANDING_SCRIPT[0].text, {
+    AudioEngine.unlockAndSpeak(LANDING_SCRIPT[0].text, {
       rate: 0.92, pitch: 1.05, signal: sig.current,
       onStart: () => { setSpeaking(true); setMood(LANDING_SCRIPT[0].mood); },
       onDone: () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(1); }, 400); },
@@ -350,13 +409,13 @@ export function LandingPARA() {
   };
 
   const dismiss = () => {
-    sig.current.cancelled = true; SpeechEngine.cancel();
+    sig.current.cancelled = true; AudioEngine.cancel();
     sessionStorage.setItem('para_landing_seen', '1');
     setDismiss(true);
   };
 
   const goSignup = () => {
-    sig.current.cancelled = true; SpeechEngine.cancel();
+    sig.current.cancelled = true; AudioEngine.cancel();
     sessionStorage.setItem('para_landing_seen', '1');
     navigate('/signup');
   };
@@ -433,7 +492,7 @@ export function LandingPARA() {
             </button>
           )}
           {voiceStarted && (
-            <button onClick={() => { const nm=!muted; setMuted(nm); if(nm) SpeechEngine.cancel(); }} style={{ width:34, height:34, borderRadius:'50%', background:'rgba(13,148,136,0.1)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
+            <button onClick={() => { const nm=!muted; setMuted(nm); if(nm) AudioEngine.cancel(); }} style={{ width:34, height:34, borderRadius:'50%', background:'rgba(13,148,136,0.1)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
               {muted ? '🔇' : '🔊'}
             </button>
           )}
@@ -504,7 +563,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
   const speakRef = useRef<(idx: number) => void>(() => {});
 
   useEffect(() => {
-    SpeechEngine.init();
+    AudioEngine.init();
     setTimeout(() => setOverlay(true), 40);
     setTimeout(() => setRobotY(-90), 200);
     setTimeout(() => setRobotY(10),  460);
@@ -512,7 +571,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     setTimeout(() => setRobotY(0),   840);
     setTimeout(() => setSkip(true),  2800);
     setTimeout(() => { if (!sig.current.cancelled) speakRef.current(0); }, 3000);
-    return () => { sig.current.cancelled = true; SpeechEngine.cancel(); };
+    return () => { sig.current.cancelled = true; AudioEngine.cancel(); };
   }, []);
 
   const speakLine = useCallback((idx: number) => {
@@ -520,15 +579,15 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     if (idx >= script.length) {
       setLineIdx(-1); setSpeaking(false); setCardIn(false);
       setTimeout(() => { setCard(null); setPhase('intake'); setIntakeIn(true); }, 380);
-      if (!muted && voiceOk) { setSpeaking(true); setMood('curious'); SpeechEngine.speak(INTAKE_QUESTIONS[0].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
+      if (!muted && voiceOk) { setSpeaking(true); setMood('curious'); AudioEngine.speak(INTAKE_QUESTIONS[0].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
       return;
     }
     const line = script[idx];
     setLineIdx(idx); setMood(line.mood); setSpeaking(true); setCardIn(false);
     setTimeout(() => { setCard(line.card ?? null); if (line.card) setTimeout(() => setCardIn(true), 60); }, 280);
     if (!muted && voiceOk) {
-      const fallback = setTimeout(() => { SpeechEngine.clearPending(); setSpeaking(false); if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2400, line.text.length * 28));
-      SpeechEngine.speak(line.text, { rate:0.92, pitch:1.05, signal:sig.current,
+      const fallback = setTimeout(() => { AudioEngine.clearPending(); setSpeaking(false); if (!sig.current.cancelled) speakRef.current(idx + 1); }, Math.max(2400, line.text.length * 28));
+      AudioEngine.speak(line.text, { rate:0.92, pitch:1.05, signal:sig.current,
         onStart: () => clearTimeout(fallback),
         onDone: () => { clearTimeout(fallback); setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(idx + 1); }, line.pauseAfter ?? 380); },
       });
@@ -540,13 +599,13 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
   useEffect(() => { speakRef.current = speakLine; }, [speakLine]);
 
   const triggerExit = (data: Record<string,string[]>) => {
-    setExit(true); sig.current.cancelled = true; SpeechEngine.cancel();
+    setExit(true); sig.current.cancelled = true; AudioEngine.cancel();
     setTimeout(() => onDone(data), 520);
   };
 
   const handleTapToStart = () => {
     setVoiceOk(true); sig.current.cancelled = false;
-    SpeechEngine.unlockAndSpeak(script[0].text, { rate:0.92, pitch:1.05, signal:sig.current,
+    AudioEngine.unlockAndSpeak(script[0].text, { rate:0.92, pitch:1.05, signal:sig.current,
       onStart: () => { setSpeaking(true); setMood(script[0].mood); },
       onDone:  () => { setSpeaking(false); setTimeout(() => { if (!sig.current.cancelled) speakRef.current(1); }, script[0].pauseAfter ?? 380); },
     });
@@ -558,7 +617,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
     setIntakeStep(next); setIntakeIn(false); setMultiSel([]);
     setTimeout(() => {
       setIntakeIn(true); setMood(INTAKE_QUESTIONS[next].mood);
-      if (!muted && voiceOk) { setSpeaking(true); SpeechEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
+      if (!muted && voiceOk) { setSpeaking(true); AudioEngine.unlockAndSpeak(INTAKE_QUESTIONS[next].text, { rate:0.92, pitch:1.08, signal:sig.current, onDone:() => setSpeaking(false) }); }
     }, 320);
     setIntakeData(newData);
   };
@@ -592,7 +651,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
           <span style={{ color:'#2dd4bf', fontFamily:'monospace', fontSize:12, letterSpacing:'0.17em', fontWeight:600 }}>PARA · PARASITEPRO</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <button onClick={() => { const nm = !muted; if(nm) SpeechEngine.cancel(); }} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.07)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
+          <button onClick={() => { const nm = !muted; if(nm) AudioEngine.cancel(); }} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.07)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
             {muted ? '🔇' : '🔊'}
           </button>
           {skippable && <button onClick={() => triggerExit(intakeData)} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color:'#9ca3af', borderRadius:8, padding:'5px 12px', fontSize:12, cursor:'pointer', fontFamily:'inherit' }}>Skip ×</button>}
@@ -773,7 +832,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
                 <div style={{ padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(13,148,136,0.18)':'rgba(15,32,46,0.95)', border:m.role==='user'?'1px solid rgba(13,148,136,0.4)':'1px solid rgba(13,148,136,0.1)' }}>
                   {m.role==='user' ? <p style={{ color:'#f1f5f9', fontSize:14, lineHeight:1.58, margin:0, whiteSpace:'pre-wrap' }}>{m.content}</p> : <MarkdownText text={m.content}/>}
                 </div>
-                {m.role==='assistant' && <button onClick={() => SpeechEngine.unlockAndSpeak(m.content, { rate:0.92, pitch:1.05 })} title="Listen" style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}>🔊</button>}
+                {m.role==='assistant' && <button onClick={() => AudioEngine.unlockAndSpeak(m.content, { rate:0.92, pitch:1.05 })} title="Listen" style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}>🔊</button>}
               </div>
             </div>
             {m.role==='assistant' && idx===lastAssistantIdx && !loading && m.suggestions && <SuggestionChips suggestions={m.suggestions} onSelect={onSend} disabled={loading}/>}
@@ -858,7 +917,7 @@ export default function ParasiteBot() {
   const introKey = `para_intro_done_${user?.id || 'guest'}`;
 
   useEffect(() => {
-    SpeechEngine.init();
+    AudioEngine.init();
     // Allow any component to open PARA via custom event
     const handler = () => {
       if (phase === 'chat') setChatOpen(true);
@@ -919,7 +978,7 @@ export default function ParasiteBot() {
   };
 
   const handleClear = () => {
-    SpeechEngine.cancel(); setSpeaking(false); setMood('idle'); setMessages([]);
+    AudioEngine.cancel(); setSpeaking(false); setMood('idle'); setMessages([]);
     addBot("Fresh start! What can I help you with? 🔬", ['Start a new analysis','Take me on a tour','How do credits work?']);
   };
 
@@ -953,7 +1012,7 @@ export default function ParasiteBot() {
 
   const toggleMute = () => {
     const nm = !muted; setMuted(nm);
-    if (nm) { sigRef.current.cancelled=true; SpeechEngine.cancel(); setSpeaking(false); }
+    if (nm) { sigRef.current.cancelled=true; AudioEngine.cancel(); setSpeaking(false); }
   };
 
   const openChat = () => {

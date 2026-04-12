@@ -70,19 +70,26 @@ const ParaFig = ({ size = 110, waving = false, style = {} }) => {
 /* ─── PARA Welcome Modal — Image 1 reference ─────────────────────────── */
 const ParaModal = ({ onClose, onStart }) => {
   const [speaking, setSpeaking] = useState(false);
+  const audioRef = React.useRef(null);
   const handleSpeak = () => {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(
-      "G'day! I'm PARA, your personal guide to ParasitePro! Found something weird and not sure what it is? You're in exactly the right place. Let me show you what we're all about."
-    );
-    u.rate = 0.96; u.pitch = 1.05;
-    const pick = window.speechSynthesis.getVoices().find(v => v.lang === 'en-AU')
-      || window.speechSynthesis.getVoices().find(v => v.lang.startsWith('en'));
-    if (pick) u.voice = pick;
-    u.onend = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(u);
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    const audio = new Audio('/audio/para-line-05.mp3');
+    audioRef.current = audio;
+    audio.onplay  = () => setSpeaking(true);
+    audio.onended = () => { setSpeaking(false); audioRef.current = null; };
+    audio.onerror = () => {
+      setSpeaking(false); audioRef.current = null;
+      // fallback to Web Speech
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(
+        "G'day! I'm PARA, your personal guide to ParasitePro! Found something weird and not sure what it is? You're in exactly the right place. Let me show you what we're all about."
+      );
+      u.rate = 1.05; u.pitch = 1.38;
+      u.onend = () => setSpeaking(false);
+      setSpeaking(true);
+      window.speechSynthesis.speak(u);
+    };
+    audio.play().catch(() => audioRef.current?.dispatchEvent(new Event('error')));
   };
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()} style={{
