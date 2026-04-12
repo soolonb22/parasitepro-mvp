@@ -65,62 +65,66 @@ class SpeechEngine {
     const v = this.voices;
     const pick = (fn: (v: SpeechSynthesisVoice) => boolean) => v.find(fn) ?? null;
 
-    // ── Tier 1: Best natural Australian voices (device-specific) ──────────
-    // Android Chrome — Google AU is warm and clear
+    // ── PARA voice priority: female, young-sounding, warm ─────────────────
+    // iOS 16+ — Aria is the highest quality natural female voice (very warm)
+    const aria = pick(v => /aria/i.test(v.name) && v.lang.startsWith('en'));
+    if (aria) return aria;
+
+    // Android Chrome — Google AU Female is warm and clear
     const googleAU = pick(v => /google australian/i.test(v.name));
     if (googleAU) return googleAU;
 
-    // iOS/macOS — Karen is the native Australian voice, sounds great
+    // iOS/macOS — Karen is the native Australian female voice
     const karen = pick(v => /karen/i.test(v.name) && v.lang.startsWith('en'));
     if (karen) return karen;
 
-    // macOS — Lee is a natural Australian male
-    const lee = pick(v => /lee/i.test(v.name) && v.lang === 'en-AU');
-    if (lee) return lee;
-
-    // macOS Siri / enhanced AU
-    const auEnhanced = pick(v => v.lang === 'en-AU' && /enhanced|premium|siri/i.test(v.name));
+    // macOS Siri / enhanced AU female
+    const auEnhanced = pick(v => v.lang === 'en-AU' && /enhanced|premium|siri/i.test(v.name)
+      && !/lee/i.test(v.name));
     if (auEnhanced) return auEnhanced;
 
-    // Any en-AU at all
-    const anyAU = pick(v => v.lang === 'en-AU');
-    if (anyAU) return anyAU;
+    // Any en-AU female (skip Lee — male voice, too deep for PARA)
+    const anyAUF = pick(v => v.lang === 'en-AU' && !/lee/i.test(v.name));
+    if (anyAUF) return anyAUF;
 
-    // ── Tier 2: Natural British/NZ voices (closest to AU) ─────────────────
-    // Android — Google UK Female is warm and natural
+    // Android — Google UK English Female
     const googleUKF = pick(v => /google uk english female/i.test(v.name));
     if (googleUKF) return googleUKF;
 
-    // iOS/macOS — Daniel (British male) is the most natural English voice
-    const daniel = pick(v => /daniel/i.test(v.name) && v.lang.startsWith('en-GB'));
-    if (daniel) return daniel;
+    // iOS/macOS — Serena (British female, warm)
+    const serena = pick(v => /serena/i.test(v.name) && v.lang.startsWith('en-GB'));
+    if (serena) return serena;
+
+    // iOS — Moira (Irish female, friendly)
+    const moira = pick(v => /moira/i.test(v.name) && v.lang.startsWith('en'));
+    if (moira) return moira;
 
     // Any en-NZ
     const anyNZ = pick(v => v.lang === 'en-NZ');
     if (anyNZ) return anyNZ;
 
-    // Any en-GB enhanced/premium
-    const gbEnhanced = pick(v => v.lang === 'en-GB' && /enhanced|premium/i.test(v.name));
-    if (gbEnhanced) return gbEnhanced;
-
-    // Any en-GB
-    const anyGB = pick(v => v.lang === 'en-GB');
-    if (anyGB) return anyGB;
-
-    // ── Tier 3: US fallbacks ───────────────────────────────────────────────
-    // iOS — Samantha is a high quality US female voice
+    // iOS — Samantha (US female, clear and friendly)
     const samantha = pick(v => /samantha/i.test(v.name) && v.lang.startsWith('en'));
     if (samantha) return samantha;
 
-    // Google US female
+    // Any en-GB enhanced/premium female
+    const gbEnhanced = pick(v => v.lang === 'en-GB' && /enhanced|premium/i.test(v.name)
+      && !/daniel|oliver|arthur/i.test(v.name));
+    if (gbEnhanced) return gbEnhanced;
+
+    // Google US English female
     const googleUSF = pick(v => /google us english/i.test(v.name));
     if (googleUSF) return googleUSF;
 
-    // Windows — Zira is the most natural Windows voice
+    // Windows — Zira (female, decent)
     const zira = pick(v => /zira/i.test(v.name));
     if (zira) return zira;
 
-    // ── Tier 4: Any English ───────────────────────────────────────────────
+    // Any English — skip known male voices
+    const anyEnF = pick(v => v.lang.startsWith('en')
+      && !/daniel|oliver|arthur|lee|fred|alex|bruce|ralph|albert/i.test(v.name));
+    if (anyEnF) return anyEnF;
+
     return pick(v => v.lang.startsWith('en')) ?? null;
   }
 
@@ -148,9 +152,11 @@ class SpeechEngine {
       const isQ = chunks[i].endsWith('?');
       // Google TTS voices run slightly slower — nudge rate up a touch
       const isGoogle = voice && /google/i.test(voice.name);
-      const baseRate = opts.rate ?? (isGoogle ? 1.0 : 0.92);
-      utt.rate  = baseRate + (isQ ? 0.05 : 0);
-      utt.pitch = (opts.pitch ?? 1.05) + (isQ ? 0.12 : 0);
+      // Higher pitch + snappier rate = little, friendly, upbeat PARA character
+      const baseRate  = opts.rate  ?? (isGoogle ? 1.08 : 1.05);
+      const basePitch = opts.pitch ?? 1.38;
+      utt.rate  = baseRate  + (isQ ? 0.06 : 0);
+      utt.pitch = basePitch + (isQ ? 0.15 : 0);
       utt.volume = 1.0;
       if (voice) utt.voice = voice;
       utt.onstart = () => { if (i === 0) opts.onStart?.(); };
