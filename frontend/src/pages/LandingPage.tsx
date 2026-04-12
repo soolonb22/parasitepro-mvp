@@ -19,144 +19,53 @@ const C = {
 
 /* ─── PARA — line-art sketch figure with wide-brim hat (exact match to mockup) ── */
 const ParaWoman = ({ style = {} }) => (
-  <svg viewBox="0 0 400 580" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style={{ display:'block', width:'100%', height:'100%', ...style }}>
-
-    {/* ── Body / torso ── */}
-    <path d="M130 340 Q118 400 110 520 L290 520 Q282 400 270 340 Q248 358 200 360 Q152 358 130 340Z"
-      fill="#4A7A6A" opacity="0.9"/>
-    {/* Shirt fold lines */}
-    <path d="M178 380 Q200 395 222 380" stroke="#2D5A4A" strokeWidth="1.5" fill="none" opacity="0.4"/>
-    <path d="M172 420 Q200 438 228 420" stroke="#2D5A4A" strokeWidth="1.5" fill="none" opacity="0.3"/>
-    {/* Collar / V-neck */}
-    <path d="M168 328 Q200 348 232 328 L240 348 Q200 372 160 348Z" fill="#3A6858" opacity="0.95"/>
-    <path d="M192 348 L200 410 L208 348" stroke="#2D5A4A" strokeWidth="2" fill="none" opacity="0.5"/>
-
-    {/* ── Neck ── */}
-    <rect x="186" y="272" width="28" height="62" rx="14" fill="#C8956A"/>
-    {/* Neck shadow */}
-    <path d="M186 285 Q192 310 186 334" stroke="#B07A52" strokeWidth="2" fill="none" opacity="0.4"/>
-
-    {/* ── Left arm ── */}
-    <path d="M132 342 Q100 378 88 450 Q92 458 106 454 Q116 396 148 358Z" fill="#4A7A6A" opacity="0.9"/>
-    <ellipse cx="96" cy="457" rx="14" ry="9" fill="#C8956A" transform="rotate(-15 96 457)"/>
-
-    {/* ── Right arm ── */}
-    <path d="M268 342 Q300 374 312 448 Q306 456 292 452 Q284 394 252 358Z" fill="#4A7A6A" opacity="0.9"/>
-    <ellipse cx="304" cy="451" rx="14" ry="9" fill="#C8956A" transform="rotate(15 304 451)"/>
-
-    {/* ── Hair behind head ── */}
-    <path d="M128 210 Q118 288 134 340 Q155 355 178 350 L178 272 Q148 265 128 210Z"
-      fill="#5C3820"/>
-    <path d="M272 210 Q282 288 266 340 Q245 355 222 350 L222 272 Q252 265 272 210Z"
-      fill="#5C3820"/>
-    {/* Hair flowing longer */}
-    <path d="M128 210 Q112 260 118 330 Q126 345 138 340"
-      fill="#6B4428" opacity="0.7"/>
-    <path d="M272 210 Q288 260 282 330 Q274 345 262 340"
-      fill="#6B4428" opacity="0.7"/>
-
-    {/* ── Head ── */}
-    <ellipse cx="200" cy="188" rx="68" ry="78" fill="#D4A07A"/>
-    {/* Face highlight */}
-    <ellipse cx="188" cy="175" rx="28" ry="32" fill="#E0B08A" opacity="0.35"/>
-
-    {/* ── Face features ── */}
-    {/* Eyebrows */}
-    <path d="M162 155 Q175 148 188 152" stroke="#5C3820" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M212 152 Q225 148 238 155" stroke="#5C3820" strokeWidth="3" fill="none" strokeLinecap="round"/>
-
-    {/* Eyes — almond shaped */}
-    <path d="M158 168 Q172 160 186 168 Q172 178 158 168Z" fill="white"/>
-    <path d="M214 168 Q228 160 242 168 Q228 178 214 168Z" fill="white"/>
-    {/* Irises */}
-    <circle cx="172" cy="169" r="7" fill="#3D2510"/>
-    <circle cx="228" cy="169" r="7" fill="#3D2510"/>
-    {/* Pupils */}
-    <circle cx="173" cy="170" r="4" fill="#1A0A05"/>
-    <circle cx="229" cy="170" r="4" fill="#1A0A05"/>
-    {/* Eye shine */}
-    <circle cx="175" cy="167" r="2.2" fill="white"/>
-    <circle cx="231" cy="167" r="2.2" fill="white"/>
-    {/* Lower lash lines */}
-    <path d="M158 170 Q172 176 186 170" stroke="#3D2510" strokeWidth="1" fill="none" opacity="0.4"/>
-    <path d="M214 170 Q228 176 242 170" stroke="#3D2510" strokeWidth="1" fill="none" opacity="0.4"/>
-
-    {/* Nose */}
-    <path d="M196 186 Q200 202 204 186" stroke="#B07A52" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6"/>
-    <path d="M190 204 Q200 210 210 204" stroke="#B07A52" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5"/>
-
-    {/* Lips */}
-    <path d="M182 220 Q200 212 218 220 Q210 228 200 230 Q190 228 182 220Z" fill="#C27060"/>
-    <path d="M182 220 Q200 225 218 220" fill="none" stroke="#A85848" strokeWidth="1" opacity="0.5"/>
-    {/* Lip highlight */}
-    <path d="M192 219 Q200 215 208 219" stroke="rgba(255,200,180,0.5)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-
-    {/* Cheeks */}
-    <ellipse cx="162" cy="202" rx="16" ry="10" fill="#E8A080" opacity="0.28"/>
-    <ellipse cx="238" cy="202" rx="16" ry="10" fill="#E8A080" opacity="0.28"/>
-
-    {/* ── Hair front ── */}
-    <path d="M132 188 Q136 145 165 132 Q182 126 200 128 Q218 126 235 132 Q264 145 268 188"
-      fill="#6B4428"/>
-    <path d="M132 188 Q128 165 136 142 Q148 116 180 108 Q200 104 220 108 Q252 116 264 142 Q272 165 268 188"
-      fill="#7A4E30"/>
-    {/* Hair parting detail */}
-    <path d="M200 108 Q196 128 192 155" stroke="#5C3820" strokeWidth="1.5" fill="none" opacity="0.3"/>
-
-    {/* ── Wide-brim hat — main brim ── */}
-    <ellipse cx="200" cy="118" rx="145" ry="22" fill="#6AAB84"/>
-    <ellipse cx="200" cy="114" rx="145" ry="22" fill="#7DC498"/>
-    {/* Brim shadow underside */}
-    <ellipse cx="200" cy="124" rx="145" ry="10" fill="#4A8A64" opacity="0.4"/>
-
-    {/* Hat crown */}
-    <path d="M110 116 Q116 52 200 46 Q284 52 290 116Z" fill="#7DC498"/>
-    <path d="M114 116 Q120 56 200 50 Q280 56 286 116Z" fill="#8ED4A8"/>
-    {/* Crown top curve */}
-    <path d="M140 65 Q200 48 260 65" stroke="rgba(255,255,255,0.15)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-
-    {/* Hat band */}
-    <rect x="114" y="106" width="172" height="12" rx="3" fill="#4A8A64"/>
-    {/* Band highlight */}
-    <path d="M120 108 Q200 104 280 108" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-
-    {/* Brim front edge highlight */}
-    <path d="M66 116 Q200 108 334 116" stroke="rgba(255,255,255,0.18)" strokeWidth="2" fill="none" strokeLinecap="round"/>
-  </svg>
+  <img
+    src="/para-avatar.jpg"
+    alt="PARA"
+    draggable={false}
+    style={{
+      display: 'block', width: '100%', height: '100%',
+      objectFit: 'contain', objectPosition: 'bottom center',
+      borderRadius: '50% 50% 40% 40%',
+      filter: 'drop-shadow(0 8px 32px rgba(255,100,200,0.5))',
+      animation: 'para-hero-float 3s ease-in-out infinite',
+      ...style,
+    }}
+  />
 );
 
-/* Legacy blob — keep for modal only */
-const ParaFig = ({ size = 110, waving = false, style = {} }) => (
-  <svg width={size} height={Math.round(size * 1.18)} viewBox="0 0 100 118"
-    fill="none" style={{ display: 'block', ...style }}>
-    <ellipse cx="50" cy="114" rx="28" ry="5" fill="rgba(0,0,0,0.10)"/>
-    <ellipse cx="50" cy="80" rx="30" ry="33" fill={C.teal}/>
-    {waving
-      ? <ellipse cx="17" cy="52" rx="11" ry="8" fill={C.teal} transform="rotate(-50 17 52)"/>
-      : <ellipse cx="21" cy="74" rx="11" ry="8" fill={C.teal} transform="rotate(-18 21 74)"/>}
-    <ellipse cx="79" cy="74" rx="11" ry="8" fill={C.teal} transform="rotate(18 79 74)"/>
-    <ellipse cx="37" cy="108" rx="12" ry="7" fill={C.tealDark}/>
-    <ellipse cx="63" cy="108" rx="12" ry="7" fill={C.tealDark}/>
-    <ellipse cx="50" cy="52" rx="30" ry="29" fill={C.teal}/>
-    <ellipse cx="50" cy="54" rx="22" ry="20" fill="rgba(255,255,255,0.09)"/>
-    <ellipse cx="37" cy="48" rx="9.5" ry="10.5" fill="white"/>
-    <ellipse cx="63" cy="48" rx="9.5" ry="10.5" fill="white"/>
-    <circle cx="38.5" cy="50" r="5.8" fill="#0D2218"/>
-    <circle cx="64.5" cy="50" r="5.8" fill="#0D2218"/>
-    <circle cx="41" cy="46" r="2.3" fill="white"/>
-    <circle cx="67" cy="46" r="2.3" fill="white"/>
-    <ellipse cx="26" cy="58" rx="6" ry="4" fill="#FF9999" opacity="0.28"/>
-    <ellipse cx="74" cy="58" rx="6" ry="4" fill="#FF9999" opacity="0.28"/>
-    <path d="M37 63 Q50 76 63 63" fill="#0D2218"/>
-    <path d="M39 65 Q50 74 61 65" fill="#E87070"/>
-    <ellipse cx="50" cy="25" rx="39" ry="9.5" fill="#4D6B3C"/>
-    <path d="M22 25 Q26 3 50 3 Q74 3 78 25Z" fill="#5E8048"/>
-    <rect x="24" y="19" width="52" height="7.5" rx="2.5" fill="#3A5228"/>
-    <path d="M30 21 Q48 15 64 18" stroke="rgba(255,255,255,0.17)" strokeWidth="2.5"
-      fill="none" strokeLinecap="round"/>
-  </svg>
-);
+/* Hero float keyframe */
+if (typeof document !== 'undefined' && !document.getElementById('para-hero-kf')) {
+  const s = document.createElement('style');
+  s.id = 'para-hero-kf';
+  s.textContent = `@keyframes para-hero-float { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-12px) rotate(1.5deg)} }`;
+  document.head.appendChild(s);
+}
+
+/* ParaFig — intro modal avatar */
+const ParaFig = ({ size = 110, waving = false, style = {} }) => {
+  const anim = waving
+    ? 'rb-wave 1.6s ease-in-out infinite'
+    : 'rb-talk 0.35s ease-in-out infinite';
+  return (
+    <div style={{ width: size, height: Math.round(size * 1.18), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, ...style }}>
+      <img
+        src="/para-avatar.jpg"
+        alt="PARA"
+        draggable={false}
+        style={{
+          width: '100%', height: '100%',
+          objectFit: 'contain',
+          borderRadius: '50% 50% 40% 40%',
+          animation: anim,
+          filter: 'drop-shadow(0 4px 16px rgba(255,100,200,0.5))',
+          transformOrigin: 'bottom center',
+          userSelect: 'none',
+        }}
+      />
+    </div>
+  );
+};
 
 /* ─── PARA Welcome Modal — Image 1 reference ─────────────────────────── */
 const ParaModal = ({ onClose, onStart }) => {
