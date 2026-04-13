@@ -9,10 +9,13 @@ import { Menu, Microscope, LayoutDashboard, LogOut, User, ChevronDown, Zap } fro
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
-  { href: '/chat',       label: 'Free Chatbot' },
-  { href: '/research',   label: 'Research Library' },
-  { href: '/analyzer',   label: 'AI Analyser' },
-  { href: '/assistant',  label: 'Assistant' },
+  { href: '/chat',               label: 'Free Chatbot' },
+  { href: '/analyzer',           label: 'AI Analyser' },
+  { href: '/encyclopedia',       label: 'Encyclopedia' },
+  { href: '/travel',             label: 'Travel Map' },
+  { href: '/journal',            label: 'Journal' },
+  { href: '/treatment-tracker',  label: 'Treatment Tracker' },
+  { href: '/research',           label: 'Research Library' },
 ]
 
 function UserMenu({ name, email, credits, avatarUrl }: {
