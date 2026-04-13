@@ -8,6 +8,7 @@ import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 // ── Core pages ────────────────────────────────────────────────────────────────
 import LandingPage from './pages/LandingPage';
+import ChatPage from './pages/ChatPage';
 import UploadPage from './pages/UploadPage';
 import AnalysisResultsPage from './pages/AnalysisResultsPage';
 import GPReportPage from './pages/GPReportPage';
@@ -293,6 +294,7 @@ function App() {
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
