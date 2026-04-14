@@ -5,6 +5,84 @@ import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 import { PARA } from '../utils/para-copy';
 
+/* ── New-user welcome modal ──────────────────────────────────────── */
+const NewUserWelcomeModal: React.FC<{ firstName?: string; credits: number; onClose: () => void }> = ({ firstName, credits, onClose }) => (
+  <div
+    onClick={e => e.target === e.currentTarget && onClose()}
+    style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(3px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+    }}>
+    <div style={{
+      background: 'var(--bg-surface)', border: '1px solid var(--bg-border)',
+      borderRadius: 20, maxWidth: 420, width: '100%',
+      boxShadow: '0 24px 64px rgba(0,0,0,0.5)', overflow: 'hidden',
+      animation: 'welcomeIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+    }}>
+      {/* Accent bar */}
+      <div style={{ height: 4, background: 'linear-gradient(90deg,#00BFA5,#A8D5BA,#fbbf24)' }} />
+
+      <div style={{ padding: '28px 28px 24px' }}>
+        {/* Icon + heading */}
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>🎉</div>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 22, color: 'var(--text-primary)' }}>
+            You're in{firstName ? `, ${firstName}` : ''}!
+          </h2>
+          <p style={{ margin: '6px 0 0', fontSize: 14, color: 'var(--text-muted)' }}>
+            Welcome to ParasitePro — Australia's AI-powered parasite education tool.
+          </p>
+        </div>
+
+        {/* Credits badge */}
+        <div style={{
+          background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)',
+          borderRadius: 12, padding: '14px 16px', marginBottom: 20, textAlign: 'center',
+        }}>
+          <p style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 800, color: 'var(--amber-bright)' }}>
+            {credits} free {credits === 1 ? 'analysis' : 'analyses'}
+          </p>
+          <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
+            ready to use — no credit card needed
+          </p>
+        </div>
+
+        {/* 3-step explainer */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
+          {[
+            { icon: '📸', text: 'Upload a photo of your sample — skin, stool, or environmental' },
+            { icon: '🔬', text: 'Our AI gives you a structured educational assessment in seconds' },
+            { icon: '🏥', text: 'Use the report to have a more informed conversation with your GP' },
+          ].map(({ icon, text }) => (
+            <div key={text} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={onClose}
+          style={{
+            width: '100%', padding: '13px', border: 'none', borderRadius: 12,
+            background: 'var(--amber)', color: '#000',
+            fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}>
+          Start my first analysis →
+        </button>
+
+        <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
+          ⚠️ Educational use only — not medical advice. Always consult a GP for health concerns.
+        </p>
+      </div>
+    </div>
+    <style>{`@keyframes welcomeIn { from{opacity:0;transform:scale(0.92) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }`}</style>
+  </div>
+);
+
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
@@ -20,6 +98,17 @@ const DashboardPage: React.FC = () => {
   const { user, accessToken } = useAuthStore();
   const [analyses, setAnalyses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    // Show welcome modal for brand-new users
+    try {
+      if (sessionStorage.getItem('para_new_user') === '1') {
+        setShowWelcome(true);
+        sessionStorage.removeItem('para_new_user');
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -33,6 +122,13 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+      {showWelcome && (
+        <NewUserWelcomeModal
+          firstName={user?.firstName}
+          credits={credits}
+          onClose={() => { setShowWelcome(false); navigate('/upload'); }}
+        />
+      )}
       <div className="max-w-5xl mx-auto px-6 py-12">
 
         {/* Header */}

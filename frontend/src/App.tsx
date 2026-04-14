@@ -215,6 +215,10 @@ function SignupPage() {
       if (res.ok) {
         login(data.user, data.accessToken, data.refreshToken);
         try { sessionStorage.removeItem('para_promo_code'); } catch {}
+        // Facebook Pixel — signup conversion
+        try { if ((window as any).fbq) (window as any).fbq('track', 'CompleteRegistration'); } catch {}
+        // Flag first-time user so dashboard can show welcome moment
+        try { sessionStorage.setItem('para_new_user', '1'); } catch {}
         window.location.href = '/dashboard';
       } else setError(data.error || 'Sign up failed. Please try again.');
     } catch { setError('Unable to connect. Please try again.'); }

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import SEO from '../components/SEO';
 import TrustBar from '../components/TrustBar';
+import SignupAssistant from '../components/SignupAssistant';
 
 /* ─── Brand tokens — Image 4 reference ─────────────────────────────── */
 const C = {
@@ -249,7 +250,7 @@ const Logo = () => (
 /* ─── LANDING PAGE ───────────────────────────────────────────────────── */
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user }  = useAuthStore();
+  const { user, isAuthenticated }  = useAuthStore();
   const [showModal, setShowModal] = useState(false);
   const [scrolled, setScrolled]   = useState(false);
 
@@ -623,6 +624,8 @@ const LandingPage = () => {
           </p>
         </div>
       </footer>
+      {/* PARA signup assistant — shown to unauthenticated visitors only */}
+      {!isAuthenticated && <SignupAssistant />}
     </div>
   );
 };

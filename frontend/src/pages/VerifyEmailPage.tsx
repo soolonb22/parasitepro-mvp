@@ -87,9 +87,9 @@ const VerifyEmailPage = () => {
               <button
                 className="btn btn-primary"
                 style={{ width: '100%' }}
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/dashboard')}
               >
-                Continue to Login
+                Continue to Dashboard
               </button>
             </>
           )}
