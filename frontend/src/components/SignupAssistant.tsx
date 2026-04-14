@@ -156,154 +156,50 @@ function Confetti() {
   );
 }
 
-/* ── Robot avatar ─────────────────────────────────────────────── */
-function Robot({ mood, speaking, size = 1 }) {
-  const [blink, setBlink] = useState(false);
-  const [mouth, setMouth] = useState(0);
-  const [pulse, setPulse] = useState(false);
+/* ── PARA video avatar ────────────────────────────────────────── */
+const MOOD_VIDEO: Record<string, string> = {
+  waving:    '/videos/para-1.mp4',
+  talking:   '/videos/para-2.mp4',
+  thinking:  '/videos/para-3.mp4',
+  happy:     '/videos/para-4.mp4',
+  curious:   '/videos/para-5.mp4',
+  concerned: '/videos/para-6.mp4',
+  idle:      '/videos/para-1.mp4',
+  surprised: '/videos/para-4.mp4',
+};
 
-  useEffect(() => {
-    const next = () => { const t = setTimeout(() => { setBlink(true); setTimeout(() => setBlink(false), 120); next(); }, 4000 + Math.random() * 2000); return t; };
-    const t = next(); return () => clearTimeout(t);
-  }, []);
-  useEffect(() => {
-    if (!speaking) { setMouth(0); return; }
-    const t = setInterval(() => setMouth(p => (p + 1) % 4), 140); return () => clearInterval(t);
-  }, [speaking]);
-  useEffect(() => {
-    const t = setInterval(() => setPulse(v => !v), 900 + Math.random() * 300); return () => clearInterval(t);
-  }, []);
+function ParaVideo({ mood, speaking }: { mood: string; speaking: boolean }) {
+  const vidRef = useRef<HTMLVideoElement>(null);
+  const src = MOOD_VIDEO[mood] || MOOD_VIDEO.idle;
 
-  const skinBase = '#FFBA80', skinMid = '#E8964A', skinHi = '#FFD4A8';
-  const hairDk = '#2D1200', hairMd = '#4A2000';
-  const suitBlue = '#1E40AF', suitLt = '#2563EB';
-  const capeGold = '#FBBF24', capeDk = '#D97706';
-  const shieldBl = '#93C5FD';
-  const irisCol = mood==='concerned'?'#60A5FA':mood==='happy'?'#34D399':'#3B82F6';
-  const glowCol = mood==='concerned'?'#F87171':mood==='happy'?'#34D399':mood==='thinking'?'#C4B5FD':'#60A5FA';
-
-  const mouthPaths = [
-    'M 40 83 Q 55 93 70 83',
-    'M 41 83 Q 55 94 69 83',
-    'M 42 82 Q 55 96 68 82',
-    'M 43 81 Q 55 98 67 81',
-  ];
-  const mp = speaking ? mouthPaths[mouth] : (mood==='concerned' ? 'M 43 87 Q 55 83 67 87' : mouthPaths[0]);
-  const eyeH = blink ? 1 : mood==='surprised' ? 11 : mood==='happy' ? 8 : 9;
+  // Swap src and restart when mood changes
+  useEffect(() => {
+    const el = vidRef.current;
+    if (!el) return;
+    el.src = src;
+    el.load();
+    el.play().catch(() => {});
+  }, [src]);
 
   return (
-    <svg width={110*size} height={150*size} viewBox="0 0 110 150"
-      style={{overflow:'visible', filter:`drop-shadow(0 4px 20px rgba(30,64,175,0.5))`, transition:'filter 0.3s'}}>
-
-      {/* Gold Cape */}
-      <path d="M 8 150 Q 2 112 22 93 Q 40 138 55 130 Q 70 138 88 93 Q 108 112 102 150"
-        fill={capeGold} stroke={capeDk} strokeWidth="1.5"/>
-      <path d="M 22 93 Q 38 128 55 130 Q 72 128 88 93 Q 78 118 55 123 Q 32 118 22 93"
-        fill={capeDk} opacity="0.3"/>
-      <path d="M 8 150 Q 15 130 22 93" fill="none" stroke={capeDk} strokeWidth="1" opacity="0.4"/>
-      <path d="M 102 150 Q 95 130 88 93" fill="none" stroke={capeDk} strokeWidth="1" opacity="0.4"/>
-
-      {/* Neck */}
-      <rect x="43" y="110" width="24" height="22" rx="8" fill={skinBase}/>
-
-      {/* Blue Suit */}
-      <ellipse cx="55" cy="150" rx="44" ry="16" fill={suitBlue}/>
-      <path d="M 18 140 L 55 122 L 92 140" fill={suitBlue} stroke="#1E3A8A" strokeWidth="1.5"/>
-      <path d="M 55 124 L 64 131 L 55 140 L 46 131 Z" fill={capeGold} stroke={capeDk} strokeWidth="1"/>
-      <path d="M 55 126 L 61 131 L 55 138 L 49 131 Z" fill="#FDE68A" opacity="0.8"/>
-      <path d="M 52 128 L 52 136 M 52 128 L 56 129 Q 58 131 56 133 L 52 133"
-        fill="none" stroke={capeDk} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M 15 148 Q 22 142 32 142" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
-      <path d="M 95 148 Q 88 142 78 142" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" opacity="0.8"/>
-
-      {/* Head */}
-      <ellipse cx="55" cy="63" rx="34" ry="38" fill={skinBase} style={{filter:'drop-shadow(0 4px 12px rgba(0,0,0,0.22))'}}/>
-      <ellipse cx="47" cy="47" rx="18" ry="10" fill={skinHi} opacity="0.5"/>
-      {(mood==='happy'||speaking)&&<>
-        <ellipse cx="32" cy="74" rx="10" ry="6" fill="#F87171" opacity="0.2"/>
-        <ellipse cx="78" cy="74" rx="10" ry="6" fill="#F87171" opacity="0.2"/>
-      </>}
-
-      {/* Spiky Brown Hair */}
-      <ellipse cx="55" cy="29" rx="34" ry="19" fill={hairDk}/>
-      <ellipse cx="55" cy="25" rx="30" ry="14" fill={hairMd}/>
-      <path d="M 48 29 L 55 4 L 62 29" fill={hairDk}/>
-      <path d="M 50 30 L 55 8 L 60 30" fill={hairMd}/>
-      <path d="M 35 32 L 37 8 L 49 31" fill={hairDk}/>
-      <path d="M 37 33 L 39 11 L 48 32" fill={hairMd}/>
-      <path d="M 75 32 L 73 8 L 61 31" fill={hairDk}/>
-      <path d="M 73 33 L 71 11 L 62 32" fill={hairMd}/>
-      <path d="M 21 42 L 19 16 L 36 38" fill={hairDk}/>
-      <path d="M 89 42 L 91 16 L 74 38" fill={hairDk}/>
-      <ellipse cx="22" cy="53" rx="10" ry="20" fill={hairDk}/>
-      <ellipse cx="88" cy="53" rx="10" ry="20" fill={hairDk}/>
-      <path d="M 43 22 Q 55 15 67 20" fill="none" stroke="#7C3A10" strokeWidth="2" strokeLinecap="round" opacity="0.45"/>
-
-      {/* Eyebrows */}
-      <path d="M 29 52 Q 39 47 47 51" fill="none" stroke={hairDk} strokeWidth="4" strokeLinecap="round"
-        style={{transform:mood==='concerned'?'rotate(9deg)':mood==='curious'?'rotate(-4deg)':'none',transformOrigin:'38px 50px',transition:'transform 0.3s'}}/>
-      <path d="M 63 51 Q 71 47 81 52" fill="none" stroke={hairDk} strokeWidth="4" strokeLinecap="round"
-        style={{transform:mood==='concerned'?'rotate(-9deg)':mood==='curious'?'rotate(4deg)':'none',transformOrigin:'72px 50px',transition:'transform 0.3s'}}/>
-
-      {/* Eyes */}
-      <ellipse cx="39" cy="62" rx="12" ry={blink?1:eyeH+2} fill="white" style={{transition:'ry 0.08s'}}/>
-      <ellipse cx="71" cy="62" rx="12" ry={blink?1:eyeH+2} fill="white" style={{transition:'ry 0.08s'}}/>
-      <ellipse cx="39" cy="62" rx="12" ry={blink?1:eyeH+2} fill="none" stroke="#1A0A00" strokeWidth="1.5" style={{transition:'ry 0.08s'}}/>
-      <ellipse cx="71" cy="62" rx="12" ry={blink?1:eyeH+2} fill="none" stroke="#1A0A00" strokeWidth="1.5" style={{transition:'ry 0.08s'}}/>
-      {!blink&&<>
-        <ellipse cx="39" cy="62" rx="8" ry={eyeH} fill={irisCol} style={{transition:'fill 0.3s,ry 0.08s'}}/>
-        <ellipse cx="71" cy="62" rx="8" ry={eyeH} fill={irisCol} style={{transition:'fill 0.3s,ry 0.08s'}}/>
-        <ellipse cx="39" cy="62" rx="4.5" ry={Math.max(eyeH-2,1)} fill="#050505"/>
-        <ellipse cx="71" cy="62" rx="4.5" ry={Math.max(eyeH-2,1)} fill="#050505"/>
-        <circle cx="35" cy="58" r="2.8" fill="white" opacity="0.9"/>
-        <circle cx="67" cy="58" r="2.8" fill="white" opacity="0.9"/>
-      </>}
-
-      {/* Nose */}
-      <path d="M 52 70 Q 50 77 48 79 Q 54 81 62 79 Q 60 77 58 70"
-        fill="none" stroke={skinMid} strokeWidth="1.5" strokeLinecap="round" opacity="0.55"/>
-
-      {/* Big Smile */}
-      {!speaking&&mood!=='concerned'&&(
-        <path d="M 41 85 Q 55 95 69 85 L 68 87 Q 55 97 42 87 Z" fill="white" opacity="0.95"/>
-      )}
-      {speaking&&mouth>=1&&(
-        <ellipse cx="55" cy="88" rx={6+mouth*1.5} ry={2+mouth} fill="white" opacity="0.95"/>
-      )}
-      <path d={mp} fill="none" stroke={speaking?glowCol:'#1A0500'}
-        strokeWidth={speaking?3:2.5} strokeLinecap="round"
-        style={{filter:speaking?`drop-shadow(0 0 6px ${glowCol})`:'none',transition:'stroke 0.2s,d 0.08s'}}/>
-      {mood!=='concerned'&&<>
-        <path d="M 34 83 Q 30 88 33 93" fill="none" stroke={skinMid} strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
-        <path d="M 76 83 Q 80 88 77 93" fill="none" stroke={skinMid} strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>
-      </>}
-
-      {/* Ears */}
-      <ellipse cx="21" cy="65" rx="6" ry="9" fill={skinBase} stroke={skinMid} strokeWidth="1"/>
-      <ellipse cx="89" cy="65" rx="6" ry="9" fill={skinBase} stroke={skinMid} strokeWidth="1"/>
-
-      {/* Blue Shield */}
-      <ellipse cx="101" cy="102" rx="13" ry="13" fill="#BFDBFE" stroke="#2563EB" strokeWidth="2"
-        style={{filter:`drop-shadow(0 0 ${pulse?12:5}px #3B82F6)`,transition:'filter 0.5s'}}/>
-      <ellipse cx="101" cy="102" rx="9" ry="9" fill={shieldBl} stroke="#1D4ED8" strokeWidth="1"/>
-      <ellipse cx="101" cy="102" rx="5" ry="5" fill="#DBEAFE"/>
-      <circle cx="97" cy="98" r="2.5" fill="white" opacity="0.65"/>
-
-      {/* Thinking dots */}
-      {mood==='thinking'&&[0,1,2].map((i)=>(
-        <circle key={i} cx={42+i*13} cy="18" r="3.5" fill="#C4B5FD"
-          opacity={0.2+0.8*((mouth+i)%3===0?1:0)}
-          style={{filter:'drop-shadow(0 0 5px #C4B5FD)',transition:'opacity 0.18s'}}/>
-      ))}
-
-      {/* Surprised sparkles */}
-      {mood==='surprised'&&<>
-        <circle cx="15" cy="38" r="3.5" fill={capeGold} opacity="0.95" style={{filter:`drop-shadow(0 0 8px ${capeGold})`}}/>
-        <circle cx="95" cy="38" r="3.5" fill={capeGold} opacity="0.95" style={{filter:`drop-shadow(0 0 8px ${capeGold})`}}/>
-        <circle cx="8" cy="55" r="2" fill="#F472B6" opacity="0.8"/>
-        <circle cx="102" cy="55" r="2" fill="#F472B6" opacity="0.8"/>
-      </>}
-    </svg>
+    <div style={{
+      width: 48, height: 58, borderRadius: 10, overflow: 'hidden', flexShrink: 0,
+      boxShadow: speaking
+        ? '0 0 0 2px #0d9488, 0 0 12px rgba(13,148,136,0.5)'
+        : '0 0 0 1.5px rgba(13,148,136,0.3)',
+      transition: 'box-shadow 0.3s',
+      background: '#0d1f1a',
+    }}>
+      <video
+        ref={vidRef}
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }}
+      />
+    </div>
   );
 }
 
@@ -618,7 +514,7 @@ export default function SignupAssistant() {
         <div style={{background:'linear-gradient(90deg,#0d9488,#0891b2)',padding:'10px 12px',display:'flex',alignItems:'center',gap:10}}>
           <div style={{flexShrink:0,position:'relative',animation:`sa-bob 4s ease-in-out infinite${mood==='happy'?', sa-glow-flash 0.9s ease':''}`}}>
             {showConfetti && <Confetti/>}
-            <Robot mood={mood} speaking={speaking} size={0.36}/>
+            <ParaVideo mood={mood} speaking={speaking} />
           </div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{color:'white',fontWeight:700,fontSize:15}}>PARA</div>

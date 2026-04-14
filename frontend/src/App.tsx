@@ -228,6 +228,29 @@ function SignupPage() {
   return (
     <AuthShell>
       <div className="animate-slide-up space-y-7">
+
+        {/* PARA video hook */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 14,
+          background: 'rgba(13,148,136,0.07)', border: '1px solid rgba(13,148,136,0.2)',
+          borderRadius: 14, padding: '12px 14px',
+        }}>
+          <div style={{ width: 56, height: 68, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#0d1f1a', boxShadow: '0 0 0 1.5px rgba(13,148,136,0.4)' }}>
+            <video autoPlay muted loop playsInline src="/videos/para-1.mp4"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
+          </div>
+          <div>
+            <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#2dd4bf', lineHeight: 1.3 }}>
+              G'day! I'm PARA 👋
+            </p>
+            <p style={{ margin: '3px 0 0', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              {promoCode
+                ? `Code ${promoCode} unlocks 3 free analyses — let's go!`
+                : "Create your free account and I'll guide you through your first analysis."}
+            </p>
+          </div>
+        </div>
+
         <div>
           <h2 className="font-display font-bold text-2xl mb-1" style={{ color: 'var(--text-primary)' }}>Create account</h2>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
