@@ -236,7 +236,7 @@ function SignupPage() {
           borderRadius: 14, padding: '12px 14px',
         }}>
           <div style={{ width: 56, height: 68, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#0d1f1a', boxShadow: '0 0 0 1.5px rgba(13,148,136,0.4)' }}>
-            <video autoPlay muted loop playsInline src="/videos/para-1.mp4"
+            <video autoPlay muted loop playsInline src="/videos/para-1.mp4" poster="/videos/para-1.jpg"
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
           </div>
           <div>

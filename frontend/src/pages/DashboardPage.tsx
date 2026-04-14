@@ -31,7 +31,7 @@ const NewUserWelcomeModal: React.FC<{ firstName?: string; credits: number; onClo
             margin: '0 auto 14px', background: '#0d1f1a',
             boxShadow: '0 0 0 2px rgba(13,148,136,0.4), 0 8px 24px rgba(0,0,0,0.3)',
           }}>
-            <video autoPlay muted loop playsInline src="/videos/para-4.mp4"
+            <video autoPlay muted loop playsInline src="/videos/para-4.mp4" poster="/videos/para-4.jpg"
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
           </div>
           <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 22, color: 'var(--text-primary)' }}>

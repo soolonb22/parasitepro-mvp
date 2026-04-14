@@ -193,6 +193,7 @@ function ParaVideo({ mood, speaking }: { mood: string; speaking: boolean }) {
       <video
         ref={vidRef}
         src={src}
+        poster={src.replace('.mp4', '.jpg')}
         autoPlay
         muted
         loop
