@@ -231,7 +231,6 @@ const NotificationSettingsPage = () => {
   if (loading) {
     return (
       <div>
-        <Navbar />
         <div className="container" style={{ padding: '2rem', textAlign: 'center' }}>
           <div className="loading-spinner"></div>
           <p>Loading notification settings...</p>
@@ -246,7 +245,6 @@ const NotificationSettingsPage = () => {
         title="Notification Settings - Parasite Identification Pro"
         description="Manage your notification preferences for treatment reminders and health updates."
       />
-      <Navbar />
       <div className="container" style={{ padding: '2rem 1.5rem', maxWidth: '800px' }}>
         <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Notification Settings</h1>
         <p style={{ color: '#6b7280', marginBottom: '2rem' }}>

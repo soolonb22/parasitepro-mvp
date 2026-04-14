@@ -166,7 +166,6 @@ const BlogPage = () => {
     if (!post) {
       return (
         <>
-          <Navbar />
           <div className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
             <h1>Article Not Found</h1>
             <Link to="/blog" className="btn btn-primary" style={{ marginTop: '1rem' }}>
@@ -187,8 +186,6 @@ const BlogPage = () => {
           <meta property="og:type" content="article" />
           <meta name="keywords" content={post.tags.join(', ')} />
         </Helmet>
-        
-        <Navbar />
         
         <article className="blog-article">
           <div className="container" style={{ maxWidth: '800px', padding: '2rem 1rem' }}>
@@ -248,8 +245,6 @@ const BlogPage = () => {
         <title>Health Resources & Blog | Parasite Identification Pro</title>
         <meta name="description" content="Expert articles on parasitic infections, natural remedies, travel health, and gut wellness. Stay informed with our comprehensive health resource hub." />
       </Helmet>
-      
-      <Navbar />
       
       <div className="blog-page">
         <div className="container">

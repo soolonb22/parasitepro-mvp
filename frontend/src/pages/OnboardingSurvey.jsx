@@ -107,7 +107,6 @@ const OnboardingSurvey = () => {
         title="Get Started - Parasite Identification Pro"
         description="Tell us about your health concerns so we can personalize your experience."
       />
-      <Navbar />
 
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem 1rem' }}>
         <div style={{

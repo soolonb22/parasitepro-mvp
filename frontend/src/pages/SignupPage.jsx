@@ -114,7 +114,6 @@ const SignupPage = () => {
           description="Please verify your email to complete registration."
           canonical="/signup"
         />
-        <Navbar />
         <div className="auth-container">
           <div className="card auth-card" style={{ textAlign: 'center' }}>
             <div style={{ 
@@ -220,7 +219,6 @@ const SignupPage = () => {
         description="Create your Parasite Identification Pro account to start analyzing microscopy images with AI-powered parasite identification."
         canonical="/signup"
       />
-      <Navbar />
       <div className="auth-container">
         <div className="card auth-card">
           <h1 style={{ textAlign: 'center', marginBottom: '0.5rem' }}>

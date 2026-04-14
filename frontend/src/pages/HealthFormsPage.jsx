@@ -160,7 +160,6 @@ export default function HealthFormsPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
-        <Navbar />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
           <p>Loading...</p>
         </div>
@@ -174,7 +173,6 @@ export default function HealthFormsPage() {
         <title>Health Forms | Parasite Identification Pro</title>
         <meta name="description" content="Complete health questionnaires for personalized analysis" />
       </Helmet>
-      <Navbar />
       
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' }}>
         <div style={{ marginBottom: '2rem' }}>

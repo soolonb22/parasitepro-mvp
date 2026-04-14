@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import ParasiteBot, { LandingPARA } from './components/ParasiteBot';
+import Navbar from './components/Navbar';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 // ── Core pages ────────────────────────────────────────────────────────────────
@@ -308,6 +309,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+// Pages that use AuthShell (their own minimal header — no global Navbar)
+const NO_NAV_PATHS = ['/login', '/signup', '/forgot-password', '/reset-password'];
+
+function AppLayout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const hideNav = NO_NAV_PATHS.includes(location.pathname);
+  return (
+    <>
+      {!hideNav && <Navbar />}
+      {children}
+    </>
+  );
+}
+
 function App() {
   return (
     <HelmetProvider>
@@ -318,6 +333,7 @@ function App() {
           error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
         }} />
         <ParasiteBot />
+        <AppLayout>
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
@@ -388,6 +404,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        </AppLayout>
       </BrowserRouter>
     </HelmetProvider>
   );

@@ -407,7 +407,6 @@ export default function EncyclopediaPage() {
           title={`${selectedParasite.common_name} - Parasite Encyclopedia`}
           description={selectedParasite.description}
         />
-        <Navbar />
         
         <div style={styles.header}>
           <div style={styles.headerContent}>
@@ -509,7 +508,6 @@ export default function EncyclopediaPage() {
         title="Parasite Encyclopedia - Parasite Identification Pro"
         description="Comprehensive educational database of parasites with lifecycle, symptoms, transmission, and natural remedies"
       />
-      <Navbar />
       
       <div style={styles.header}>
         <div style={styles.headerContent}>

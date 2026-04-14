@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
 const VerifyEmailPage = () => {
@@ -40,7 +39,6 @@ const VerifyEmailPage = () => {
         description="Verify your email address to complete registration."
         canonical="/verify-email"
       />
-      <Navbar />
       <div className="auth-container">
         <div className="card auth-card" style={{ textAlign: 'center' }}>
           {status === 'verifying' && (

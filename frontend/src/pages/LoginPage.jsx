@@ -68,7 +68,6 @@ const LoginPage = () => {
           description="Please verify your email to login."
           canonical="/login"
         />
-        <Navbar />
         <div style={{
           flex: 1,
           display: 'flex',
@@ -184,7 +183,6 @@ const LoginPage = () => {
         description="Login to your Parasite Identification Pro account to view your analysis history and upload new samples."
         canonical="/login"
       />
-      <Navbar />
       <div style={{
         flex: 1,
         display: 'flex',

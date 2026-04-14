@@ -1,11 +1,9 @@
 // @ts-nocheck
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 
 export default function TipsPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
       <div className="max-w-4xl mx-auto px-6 py-16">
 
         {/* Header */}

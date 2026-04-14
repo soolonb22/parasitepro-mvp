@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Loader2, CheckCircle, AlertTriangle, ArrowRight, Sparkles, Shield, Zap } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 
 const DemoExperience = () => {
@@ -62,7 +61,6 @@ const DemoExperience = () => {
         title="Try Demo - Parasite Identification Pro"
         description="Experience our AI-powered parasite analysis with an interactive demo. See how it works before signing up."
       />
-      <Navbar />
       
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
         {step === 'intro' && (
