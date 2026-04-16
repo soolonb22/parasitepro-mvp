@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
@@ -69,7 +69,18 @@ import TravelRiskMapPage from './pages/TravelRiskMapPage';
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
+const SIGNUP_VIDEOS = [
+  'https://res.cloudinary.com/duiehozez/video/upload/v1776379478/SIGNUP_1_revvlq.mp4',
+  'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/SIGNUP_2_msiiau.mp4',
+];
+const WELCOME_1 = 'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/WELCOME_1_v98x3g.mp4';
+const WELCOME_2 = 'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/WELCOME_2_q4udi9.mp4';
+
 function AuthShell({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  const isSignup = pathname === '/signup';
+  const [videoIdx, setVideoIdx] = useState(0);
+
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--bg-base)' }}>
       <div
@@ -89,26 +100,40 @@ function AuthShell({ children }: { children: React.ReactNode }) {
             <span className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>ParasitePro</span>
           </div>
         </div>
-        <div className="relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-mono"
-            style={{ background: 'rgba(217,119,6,0.1)', border: '1px solid rgba(217,119,6,0.25)', color: 'var(--amber-bright)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" style={{ animation: 'pulse 2s infinite' }} />
-            AI Assessment Engine Active
-          </div>
-          <h1 className="font-display text-4xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
-            We don't flinch.<br /><span style={{ color: 'var(--amber)' }}>We find out.</span>
-          </h1>
-          <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Upload a photo. Get a structured, evidence-based parasite identification in seconds. Built for Australians who live where the wildlife bites back.
-          </p>
-          <div className="grid grid-cols-3 gap-4 pt-2">
-            {[{ label: 'Sample Types', value: '6+' }, { label: 'Analyses Run', value: '500+' }, { label: 'Avg. Response', value: '<30s' }].map(({ label, value }) => (
-              <div key={label} className="space-y-1">
-                <div className="font-display font-bold text-2xl" style={{ color: 'var(--amber-bright)' }}>{value}</div>
-                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</div>
+        <div className="relative z-10">
+          {isSignup ? (
+            <video
+              key={videoIdx}
+              src={SIGNUP_VIDEOS[videoIdx]}
+              autoPlay
+              muted
+              playsInline
+              onEnded={() => setVideoIdx(i => (i + 1) % SIGNUP_VIDEOS.length)}
+              style={{ width: '100%', borderRadius: '12px', display: 'block' }}
+            />
+          ) : (
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-mono"
+                style={{ background: 'rgba(217,119,6,0.1)', border: '1px solid rgba(217,119,6,0.25)', color: 'var(--amber-bright)' }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" style={{ animation: 'pulse 2s infinite' }} />
+                AI Assessment Engine Active
               </div>
-            ))}
-          </div>
+              <h1 className="font-display text-4xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                We don't flinch.<br /><span style={{ color: 'var(--amber)' }}>We find out.</span>
+              </h1>
+              <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                Upload a photo. Get a structured, evidence-based parasite identification in seconds. Built for Australians who live where the wildlife bites back.
+              </p>
+              <div className="grid grid-cols-3 gap-4 pt-2">
+                {[{ label: 'Sample Types', value: '6+' }, { label: 'Analyses Run', value: '500+' }, { label: 'Avg. Response', value: '<30s' }].map(({ label, value }) => (
+                  <div key={label} className="space-y-1">
+                    <div className="font-display font-bold text-2xl" style={{ color: 'var(--amber-bright)' }}>{value}</div>
+                    <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div className="relative z-10 text-xs" style={{ color: 'var(--text-muted)' }}>⚠️ For educational reference only. Not a substitute for medical advice.</div>
       </div>
@@ -190,10 +215,12 @@ function LoginPage() {
 
 function SignupPage() {
   const { login } = useAuthStore();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPass, setShowPass] = useState(false);
+  const [welcomePhase, setWelcomePhase] = useState<null | 'welcome1' | 'welcome2'>(null);
   const [promoCode, setPromoCode] = useState(() => {
     try { return sessionStorage.getItem('para_promo_code') || ''; } catch { return ''; }
   });
@@ -228,11 +255,30 @@ function SignupPage() {
       if (res.ok) {
         login(data.user, data.accessToken, data.refreshToken);
         try { sessionStorage.removeItem('para_promo_code'); sessionStorage.removeItem('referral_code'); } catch {}
-        window.location.href = '/dashboard';
+        setWelcomePhase('welcome1');
       } else setError(data.error || 'Sign up failed. Please try again.');
     } catch { setError('Unable to connect. Please try again.'); }
     finally { setLoading(false); }
   };
+
+  if (welcomePhase) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#000', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <video
+          key={welcomePhase}
+          src={welcomePhase === 'welcome1' ? WELCOME_1 : WELCOME_2}
+          autoPlay
+          muted
+          playsInline
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          onEnded={() => {
+            if (welcomePhase === 'welcome1') setWelcomePhase('welcome2');
+            else navigate('/dashboard');
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <AuthShell>
