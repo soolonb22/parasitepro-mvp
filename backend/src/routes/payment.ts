@@ -87,9 +87,14 @@ router.post('/create-subscription-session', authenticateToken,
     if (!subPriceId) { res.status(500).json({ error: 'Subscription not configured' }); return; }
 
     try {
-      const userRow = await pool.query('SELECT email, stripe_customer_id FROM users WHERE id = $1', [userId]);
+      const userRow = await pool.query('SELECT email, stripe_customer_id, subscription_status FROM users WHERE id = $1', [userId]);
       const user = userRow.rows[0];
       if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+
+      if (user.subscription_status === 'active' || user.subscription_status === 'past_due') {
+        res.status(409).json({ error: 'You already have an active subscription. To manage or cancel, please contact support.' });
+        return;
+      }
 
       const sessionParams: Stripe.Checkout.SessionCreateParams = {
         mode: 'subscription',

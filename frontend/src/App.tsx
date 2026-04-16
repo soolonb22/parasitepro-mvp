@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
@@ -190,12 +190,21 @@ function LoginPage() {
 
 function SignupPage() {
   const { login } = useAuthStore();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [promoCode, setPromoCode] = useState(() => {
     try { return sessionStorage.getItem('para_promo_code') || ''; } catch { return ''; }
   });
+
+  // Persist ?ref= from referral links into sessionStorage
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      try { sessionStorage.setItem('referral_code', ref); } catch {}
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setError(''); setLoading(true);
@@ -205,15 +214,20 @@ function SignupPage() {
     const firstName = (form.elements.namedItem('firstName') as HTMLInputElement).value;
     const lastName = (form.elements.namedItem('lastName') as HTMLInputElement).value;
     const code = promoCode.trim().toUpperCase();
+    const refCode = searchParams.get('ref') || (() => { try { return sessionStorage.getItem('referral_code'); } catch { return null; } })() || undefined;
     try {
       const res = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, firstName, lastName, ...(code ? { promoCode: code } : {}) }),
+        body: JSON.stringify({
+          email, password, firstName, lastName,
+          ...(code ? { promoCode: code } : {}),
+          ...(refCode ? { refCode } : {}),
+        }),
       });
       const data = await res.json();
       if (res.ok) {
         login(data.user, data.accessToken, data.refreshToken);
-        try { sessionStorage.removeItem('para_promo_code'); } catch {}
+        try { sessionStorage.removeItem('para_promo_code'); sessionStorage.removeItem('referral_code'); } catch {}
         window.location.href = '/dashboard';
       } else setError(data.error || 'Sign up failed. Please try again.');
     } catch { setError('Unable to connect. Please try again.'); }
