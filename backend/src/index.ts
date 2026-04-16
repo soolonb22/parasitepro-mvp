@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import pool from './config/database';
 
@@ -97,6 +98,35 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 // ───────────────────────────────────────────────────────────────────────────
 
+// ─── Rate limiters ────────────────────────────────────────────────────────────
+// Strict: auth endpoints — 10 attempts per 15 min per IP
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests — please try again in 15 minutes.' },
+});
+
+// Moderate: analysis uploads — 20 per hour per IP (credits are the real gate anyway)
+const analysisLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many analysis requests — please try again later.' },
+});
+
+// Payment: 30 per hour per IP — generous enough for legit use, blocks bulk abuse
+const paymentLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many payment requests — please try again later.' },
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Lazy-load routes to avoid startup crashes from missing env vars
 let authRoutes: express.Router;
 let analysisRoutes: express.Router;
@@ -105,7 +135,7 @@ let adminRouter: express.Router;
 
 try {
   authRoutes = require('./routes/auth').default;
-  app.use('/api/auth', authRoutes);
+  app.use('/api/auth', authLimiter, authRoutes);
   console.log('✅ Auth routes loaded');
 } catch (e: any) {
   console.error('❌ Failed to load auth routes:', e.message);
@@ -113,7 +143,7 @@ try {
 
 try {
   analysisRoutes = require('./routes/analysis').default;
-  app.use('/api/analysis', analysisRoutes);
+  app.use('/api/analysis', analysisLimiter, analysisRoutes);
   console.log('✅ Analysis routes loaded');
 } catch (e: any) {
   console.error('❌ Failed to load analysis routes:', e.message);
@@ -121,7 +151,7 @@ try {
 
 try {
   paymentRouter = require('./routes/payment').default;
-  app.use('/api/payment', paymentRouter);
+  app.use('/api/payment', paymentLimiter, paymentRouter);
   console.log('✅ Payment routes loaded');
 } catch (e: any) {
   console.error('❌ Failed to load payment routes:', e.message);
