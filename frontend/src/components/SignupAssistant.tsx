@@ -158,13 +158,13 @@ function Confetti() {
 
 /* ── PARA video avatar ────────────────────────────────────────── */
 const MOOD_VIDEO: Record<string, string> = {
-  waving:    '/videos/para-1.mp4',
-  talking:   '/videos/para-2.mp4',
+  waving:    'https://res.cloudinary.com/duiehozez/video/upload/v1776379478/SIGNUP_1_revvlq.mp4',
+  idle:      'https://res.cloudinary.com/duiehozez/video/upload/v1776379478/SIGNUP_1_revvlq.mp4',
+  talking:   'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/SIGNUP_2_msiiau.mp4',
   thinking:  '/videos/para-3.mp4',
   happy:     '/videos/para-4.mp4',
   curious:   '/videos/para-5.mp4',
   concerned: '/videos/para-6.mp4',
-  idle:      '/videos/para-1.mp4',
   surprised: '/videos/para-4.mp4',
 };
 

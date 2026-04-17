@@ -5,6 +5,37 @@ import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 import { PARA } from '../utils/para-copy';
 
+/* ── PARA video for welcome modal (cycles WELCOME_1 → WELCOME_2) ── */
+const WELCOME_VIDEOS = [
+  'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/WELCOME_1_v98x3g.mp4',
+  'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/WELCOME_2_q4udi9.mp4',
+];
+function WelcomeParaVideo() {
+  const vidRef = React.useRef<HTMLVideoElement>(null);
+  const idxRef = React.useRef(0);
+
+  function handleEnded() {
+    idxRef.current = (idxRef.current + 1) % WELCOME_VIDEOS.length;
+    const el = vidRef.current;
+    if (!el) return;
+    el.src = WELCOME_VIDEOS[idxRef.current];
+    el.load();
+    el.play().catch(() => {});
+  }
+
+  return (
+    <video
+      ref={vidRef}
+      src={WELCOME_VIDEOS[0]}
+      autoPlay
+      muted
+      playsInline
+      onEnded={handleEnded}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }}
+    />
+  );
+}
+
 /* ── New-user welcome modal ──────────────────────────────────────── */
 const NewUserWelcomeModal: React.FC<{ firstName?: string; credits: number; onClose: () => void }> = ({ firstName, credits, onClose }) => (
   <div
@@ -31,8 +62,7 @@ const NewUserWelcomeModal: React.FC<{ firstName?: string; credits: number; onClo
             margin: '0 auto 14px', background: '#0d1f1a',
             boxShadow: '0 0 0 2px rgba(13,148,136,0.4), 0 8px 24px rgba(0,0,0,0.3)',
           }}>
-            <video autoPlay muted loop playsInline src="/videos/para-4.mp4" poster="/videos/para-4.jpg"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
+            <WelcomeParaVideo />
           </div>
           <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 22, color: 'var(--text-primary)' }}>
             You're in{firstName ? `, ${firstName}` : ''}!
