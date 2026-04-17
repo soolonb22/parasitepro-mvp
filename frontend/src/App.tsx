@@ -427,6 +427,7 @@ function App() {
           <Route path="/results/:id" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
           <Route path="/scientific-library" element={<ScientificLibraryPage />} />
           <Route path="/encyclopedia" element={<EncyclopediaPage />} />
+          <Route path="/encyclopedia/:slug" element={<EncyclopediaPage />} />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
