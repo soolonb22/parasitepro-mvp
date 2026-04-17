@@ -133,7 +133,7 @@ export function ParaAuthPanel({ mode }: { mode: 'signup' | 'login' }) {
     if (muted) { onDone?.(); return; }
     sigRef.current = { cancelled: false };
     setSpeaking(true);
-    AudioEngine.speak(t, {
+    AudioEngine.unlockAndSpeak(t, {
       rate: 0.92, pitch: 1.08,
       signal: sigRef.current,
       onDone: () => { setSpeaking(false); onDone?.(); },
@@ -372,7 +372,7 @@ export function ParaAuthBanner({ mode, promoCode }: { mode: 'signup' | 'login'; 
     if (muted) { onDone?.(); return; }
     sigRef.current = { cancelled: false };
     setSpeaking(true);
-    AudioEngine.speak(t, {
+    AudioEngine.unlockAndSpeak(t, {
       rate: 0.92, pitch: 1.08,
       signal: sigRef.current,
       onDone: () => { setSpeaking(false); onDone?.(); },

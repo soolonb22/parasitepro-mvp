@@ -213,18 +213,18 @@ export class AudioEngine {
 
   static speak(text: string, opts: any = {}): void {
     const file = this.getFile(text);
-    if (!file) { SpeechEngine.speak(text, opts); return; }
+    if (!file) { SpeechEngine.unlockAndSpeak(text, opts); return; }
     this.cancel();
     const audio = new Audio(file);
     this.current = audio;
     audio.onplay  = () => opts.onStart?.();
     audio.onended = () => { this.current = null; opts.onDone?.(); };
-    audio.onerror = () => { this.current = null; SpeechEngine.speak(text, opts); };
-    audio.play().catch(() => { this.current = null; SpeechEngine.speak(text, opts); });
+    audio.onerror = () => { this.current = null; SpeechEngine.unlockAndSpeak(text, opts); };
+    audio.play().catch(() => { this.current = null; SpeechEngine.unlockAndSpeak(text, opts); });
   }
 
   static unlockAndSpeak(text: string, opts: any = {}): void {
-    this.speak(text, opts);
+    SpeechEngine.unlockAndSpeak(text, opts);
   }
 
   static cancel(): void {
