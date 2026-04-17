@@ -252,7 +252,7 @@ export default function ParaDox() {
       .map(m => ({ role: m.role, content: m.content }));
 
     try {
-      const res = await fetch(`${getApiUrl()}/api/paradox/message`, {
+      const res = await fetch(getApiUrl('/paradox/message'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

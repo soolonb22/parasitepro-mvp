@@ -12,4 +12,8 @@ export const STRIPE_PUBLIC_KEY =
   import.meta.env.VITE_STRIPE_PUBLIC_KEY ||
   'pk_live_51SEURXKP9uxdve7jnKzYboXV37u42eKc5uM21TQ15iXhYLUPQi8Jz7b3VR7yJTGtXBj4EMi9DwnV8TNqb1DhDKmH00U4I1qbyF';
 
-export const getApiUrl = (path: string) => `${API_URL}${path.startsWith('/') ? path : '/' + path}`;
+export const getApiUrl = (path: string) => {
+  // Strip a leading /api/ prefix — callers sometimes include it but API_URL already ends with /api
+  const clean = path.replace(/^\/api\//, '/');
+  return `${API_URL}${clean.startsWith('/') ? clean : '/' + clean}`;
+};
