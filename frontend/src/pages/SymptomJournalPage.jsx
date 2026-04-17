@@ -5,9 +5,14 @@ import SymptomTrendChart from '../components/SymptomTrendChart';
 import InteractiveBodyMap from '../components/InteractiveBodyMap';
 import HealingTimeline from '../components/HealingTimeline';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 export default function SymptomJournalPage() {
   const navigate = useNavigate();
+  const { accessToken } = useAuthStore();
   const [entries, setEntries] = useState([]);
   const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,22 +41,20 @@ export default function SymptomJournalPage() {
   const [analyzing, setAnalyzing] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!accessToken) {
       navigate('/login');
       return;
     }
     fetchData();
-  }, [navigate]);
+  }, [navigate, accessToken]);
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [entriesRes, statsRes, optionsRes, analysesRes] = await Promise.all([
-        axios.get('/api/journal/entries?limit=90', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/journal/stats', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/journal/options', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/analysis/list', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { analyses: [] } }))
+        axios.get(`${API_URL}/journal/entries?limit=90`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        axios.get(`${API_URL}/journal/stats`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        axios.get(`${API_URL}/journal/options`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        axios.get(`${API_URL}/analysis/list`, { headers: { Authorization: `Bearer ${accessToken}` } }).catch(() => ({ data: { analyses: [] } }))
       ]);
       setEntries(entriesRes.data.entries);
       setStats(statsRes.data);
@@ -77,16 +80,15 @@ export default function SymptomJournalPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      const bodyMapNotes = bodyMapSymptoms.length > 0 
+      const bodyMapNotes = bodyMapSymptoms.length > 0
         ? `Body Map: ${bodyMapSymptoms.map(s => `${s.regionName} (${s.typeName})`).join(', ')}`
         : '';
-      
-      await axios.post('/api/journal/entries', {
+
+      await axios.post(`${API_URL}/journal/entries`, {
         ...formData,
         notes: formData.notes + (bodyMapNotes ? '\n' + bodyMapNotes : '')
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setShowForm(false);
       setBodyMapSymptoms([]);
@@ -116,9 +118,8 @@ export default function SymptomJournalPage() {
   const handleAnalyze = async () => {
     setAnalyzing(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('/api/journal/analysis?days=30', {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await axios.get(`${API_URL}/journal/analysis?days=30`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setAnalysis(res.data.analysis);
     } catch (error) {
@@ -132,9 +133,8 @@ export default function SymptomJournalPage() {
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this entry?')) return;
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/journal/entries/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`${API_URL}/journal/entries/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       fetchData();
     } catch (error) {
@@ -151,7 +151,6 @@ export default function SymptomJournalPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
-        <Navbar />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
           <p>Loading...</p>
         </div>

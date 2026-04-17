@@ -2,9 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 export default function HealthFormsPage() {
   const navigate = useNavigate();
+  const { accessToken } = useAuthStore();
   const [forms, setForms] = useState([]);
   const [selectedForm, setSelectedForm] = useState(null);
   const [responses, setResponses] = useState({});
@@ -15,21 +20,19 @@ export default function HealthFormsPage() {
   const [showResults, setShowResults] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!accessToken) {
       navigate('/login');
       return;
     }
     fetchData();
-  }, [navigate]);
+  }, [navigate, accessToken]);
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [formsRes, profileRes, responsesRes] = await Promise.all([
-        axios.get('/api/health/forms', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/health/profile', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/health/responses', { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${API_URL}/health/forms`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        axios.get(`${API_URL}/health/profile`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        axios.get(`${API_URL}/health/responses`, { headers: { Authorization: `Bearer ${accessToken}` } })
       ]);
       setForms(formsRes.data.forms);
       setProfile(profileRes.data.profile);
@@ -43,9 +46,8 @@ export default function HealthFormsPage() {
 
   const loadForm = async (formId) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`/api/health/forms/${formId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await axios.get(`${API_URL}/health/forms/${formId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setSelectedForm(res.data);
       setResponses(res.data.previousResponse?.responses || {});
@@ -72,10 +74,9 @@ export default function HealthFormsPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post(`/api/health/forms/${selectedForm.id}/submit`, 
+      const res = await axios.post(`${API_URL}/health/forms/${selectedForm.id}/submit`,
         { responses },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
       setShowResults(res.data.analysis);
       fetchData();
@@ -160,7 +161,6 @@ export default function HealthFormsPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
-        <Navbar />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
           <p>Loading...</p>
         </div>

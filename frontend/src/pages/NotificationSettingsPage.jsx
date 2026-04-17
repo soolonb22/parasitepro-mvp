@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const NotificationSettingsPage = () => {
   const navigate = useNavigate();
+  const { accessToken } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -23,8 +28,7 @@ const NotificationSettingsPage = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!accessToken) {
       navigate('/login');
       return;
     }
@@ -35,13 +39,12 @@ const NotificationSettingsPage = () => {
 
     fetchPreferences();
     fetchNotificationHistory();
-  }, [navigate]);
+  }, [navigate, accessToken]);
 
   const fetchPreferences = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/notifications/preferences', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_URL}/notifications/preferences`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setPreferences(response.data.preferences);
       setHasActiveSubscription(response.data.hasActiveSubscription);
@@ -55,9 +58,8 @@ const NotificationSettingsPage = () => {
 
   const fetchNotificationHistory = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/notifications/history?limit=10', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_URL}/notifications/history?limit=10`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setNotifications(response.data.notifications);
       setUnreadCount(response.data.unreadCount);
@@ -91,20 +93,19 @@ const NotificationSettingsPage = () => {
         return;
       }
 
-      const token = localStorage.getItem('token');
-      const vapidResponse = await axios.get('/api/notifications/vapid-public-key');
+      const vapidResponse = await axios.get(`${API_URL}/notifications/vapid-public-key`);
       const vapidPublicKey = vapidResponse.data.publicKey;
 
       const registration = await navigator.serviceWorker.ready;
-      
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
       });
 
-      await axios.post('/api/notifications/subscribe', 
+      await axios.post(`${API_URL}/notifications/subscribe`,
         { subscription: subscription.toJSON() },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
 
       setHasActiveSubscription(true);
@@ -128,9 +129,8 @@ const NotificationSettingsPage = () => {
       const subscription = await registration.pushManager.getSubscription();
       
       if (subscription) {
-        const token = localStorage.getItem('token');
-        await axios.delete('/api/notifications/subscribe', {
-          headers: { Authorization: `Bearer ${token}` },
+        await axios.delete(`${API_URL}/notifications/subscribe`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
           data: { endpoint: subscription.endpoint }
         });
         await subscription.unsubscribe();
@@ -151,8 +151,6 @@ const NotificationSettingsPage = () => {
     try {
       setSaving(true);
       setError('');
-      const token = localStorage.getItem('token');
-      
       const payload = {
         treatmentReminders: updates.treatment_reminders ?? preferences.treatment_reminders,
         dailyCheckin: updates.daily_checkin ?? preferences.daily_checkin,
@@ -162,8 +160,8 @@ const NotificationSettingsPage = () => {
         emailNotifications: updates.email_notifications ?? preferences.email_notifications
       };
 
-      const response = await axios.put('/api/notifications/preferences', payload, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.put(`${API_URL}/notifications/preferences`, payload, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
 
       setPreferences(response.data.preferences);
@@ -180,9 +178,8 @@ const NotificationSettingsPage = () => {
   const sendTestNotification = async () => {
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.post('/api/notifications/test', {}, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.post(`${API_URL}/notifications/test`, {}, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       
       if (response.data.success) {
@@ -200,9 +197,8 @@ const NotificationSettingsPage = () => {
 
   const markAllRead = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put('/api/notifications/read-all', {}, {
-        headers: { Authorization: `Bearer ${token}` }
+      await axios.put(`${API_URL}/notifications/read-all`, {}, {
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setUnreadCount(0);
       setNotifications(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
@@ -231,7 +227,6 @@ const NotificationSettingsPage = () => {
   if (loading) {
     return (
       <div>
-        <Navbar />
         <div className="container" style={{ padding: '2rem', textAlign: 'center' }}>
           <div className="loading-spinner"></div>
           <p>Loading notification settings...</p>

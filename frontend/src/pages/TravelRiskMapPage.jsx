@@ -556,8 +556,6 @@ const TravelRiskMapPage = () => {
         title="Travel Risk Map - Parasite Identification Pro"
         description="Interactive world map showing parasite risk levels by region with real WHO/CDC data and travel health advisories."
       />
-      <Navbar />
-      
       <div className="travel-map-header">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h1>Global Parasite Risk Heat Map</h1>

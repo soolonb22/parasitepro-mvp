@@ -6,6 +6,10 @@ import MealPlanSection from '../components/MealPlanSection';
 import ShareResultsButton from '../components/ShareResultsButton';
 import ResultsUpsellCard from '../components/ResultsUpsellCard';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const URGENCY_STYLES = {
   low: { bg: '#dcfce7', color: '#166534', icon: '✅', label: 'Low Concern' },
@@ -784,6 +788,7 @@ const EducationalInfoSection = ({ info, parasiteName }) => {
 
 const ResultsPage = () => {
   const { id } = useParams();
+  const { accessToken } = useAuthStore();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -805,7 +810,9 @@ const ResultsPage = () => {
 
   const fetchResults = async () => {
     try {
-      const response = await axios.get(`/api/analysis/analyses/${id}`);
+      const response = await axios.get(`${API_URL}/analysis/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
       setData(response.data);
     } catch (err) {
       setError('Failed to load results');
@@ -823,9 +830,9 @@ const ResultsPage = () => {
     
     setSubmittingAnswers(true);
     try {
-      const response = await axios.post(`/api/analysis/analyses/${id}/answers`, {
+      const response = await axios.post(`${API_URL}/analysis/${id}/deep-dive`, {
         answers: selectedAnswers
-      });
+      }, { headers: { Authorization: `Bearer ${accessToken}` } });
       
       setData(prev => ({
         ...prev,
@@ -855,7 +862,6 @@ const ResultsPage = () => {
           description="View your health analysis results with detailed information and recommendations."
           canonical="/results"
         />
-        <Navbar />
         <div className="container" style={{ padding: '2rem', textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔬</div>
           Loading results...
@@ -872,7 +878,6 @@ const ResultsPage = () => {
           description="View your health analysis results."
           canonical="/results"
         />
-        <Navbar />
         <div className="container" style={{ padding: '2rem' }}>
           <div style={{ color: '#991b1b', textAlign: 'center' }}>{error}</div>
         </div>

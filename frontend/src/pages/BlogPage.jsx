@@ -166,7 +166,6 @@ const BlogPage = () => {
     if (!post) {
       return (
         <>
-          <Navbar />
           <div className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
             <h1>Article Not Found</h1>
             <Link to="/blog" className="btn btn-primary" style={{ marginTop: '1rem' }}>

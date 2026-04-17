@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
+
 
 interface SharedData {
   analysis: any;
@@ -21,7 +24,7 @@ export default function SharedResultsPage() {
 
   const fetchSharedResult = async () => {
     try {
-      const response = await axios.get(`/api/share/view/${token}`);
+      const response = await axios.get(`${API_URL}/share/view/${token}`);
       setData(response.data);
     } catch (err) {
       setError((err as any)?.response?.data?.error || 'Failed to load shared result');

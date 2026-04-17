@@ -4,6 +4,9 @@ import { ArrowRight, ArrowLeft, CheckCircle, Target, Clock, Plane, MessageSquare
 import axios from 'axios';
 import SEO from '../components/SEO';
 
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
+
 const OnboardingSurvey = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
@@ -79,7 +82,7 @@ const OnboardingSurvey = () => {
     } else {
       setLoading(true);
       try {
-        await axios.post('/api/onboarding/submit', {
+        await axios.post(`${API_URL}/onboarding/submit`, {
           reason: answers.reason,
           urgency: answers.urgency,
           travelHistory: answers.travelHistory,
@@ -107,8 +110,6 @@ const OnboardingSurvey = () => {
         title="Get Started - Parasite Identification Pro"
         description="Tell us about your health concerns so we can personalize your experience."
       />
-      <Navbar />
-
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem 1rem' }}>
         <div style={{
           display: 'flex',

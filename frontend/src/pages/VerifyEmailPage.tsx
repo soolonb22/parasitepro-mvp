@@ -3,6 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
+const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
+const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
+
 const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState('verifying');
@@ -20,7 +23,7 @@ const VerifyEmailPage = () => {
       }
       
       try {
-        const response = await axios.post('/api/auth/verify-email', { token });
+        const response = await axios.post(`${API_URL}/auth/verify-email`, { token });
         setStatus('success');
         setMessage(response.data.message);
       } catch (err) {
