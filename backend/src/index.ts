@@ -144,6 +144,14 @@ try {
 }
 
 try {
+  const paraGuideRouter = require('./routes/para-guide').default;
+  app.use('/api/para-guide', paraGuideRouter);
+  console.log('✅ Para-guide routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load para-guide routes:', e.message);
+}
+
+try {
   const paradoxRouter = require('./routes/paradox').default;
   app.use('/api/paradox', paradoxRouter);
   console.log('✅ ParaDox routes loaded');
