@@ -34,7 +34,7 @@ type Msg = { role: 'user' | 'assistant'; content: string; id: number; suggestion
 /* ══════════════════════════════════════════════════════════════
    SPEECH ENGINE
 ══════════════════════════════════════════════════════════════ */
-class SpeechEngine {
+export class SpeechEngine {
   private static voices: SpeechSynthesisVoice[] = [];
   private static unlocked = false;
   private static pendingAfterUnlock: (() => void) | null = null;
@@ -198,7 +198,7 @@ const PARA_AUDIO_MAP: Record<string, string> = {
   "You absolute legend":             '/audio/para-line-18.mp3',
 };
 
-class AudioEngine {
+export class AudioEngine {
   private static current: HTMLAudioElement | null = null;
 
   static init(): void { SpeechEngine.init(); }

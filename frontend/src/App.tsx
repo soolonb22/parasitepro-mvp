@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import ParasiteBot, { LandingPARA } from './components/ParasiteBot';
 import Navbar from './components/Navbar';
+import { ParaAuthPanel, ParaAuthBanner } from './components/ParaAuthChat';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 // ── Core pages ────────────────────────────────────────────────────────────────
@@ -71,115 +72,12 @@ import TravelRiskMapPage from './pages/TravelRiskMapPage';
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
-/* ── PARA greeting videos ─────────────────────────────────────────────────── */
-const GREETING_CLIPS = [
-  'https://res.cloudinary.com/duiehozez/video/upload/v1776379478/SIGNUP_1_revvlq.mp4',
-  'https://res.cloudinary.com/duiehozez/video/upload/v1776379477/SIGNUP_2_msiiau.mp4',
-];
-
-// Full-height PARA panel for desktop left column
-function ParaSidePanel() {
-  const [idx, setIdx] = useState(0);
-
-  function handleEnded() {
-    setIdx(i => (i + 1) % GREETING_CLIPS.length);
-  }
-
-  return (
-    <div style={{ position: 'relative', width: '100%', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, padding: '32px 0' }}>
-      {/* PARA video — large portrait */}
-      <div style={{
-        width: 200, height: 240, borderRadius: 20, overflow: 'hidden',
-        boxShadow: '0 0 0 2px rgba(13,148,136,0.5), 0 24px 64px rgba(0,0,0,0.5)',
-        background: '#0d1f1a', flexShrink: 0,
-        animation: 'paraFloat 4s ease-in-out infinite',
-      }}>
-        <video
-          key={idx}
-          src={GREETING_CLIPS[idx]}
-          autoPlay muted playsInline
-          onEnded={handleEnded}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }}
-        />
-      </div>
-
-      {/* Speech bubble */}
-      <div style={{
-        background: 'rgba(13,148,136,0.1)', border: '1px solid rgba(13,148,136,0.3)',
-        borderRadius: 16, padding: '14px 20px', maxWidth: 260, textAlign: 'center',
-        position: 'relative',
-      }}>
-        <div style={{
-          position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)',
-          width: 0, height: 0,
-          borderLeft: '8px solid transparent', borderRight: '8px solid transparent',
-          borderBottom: '8px solid rgba(13,148,136,0.3)',
-        }} />
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#2dd4bf', lineHeight: 1.4 }}>
-          G'day! I'm PARA 👋
-        </p>
-        <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-          Australia's AI parasite education guide. Let's get you sorted.
-        </p>
-      </div>
-
-      {/* Subtle stats */}
-      <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
-        {[{ label: 'Sample Types', value: '6+' }, { label: 'Analyses Run', value: '500+' }, { label: 'Response Time', value: '<30s' }].map(({ label, value }) => (
-          <div key={label} style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20, color: 'var(--amber-bright)' }}>{value}</div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{label}</div>
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        @keyframes paraFloat {
-          0%,100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-// Compact inline PARA greeting banner for mobile + login page
-function ParaGreetingBanner({ message }: { message: string }) {
-  const [idx, setIdx] = useState(0);
-
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 14,
-      background: 'rgba(13,148,136,0.07)', border: '1px solid rgba(13,148,136,0.2)',
-      borderRadius: 14, padding: '12px 14px',
-    }}>
-      <div style={{ width: 56, height: 68, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#0d1f1a', boxShadow: '0 0 0 1.5px rgba(13,148,136,0.4)' }}>
-        <video
-          key={idx}
-          src={GREETING_CLIPS[idx]}
-          autoPlay muted playsInline
-          onEnded={() => setIdx(i => (i + 1) % GREETING_CLIPS.length)}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }}
-        />
-      </div>
-      <div>
-        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#2dd4bf', lineHeight: 1.3 }}>
-          G'day! I'm PARA 👋
-        </p>
-        <p style={{ margin: '3px 0 0', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-          {message}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function AuthShell({ children }: { children: React.ReactNode }) {
+function AuthShell({ children, mode = 'signup' }: { children: React.ReactNode; mode?: 'signup' | 'login' }) {
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--bg-base)' }}>
-      {/* Desktop left panel — PARA greeting */}
+      {/* Desktop left panel — PARA interactive guide */}
       <div
-        className="hidden lg:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden"
+        className="hidden lg:flex flex-col w-5/12 p-10 relative overflow-hidden"
         style={{ background: 'var(--bg-surface)', borderRight: '1px solid var(--bg-border)' }}
       >
         <div className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
@@ -188,22 +86,22 @@ function AuthShell({ children }: { children: React.ReactNode }) {
           style={{ backgroundImage: 'linear-gradient(rgba(45,47,58,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(45,47,58,0.8) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
         {/* Logo */}
-        <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ background: 'rgba(217,119,6,0.15)', border: '1px solid rgba(217,119,6,0.3)' }}>
-              <Microscope size={20} style={{ color: 'var(--amber)' }} />
-            </div>
-            <span className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>ParasitePro</span>
+        <div className="relative z-10 flex items-center gap-3 mb-6 flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+            style={{ background: 'rgba(217,119,6,0.15)', border: '1px solid rgba(217,119,6,0.3)' }}>
+            <Microscope size={20} style={{ color: 'var(--amber)' }} />
           </div>
+          <span className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>ParasitePro</span>
         </div>
 
-        {/* PARA side panel */}
-        <div className="relative z-10 flex-1 flex items-center justify-center">
-          <ParaSidePanel />
+        {/* PARA talking guide — fills remaining space */}
+        <div className="relative z-10 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          <ParaAuthPanel mode={mode} />
         </div>
 
-        <div className="relative z-10 text-xs" style={{ color: 'var(--text-muted)' }}>⚠️ For educational reference only. Not a substitute for medical advice.</div>
+        <div className="relative z-10 text-xs mt-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
+          ⚠️ For educational reference only. Not a substitute for medical advice.
+        </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-6">
@@ -240,11 +138,11 @@ function LoginPage() {
   };
 
   return (
-    <AuthShell>
+    <AuthShell mode="login">
       <div className="animate-slide-up space-y-7">
-        {/* PARA greeting — visible on mobile (desktop has side panel) */}
+        {/* PARA greeting — mobile only (desktop has side panel) */}
         <div className="lg:hidden">
-          <ParaGreetingBanner message="Welcome back! Ready to continue your parasite education journey?" />
+          <ParaAuthBanner mode="login" />
         </div>
         <div>
           <h2 className="font-display font-bold text-2xl mb-1" style={{ color: 'var(--text-primary)' }}>Sign in</h2>
@@ -323,12 +221,12 @@ function SignupPage() {
   };
 
   return (
-    <AuthShell>
+    <AuthShell mode="signup">
       <div className="animate-slide-up space-y-7">
 
         {/* PARA video hook — mobile only (desktop has side panel) */}
         <div className="lg:hidden">
-          <ParaGreetingBanner message={promoCode ? `Code ${promoCode} unlocks 3 free analyses — let's go!` : "Create your free account and I'll guide you through your first analysis."} />
+          <ParaAuthBanner mode="signup" promoCode={promoCode} />
         </div>
 
         <div>
