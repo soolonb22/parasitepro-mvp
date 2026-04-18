@@ -192,6 +192,31 @@ LIFE CYCLE PATTERNS: Most gut parasites follow: eggs shed in faeces → contamin
 DIAGNOSIS METHODS: Stool OCP microscopy (ova, cysts, parasites), stool PCR (more sensitive), sellotape test (pinworms — morning before bathing), serology/blood tests (strongyloides, toxoplasma, toxocara), skin scraping (scabies).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AUSTRALIAN PARASITE RESEARCH HIGHLIGHTS (2017–2026):
+
+• STRONGYLOIDES PREVALENCE (2026): Wagnew et al., Journal of Infection 2026 — predicted prevalence up to 37.8% in northern QLD, 26.9% NT, 22.2% northern WA. Mackay and surrounding regions are hidden hotspots in Indigenous communities. Autoinfective cycle means lifelong risk without treatment. (Source: Wagnew et al. 2026, PARA-SITE 2025)
+
+• OPHIDASCARIS BRAIN CASE (2023): World-first — 8 cm live Ophidascaris robertsi roundworm (normally in carpet pythons) surgically removed from a human frontal lobe in NSW. Patient had eosinophilia, psychiatric symptoms, then brain lesion on MRI. Highlights zoonotic risk at human-wildlife interfaces. (Source: Hossain et al., Emerging Infectious Diseases 2023)
+
+• HAYCOCKNEMA PERPLEXUM (rare Australian myositis): Australian-only nematode causing parasitic myositis. Nine confirmed human cases — five from tropical north QLD including the Mackay region. Progressive muscle weakness, eosinophilia, dysphagia. Never reported outside Australia. Treatment: prolonged albendazole or ivermectin. (Source: Ward et al. Pathology 2022, CDC EID 2022)
+
+• ANGIOSTRONGYLUS (Rat Lungworm) in QLD: Angiostrongylus cantonensis causes eosinophilic meningitis from infected slugs/snails or contaminated produce. Multiple lineages confirmed in tropical north. Risk in Mackay backyards — wash vegetables thoroughly, avoid raw snails.
+
+• ZELONIA AUSTRALIENSIS: Leishmania-relative found in Australian black flies. Not yet confirmed in humans but present in biting insects — raises climate-change concerns. (Source: UTS, PLOS NTDs 2017)
+
+• HEPATOCYSTIS in FLYING FOXES: Pteropus bats carry unique Hepatocystis lineages (malaria-related but not infective to humans). Higher prevalence in QLD roosts. Key research for zoonotic evolution models. (Source: Schaer et al. 2018–2019)
+
+• HYDATIDS SYLVATIC CYCLE: Echinococcus granulosus cycles through dingoes/foxes → macropods (kangaroos/wallabies) in QLD grazing lands. Spillover risk when handling wild game. (Source: PARA-SITE 2025, CSIRO)
+
+• COMMUNITY STRONGYLOIDES CONTROL: Ivermectin mass drug administration in remote Indigenous community — 79.8% cure rate, 92% participation, 16.6% baseline seroprevalence. Community leadership was the key factor. (Source: Miller et al., Tropical Medicine and Infectious Disease 2018)
+
+• PARA-SITE 2025: Australian Society for Parasitology's 265-chapter electronic guide — definitive reference for Australian parasite taxonomy, life cycles and identification.
+
+• ASP CONFERENCE 2026: Annual Conference 29 Jun – 2 Jul, Gold Coast (Surfers Paradise). Focus on Strongyloides, bioinformatics, emerging zoonoses. (Source: parasite.org.au)
+
+• CSIRO WILDLIFE COLLECTION: 9,228 specimens, 1,074 parasite species from 7,358 hosts. Undescribed species from monotremes, marsupials, reptiles — documents sylvatic spillover cycles.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REQUIRED DISCLAIMER (add only when relevant to biological analysis)
 "📚 This is educational pattern analysis only — not a medical assessment. For health concerns, see a qualified healthcare professional."
 

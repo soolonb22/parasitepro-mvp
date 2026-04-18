@@ -300,6 +300,96 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
   }
 });
 
+// ── Research knowledge base (12 Australian parasite research entries) ─────────
+const KNOWLEDGE_ENTRIES = [
+  {
+    id: 'strongyloides-qld-2026',
+    keywords: ['strongyloides', 'threadworm', 'queensland', 'mackay', 'indigenous', 'prevalence', 'northern'],
+    content: 'Strongyloidiasis has striking spatial patterns across Australia according to the 2026 Wagnew et al. study in the Journal of Infection. Predicted prevalence reaches up to 37.8% in northern Queensland — the highest in the country — along with hotspots in the Northern Territory (26.9%) and northern WA (22.2%). Warm moist soils, poor sanitation in remote communities, and the parasite\'s unique autoinfective cycle let it persist for decades inside one person. In the Mackay region and surrounding northern QLD, this creates a hidden local risk, especially in Indigenous communities where hyperendemic rates have been documented. Climatic factors and socioeconomic conditions drive the clustering; southern Australia sits below 3%. PARA-SITE 2025 and the Australian Society for Parasitology stress awareness before chronic gut issues or dangerous hyperinfection in immunosuppressed people appear.',
+    sources: ['Wagnew et al., Journal of Infection 2026', 'PARA-SITE 2025', 'Australian Society for Parasitology'],
+  },
+  {
+    id: 'ophidascaris-brain-case-2023',
+    keywords: ['ophidascaris', 'python worm', 'brain worm', 'carpet python', 'neural larva migrans'],
+    content: 'In a world-first 2023 case reported in Emerging Infectious Diseases, an 8 cm live Ophidascaris robertsi roundworm — normally found only in Australian carpet pythons — was surgically removed from the frontal lobe of a 64-year-old woman in coastal New South Wales. She first presented with abdominal pain, diarrhoea, cough and night sweats, was diagnosed with hypereosinophilic syndrome, and started on immunosuppressive steroids. Eighteen months later, worsening mood, forgetfulness and depression led to an MRI that revealed a brain lesion. During surgery at Canberra Hospital the wriggling worm was found alive. This is the first known instance of this ascarid completing larval migration into a human brain, highlighting how close human-wildlife interfaces in Australia can produce unexpected zoonoses.',
+    sources: ['Hossain et al., Emerging Infectious Diseases 2023', 'ANU & Canberra Hospital case report'],
+  },
+  {
+    id: 'haycocknema-perplexum-tropical',
+    keywords: ['haycocknema', 'perplexum', 'myositis', 'muscle parasite', 'tropical australia', 'mackay'],
+    content: 'Haycocknema perplexum is an exceedingly rare Australian-only muspiceoid nematode causing parasitic myositis. At least nine confirmed human cases exist — four from Tasmania and five from tropical north Queensland, including one patient who lived in the Mackay region with extensive bush exposure but no bush-meat consumption. Patients develop progressive muscle weakness, facial involvement, weight loss, dysphagia and marked eosinophilia. Worms (300–500 μm long) live inside individual muscle fibres and are non-encysted. Transmission is still unknown but linked to wildlife contact; females are ovoviviparous so larvae are released continuously. Treatment requires prolonged albendazole or ivermectin; some patients became wheelchair-bound. This parasite has never been reported outside Australia.',
+    sources: ['Ward et al., Pathology 2022', 'Koehler et al., 2016', 'CDC EID 2022'],
+  },
+  {
+    id: 'hepatocystis-flying-foxes',
+    keywords: ['hepatocystis', 'flying fox', 'pteropus', 'malaria-like', 'bats', 'queensland'],
+    content: 'Australian flying foxes (Pteropus species) carry distinct lineages of Hepatocystis — a haemosporidian parasite related to malaria but strictly liver-specific and non-pathogenic to humans. Multilocus phylogenetic studies by Schaer et al. (2018–2019) show these form a unique Pteropus-specific clade separate from Asian or African forms. Prevalence is lowest in the southernmost colonies (e.g. Adelaide) and higher in Queensland roosts. The research helps model how malaria-like parasites evolve and jump between hosts, underscoring Australia\'s role in haemosporidian diversity. Flying foxes in northern QLD are key reservoirs.',
+    sources: ['Schaer et al., International Journal for Parasitology: Parasites and Wildlife 2018–2019'],
+  },
+  {
+    id: 'csiro-wildlife-parasite-collection',
+    keywords: ['csiro', 'wildlife parasites', 'collection', 'host-parasite'],
+    content: 'The CSIRO Australian Wildlife Parasite and Pathology Collection is one of the largest in the world, holding 9,228 irreplaceable specimens representing 1,074 parasite species from 7,358 individual hosts across 94 families and 13 orders. Many specimens come from Queensland and northern Australia, including undescribed species from monotremes, marsupials, birds and reptiles. It documents sylvatic cycles (hydatids in macropods, rare ticks, flukes) that can spill over to humans or pets — an unmatched resource for understanding Australia\'s unique parasite ecology.',
+    sources: ['CSIRO Data Access Portal', 'Australian National Wildlife Collection'],
+  },
+  {
+    id: 'zelonia-australiensis',
+    keywords: ['zelonia', 'australiensis', 'leishmania-like', 'black fly', 'northern australia'],
+    content: 'Zelonia australiensis is a unique trypanosomatid first discovered in black flies feeding on mammals in northern Australia. It shares an evolutionary ancestor with the flesh-eating Leishmania parasites but has never been found infecting humans here. Its presence in biting insects that also feed on people raises important questions about potential exotic pathogen establishment as Australia\'s climate warms and ecosystems shift.',
+    sources: ['University of Technology Sydney study, PLOS Neglected Tropical Diseases 2017'],
+  },
+  {
+    id: 'parasite-site-2025',
+    keywords: ['para-site', 'electronic guide', 'australian society for parasitology'],
+    content: 'PARA-SITE 2025 is the latest electronic guide produced jointly by the Australian Society for Parasitology, University of Queensland and the Australian Biological Resources Study (ABRS). It contains 265 detailed chapters on Australian parasite taxonomy, life cycles, identification keys and local case studies — the definitive, go-to resource used by researchers and clinicians across the country. A more user-friendly version with individual downloadable PDFs is scheduled for release later in 2025.',
+    sources: ['Australian Society for Parasitology website'],
+  },
+  {
+    id: 'asp-conference-2026',
+    keywords: ['asp conference', 'parasitology conference', 'gold coast'],
+    content: 'The 2026 Australian Society for Parasitology Annual Conference runs 29 June – 2 July at Mantra on View, Surfers Paradise on the Gold Coast. It brings together human and veterinary parasitologists for the latest on Strongyloides, bioinformatics, emerging zoonoses and more — literally in Queensland\'s backyard. Perfect for Mackay-area researchers or clinicians wanting to connect with cutting-edge local work.',
+    sources: ['parasite.org.au'],
+  },
+  {
+    id: 'angiostrongylus-australia',
+    keywords: ['angiostrongylus', 'rat lungworm', 'snail', 'queensland'],
+    content: 'Angiostrongylus cantonensis (rat lungworm) is well established in Queensland, causing eosinophilic meningitis after accidental ingestion of infected slugs, snails or contaminated produce. Australian molecular studies confirm multiple lineages here, with most human cases linked to the tropical north. Gardeners, children playing outside and anyone in Mackay backyards need to be extra careful — thorough washing of vegetables and avoiding raw snails is the only prevention.',
+    sources: ['Australian parasitology surveys'],
+  },
+  {
+    id: 'ticks-australia-barker',
+    keywords: ['ticks', 'ixodes holocyclus', 'paralysis tick', 'queensland'],
+    content: 'Australia is home to over 70 tick species; Ixodes holocyclus (the paralysis tick) is the most medically important in eastern Queensland and coastal NSW. It can cause ascending flaccid paralysis in humans and pets. Stephen Barker\'s comprehensive guides detail morphology, hosts and distribution — essential knowledge for anyone living or bushwalking around Mackay and the Queensland coast.',
+    sources: ['Barker et al., Zootaxa 2014 & Australian Ticks book'],
+  },
+  {
+    id: 'hydatids-macropods',
+    keywords: ['hydatid', 'echinococcus', 'macropods', 'kangaroo', 'dingo'],
+    content: 'Hydatid disease (Echinococcus granulosus) maintains active sylvatic cycles in Australia: dingoes and foxes as definitive hosts, macropods (kangaroos and wallabies) as intermediate hosts. This spillover risk exists in Queensland grazing lands and bush areas — one reason why handling wild game or offal requires care. PARA-SITE 2025 and CSIRO records highlight the ongoing public-health importance.',
+    sources: ['PARA-SITE 2025', 'CSIRO wildlife records'],
+  },
+  {
+    id: 'community-strongyloides-control',
+    keywords: ['community control', 'strongyloides', 'indigenous', 'mass drug administration'],
+    content: 'A community-directed ivermectin program in a remote Australian Indigenous community achieved a 79.8% cure rate with 92% participation. Baseline seroprevalence was 16.6%. Strong local Aboriginal leadership was the key success factor — one of the few documented effective mass interventions for strongyloidiasis in Australia and proof that community-owned approaches work.',
+    sources: ['Miller et al., Tropical Medicine and Infectious Disease 2018'],
+  },
+];
+
+function findRelevantKnowledge(message: string): string {
+  const q = message.toLowerCase();
+  const scored = KNOWLEDGE_ENTRIES.map(entry => {
+    const score = entry.keywords.reduce((acc, kw) => acc + (q.includes(kw.toLowerCase()) ? 8 : 0), 0);
+    return { entry, score };
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 2);
+
+  if (!scored.length) return '';
+  return '\n\n━━ RESEARCH CONTEXT ━━\n' +
+    scored.map(({ entry }) =>
+      `${entry.id}:\n${entry.content}\nSources: ${entry.sources.join(', ')}`
+    ).join('\n\n');
+}
+
 // ── RAG-lite: find encyclopedia entries relevant to the user's message ────────
 function findRelevantParasites(message: string): string {
   const q = message.toLowerCase();
@@ -359,8 +449,9 @@ router.post('/stream', authenticateToken, async (req: Request, res: Response): P
           ? `Age: ${healthContext.age||'Unknown'}, Symptoms: ${healthContext.symptoms||'None reported'}, Duration: ${healthContext.duration||'Unknown'}, Location: ${healthContext.location||'Unknown'}, Travel: ${healthContext.travel||'None'}, Pets: ${healthContext.pets||'Unknown'}`
           : 'Not collected yet.');
 
-    // RAG-lite: inject relevant encyclopedia entries
+    // RAG-lite: inject relevant encyclopedia + research knowledge
     systemPrompt += findRelevantParasites(safeMessage);
+    systemPrompt += findRelevantKnowledge(safeMessage);
 
     if (reportData) {
       systemPrompt += '\n\n' + REPORT_NARRATOR_PROMPT.replace('{REPORT_DATA}', JSON.stringify(reportData, null, 2));
