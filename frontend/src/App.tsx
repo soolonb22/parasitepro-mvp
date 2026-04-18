@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
@@ -62,7 +62,6 @@ import HealthFormsPage from './pages/HealthFormsPage';
 import NotificationSettingsPage from './pages/NotificationSettingsPage';
 import OnboardingSurvey from './pages/OnboardingSurvey';
 import PromoLandingPage from './pages/PromoLandingPage';
-import ResultsPage from './pages/ResultsPage';
 import SymptomJournalPage from './pages/SymptomJournalPage';
 import TravelRiskMapPage from './pages/TravelRiskMapPage';
 
@@ -273,7 +272,7 @@ function SignupPage() {
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           onEnded={() => {
             if (welcomePhase === 'welcome1') setWelcomePhase('welcome2');
-            else navigate('/dashboard');
+            else navigate('/onboarding');
           }}
         />
       </div>
@@ -338,6 +337,11 @@ function SignupPage() {
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function RedirectToAnalysis() {
+  const { id } = useParams() as { id: string };
+  return <Navigate to={`/analysis/${id}`} replace />;
 }
 
 const AUTH_PATHS = ['/login', '/signup', '/forgot-password', '/reset-password'];
@@ -424,7 +428,7 @@ function App() {
           <Route path="/health-forms" element={<ProtectedRoute><HealthFormsPage /></ProtectedRoute>} />
           <Route path="/travel-risk" element={<ProtectedRoute><TravelRiskMapPage /></ProtectedRoute>} />
           <Route path="/onboarding" element={<ProtectedRoute><OnboardingSurvey /></ProtectedRoute>} />
-          <Route path="/results/:id" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
+          <Route path="/results/:id" element={<RedirectToAnalysis />} />
           <Route path="/scientific-library" element={<ScientificLibraryPage />} />
           <Route path="/encyclopedia" element={<EncyclopediaPage />} />
           <Route path="/encyclopedia/:slug" element={<EncyclopediaPage />} />

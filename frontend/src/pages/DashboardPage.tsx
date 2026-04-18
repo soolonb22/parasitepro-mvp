@@ -58,6 +58,22 @@ const DashboardPage: React.FC = () => {
           </button>
         </div>
 
+        {/* Stats row */}
+        {!loading && analyses.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+            {[
+              { label: 'Total analyses', value: analyses.length },
+              { label: 'Completed', value: analyses.filter((a: any) => a.status === 'completed').length },
+              { label: 'High / urgent', value: analyses.filter((a: any) => a.urgencyLevel === 'high' || a.urgencyLevel === 'emergency').length },
+            ].map(({ label, value }) => (
+              <div key={label} className="rounded-2xl p-4" style={{ background: 'var(--bg-surface)', border: '1px solid var(--bg-border)' }}>
+                <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
+                <p className="font-display font-bold text-3xl" style={{ color: 'var(--text-primary)' }}>{value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="grid md:grid-cols-3 gap-6">
 
           {/* Credits card */}
@@ -185,7 +201,7 @@ const DashboardPage: React.FC = () => {
           {[
             { icon: '📚', label: 'Encyclopedia', path: '/encyclopedia' },
             { icon: '🗺️', label: 'Travel risk map', path: '/travel-risk' },
-            { icon: '📓', label: 'Symptom journal', path: '/symptom-journal' },
+            { icon: '🔬', label: 'Scientific library', path: '/scientific-library' },
             { icon: '🎯', label: 'Sample report', path: '/sample-report' },
           ].map(({ icon, label, path }) => (
             <button key={path} onClick={() => navigate(path)}

@@ -88,10 +88,9 @@ const OnboardingSurvey = () => {
           travelHistory: answers.travelHistory,
           additionalNotes: answers.additionalNotes
         });
-        navigate('/signup', { state: { fromOnboarding: true } });
+        navigate('/upload');
       } catch (error) {
-        console.error('Failed to save onboarding:', error);
-        navigate('/signup', { state: { fromOnboarding: true } });
+        navigate('/upload');
       }
     }
   };
