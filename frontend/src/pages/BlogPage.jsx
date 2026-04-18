@@ -187,7 +187,7 @@ const BlogPage = () => {
           <meta name="keywords" content={post.tags.join(', ')} />
         </Helmet>
         
-        <Navbar />
+  
         
         <article className="blog-article">
           <div className="container" style={{ maxWidth: '800px', padding: '2rem 1rem' }}>
@@ -220,12 +220,33 @@ const BlogPage = () => {
             
             <div className="blog-share-section">
               <h4>Share this article</h4>
-              <SocialShareButtons 
-                url={`${window.location.origin}/blog/${post.slug}`}
-                title={post.title}
-                description={post.excerpt}
-                hashtags={post.tags}
-              />
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`${window.location.origin}/blog/${post.slug}`)}&hashtags=${post.tags.join(',')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.875rem' }}
+                >
+                  Share on X
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${window.location.origin}/blog/${post.slug}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.875rem' }}
+                >
+                  Share on Facebook
+                </a>
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.875rem' }}
+                  onClick={() => navigator.clipboard?.writeText(`${window.location.origin}/blog/${post.slug}`)}
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
             
             <div className="blog-cta">
@@ -248,7 +269,7 @@ const BlogPage = () => {
         <meta name="description" content="Expert articles on parasitic infections, natural remedies, travel health, and gut wellness. Stay informed with our comprehensive health resource hub." />
       </Helmet>
       
-      <Navbar />
+
       
       <div className="blog-page">
         <div className="container">
