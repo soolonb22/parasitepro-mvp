@@ -333,6 +333,8 @@ const AnalysisResultsPage = () => {
   const [showUpsell, setShowUpsell]     = useState(false);
   const upsellShown                     = useRef(false);
   const [copied, setCopied]             = useState(false);
+  const [shareToken, setShareToken]     = useState<string | null>(null);
+  const [sharing, setSharing]           = useState(false);
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -373,6 +375,27 @@ const AnalysisResultsPage = () => {
       setFeedbackDone(true);
       toast.success(helpful ? 'Glad it helped.' : 'Thanks for the feedback.');
     } catch { toast.error('Failed to submit feedback'); }
+  };
+
+  const handleShare = async () => {
+    setSharing(true);
+    try {
+      let token = shareToken;
+      if (!token) {
+        const res = await axios.post(`${API_URL}/share`, { analysisId: id }, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        token = res.data.token;
+        setShareToken(token);
+      }
+      const url = `${window.location.origin}/results/shared/${token}`;
+      await navigator.clipboard.writeText(url);
+      toast.success('Share link copied to clipboard!');
+    } catch {
+      toast.error('Could not create share link');
+    } finally {
+      setSharing(false);
+    }
   };
 
   // Loading
@@ -485,14 +508,15 @@ const AnalysisResultsPage = () => {
               <FileText size={15} /> Download PDF for GP
             </button>
 
-            {/* Secondary — My Health Record */}
+            {/* Secondary — Copy share link */}
             <button
-              onClick={() => setShowMHR(true)}
-              style={{ flex: 1, minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 20px', background: 'transparent', color: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: 10, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.65)'; }}
+              onClick={handleShare}
+              disabled={sharing}
+              style={{ flex: 1, minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 20px', background: 'transparent', color: 'rgba(255,255,255,0.9)', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: 10, fontSize: '0.9rem', fontWeight: 600, cursor: sharing ? 'default' : 'pointer', opacity: sharing ? 0.7 : 1, transition: 'all 0.15s' }}
+              onMouseEnter={e => { if (!sharing) { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.65)'; } }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
             >
-              <ExternalLink size={15} /> Share to My Health Record
+              <ExternalLink size={15} /> {sharing ? 'Creating link…' : 'Copy Share Link'}
             </button>
           </div>
 

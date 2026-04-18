@@ -135,6 +135,19 @@ export async function runMigrations(): Promise<void> {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id VARCHAR(255);
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS shared_analyses (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        analysis_id UUID NOT NULL REFERENCES analyses(id) ON DELETE CASCADE,
+        token VARCHAR(64) NOT NULL UNIQUE,
+        view_count INTEGER DEFAULT 0,
+        expires_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_shared_analyses_token ON shared_analyses(token);
+      CREATE INDEX IF NOT EXISTS idx_shared_analyses_analysis ON shared_analyses(analysis_id);
+    `);
+
     console.log('✅ Database migrations complete');
   } catch (err: any) {
     console.error('⚠️  Migration error (non-fatal):', err.message);

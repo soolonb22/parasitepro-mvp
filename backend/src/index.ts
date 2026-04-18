@@ -189,6 +189,14 @@ try {
   console.error('❌ Failed to load encyclopedia routes:', e.message);
 }
 
+try {
+  const shareRouter = require('./routes/share').default;
+  app.use('/api/share', shareRouter);
+  console.log('✅ Share routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load share routes:', e.message);
+}
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found', path: req.path });
