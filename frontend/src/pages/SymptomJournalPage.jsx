@@ -164,7 +164,7 @@ export default function SymptomJournalPage() {
         <title>Symptom Journal | Parasite Identification Pro</title>
         <meta name="description" content="Track your daily symptoms, visualize health trends, and monitor your healing journey" />
       </Helmet>
-      <Navbar />
+
       
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>

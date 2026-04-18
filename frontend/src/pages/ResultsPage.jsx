@@ -921,7 +921,7 @@ const ResultsPage = () => {
         description="View your health analysis results with detailed information and recommendations."
         canonical="/results"
       />
-      <Navbar />
+
       <div className="container" style={{ padding: '2rem 1.5rem', maxWidth: '1000px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <Link to="/dashboard" style={{ color: '#2563eb' }}>

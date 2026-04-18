@@ -174,7 +174,7 @@ export default function HealthFormsPage() {
         <title>Health Forms | Parasite Identification Pro</title>
         <meta name="description" content="Complete health questionnaires for personalized analysis" />
       </Helmet>
-      <Navbar />
+
       
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' }}>
         <div style={{ marginBottom: '2rem' }}>
