@@ -8,7 +8,7 @@ const router = Router();
 // 25 parasites — Australian-focused, clinically accurate
 // ══════════════════════════════════════════════════════════════════════════════
 
-const PARASITES = [
+export const PARASITES = [
   {
     id: 'giardia',
     slug: 'giardia',

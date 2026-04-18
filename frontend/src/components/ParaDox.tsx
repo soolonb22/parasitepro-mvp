@@ -252,14 +252,10 @@ export default function ParaDox() {
       .map(m => ({ role: m.role, content: m.content }));
 
     try {
-      const res = await fetch(getApiUrl('/paradox/message'), {
+      const res = await fetch(getApiUrl('/paradox/stream'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: content,
-          depth,
-          conversationHistory: history,
-        }),
+        body: JSON.stringify({ message: content, depth, conversationHistory: history }),
       });
 
       if (!res.ok) {
@@ -267,15 +263,37 @@ export default function ParaDox() {
         throw new Error(err.error || `HTTP ${res.status}`);
       }
 
-      const data = await res.json();
+      // Add streaming placeholder
+      const streamId = msgId + 2;
+      setMessages(prev => [...prev, { role: 'assistant', content: '', id: streamId, suggestions: [] }]);
       setMood('talking');
-      const assistantMsg: Msg = {
-        role: 'assistant',
-        content: data.message || '',
-        id: msgId + 2,
-        suggestions: data.suggestions,
-      };
-      setMessages(prev => [...prev, assistantMsg]);
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      let streamedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const parts = buf.split('\n\n');
+        buf = parts.pop() ?? '';
+        for (const part of parts) {
+          if (!part.startsWith('data: ')) continue;
+          try {
+            const ev = JSON.parse(part.slice(6));
+            if (ev.t === 'd') {
+              streamedContent += ev.v;
+              setMessages(prev => prev.map(m => m.id === streamId ? { ...m, content: streamedContent } : m));
+            } else if (ev.t === 'done') {
+              setMessages(prev => prev.map(m => m.id === streamId ? { ...m, content: ev.full || streamedContent, suggestions: ev.s || [] } : m));
+            } else if (ev.t === 'error') {
+              throw new Error(ev.v);
+            }
+          } catch {}
+        }
+      }
       setTimeout(() => setMood('idle'), 1500);
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Try again!');

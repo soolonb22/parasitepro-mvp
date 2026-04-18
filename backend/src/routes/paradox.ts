@@ -295,4 +295,62 @@ router.post('/message', async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/paradox/stream — streaming SSE version
+router.post('/stream', async (req: Request, res: Response): Promise<void> => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const send = (obj: object) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+
+  try {
+    const { message, depth, conversationHistory = [] } = req.body;
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      send({ t: 'error', v: 'Message is required' }); res.end(); return;
+    }
+
+    const safeMessage = message.trim().slice(0, 2000);
+    const depthInstruction = depth ? `[User has selected depth: ${depth.toUpperCase()}. Honour this in your response.]` : '';
+
+    const safeHistory = Array.isArray(conversationHistory)
+      ? conversationHistory.slice(-20)
+          .filter((m: any) => m && (m.role==='user'||m.role==='assistant') && typeof m.content==='string')
+          .map((m: any) => ({ role: m.role as 'user'|'assistant', content: m.content.slice(0,4000) }))
+      : [];
+
+    const messages: Anthropic.MessageParam[] = [
+      ...safeHistory,
+      { role: 'user', content: depthInstruction ? `${depthInstruction}\n\n${safeMessage}` : safeMessage },
+    ];
+
+    let fullText = '';
+    let sentLength = 0;
+
+    const stream = anthropic.messages.stream({
+      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
+      max_tokens: 1600,
+      system: PARADOX_SYSTEM_PROMPT,
+      messages,
+    });
+
+    stream.on('text', (delta: string) => {
+      fullText += delta;
+      const cutAt = fullText.indexOf('|||SUGGESTIONS|||');
+      const displayable = cutAt >= 0 ? fullText.slice(0, cutAt) : fullText;
+      const newChars = displayable.slice(sentLength);
+      if (newChars) { sentLength = displayable.length; send({ t: 'd', v: newChars }); }
+    });
+
+    await stream.finalMessage();
+    const { message: cleanMessage, suggestions } = parseResponse(fullText);
+    send({ t: 'done', s: suggestions, full: cleanMessage });
+    res.end();
+  } catch (err: any) {
+    console.error('ParaDox stream error:', err?.message);
+    send({ t: 'error', v: 'ParaDox encountered an error — try again' });
+    res.end();
+  }
+});
+
 export default router;

@@ -963,7 +963,12 @@ export default function ParasiteBot() {
   const [mood,     setMood]     = useState<Mood>('idle');
   const [speaking, setSpeaking] = useState(false);
   const [muted,    setMuted]    = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>(() => {
+    try {
+      const saved = localStorage.getItem(`para_history_${useAuthStore.getState().user?.id||'guest'}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
   const [loading,  setLoading]  = useState(false);
   const idRef      = useRef(0);
   const sigRef     = useRef({ cancelled: false });
@@ -982,6 +987,15 @@ export default function ParasiteBot() {
     window.addEventListener('para:open', handler);
     return () => window.removeEventListener('para:open', handler);
   }, [phase]);
+
+  // Persist conversation to localStorage (keep last 30 messages)
+  useEffect(() => {
+    if (!messages.length) return;
+    try {
+      const key = `para_history_${user?.id||'guest'}`;
+      localStorage.setItem(key, JSON.stringify(messages.slice(-30)));
+    } catch {}
+  }, [messages, user?.id]);
 
   useEffect(() => {
     if (!isAuthenticated || !isProtected) { setPhase('hidden'); return; }
@@ -1036,6 +1050,7 @@ export default function ParasiteBot() {
 
   const handleClear = () => {
     SpeechEngine.cancel(); setSpeaking(false); setMood('idle'); setMessages([]);
+    try { localStorage.removeItem(`para_history_${user?.id||'guest'}`); } catch {}
     addBot("Fresh start! What can I help you with? 🔬", ['Start a new analysis','Take me on a tour','How do credits work?']);
   };
 
@@ -1047,19 +1062,54 @@ export default function ParasiteBot() {
     const cu = useAuthStore.getState().user;
     const userState = { credits:cu?.imageCredits??0, imageCredits:cu?.imageCredits??0, firstName:cu?.firstName||'there', isFirstVisit };
     try {
-      const res = await fetch(getApiUrl('/chatbot/message'), { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` }, body:JSON.stringify({ message:text, conversationHistory:history, healthContext, currentPage:location.pathname, userState, triggerType }) });
-      const data = await res.json();
+      const res = await fetch(getApiUrl('/chatbot/stream'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ message: text, conversationHistory: history, healthContext, currentPage: location.pathname, userState, triggerType }),
+      });
       if (!res.ok) {
-        const errMsg = res.status===401?'Session expired — please refresh.':res.status===402?"PARA's AI credits are low — try again shortly!":data.error||'Something went wrong. Try again?';
+        const data = await res.json().catch(() => ({}));
+        const errMsg = res.status===401 ? 'Session expired — please refresh.' : res.status===402 ? "PARA's AI credits are low — try again shortly!" : data.error||'Something went wrong. Try again?';
         setLoading(false); setMood('concerned');
         setMessages(prev => [...prev, { role:'assistant', content:errMsg, suggestions:['Try again','Go to dashboard'], id:++idRef.current }]);
         setTimeout(() => setMood('idle'), 2200); return;
       }
-      const reply = data.message || "Sorry, had a hiccup. Try again?";
-      const suggestions: string[] = Array.isArray(data.suggestions) ? data.suggestions : [];
-      setLoading(false); setMood('talking'); setSpeaking(true);
-      setMessages(prev => [...prev, { role:'assistant', content:reply, suggestions, id:++idRef.current }]);
-      setTimeout(() => { setSpeaking(false); setMood('idle'); }, 400);
+
+      // Streaming placeholder
+      const streamMsgId = ++idRef.current;
+      setLoading(false); setMood('talking');
+      setMessages(prev => [...prev, { role:'assistant', content:'', suggestions:[], id:streamMsgId }]);
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      let streamedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const parts = buf.split('\n\n');
+        buf = parts.pop() ?? '';
+        for (const part of parts) {
+          if (!part.startsWith('data: ')) continue;
+          try {
+            const ev = JSON.parse(part.slice(6));
+            if (ev.t === 'd') {
+              streamedContent += ev.v;
+              setMessages(prev => prev.map(m => m.id === streamMsgId ? { ...m, content: streamedContent } : m));
+            } else if (ev.t === 'done') {
+              const finalContent = ev.full || streamedContent;
+              const suggestions: string[] = Array.isArray(ev.s) ? ev.s : [];
+              setMessages(prev => prev.map(m => m.id === streamMsgId ? { ...m, content: finalContent, suggestions } : m));
+              setSpeaking(true);
+              setTimeout(() => { setSpeaking(false); setMood('idle'); }, 400);
+            } else if (ev.t === 'error') {
+              throw new Error(ev.v);
+            }
+          } catch {}
+        }
+      }
     } catch {
       setLoading(false); setMood('concerned');
       setMessages(prev => [...prev, { role:'assistant', content:"Couldn't connect just then. Check your connection and try again.", suggestions:['Try again'], id:++idRef.current }]);

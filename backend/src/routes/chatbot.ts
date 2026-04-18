@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { authenticateToken } from '../middleware/auth';
+import { PARASITES } from './encyclopedia';
 
 const router = Router();
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -296,6 +297,109 @@ router.post('/message', authenticateToken, async (req: Request, res: Response) =
       return res.status(402).json({ error: 'AI credits exhausted. Please top up at console.anthropic.com.' });
     }
     res.status(500).json({ error: 'Failed to get response from PARA' });
+  }
+});
+
+// ── RAG-lite: find encyclopedia entries relevant to the user's message ────────
+function findRelevantParasites(message: string): string {
+  const q = message.toLowerCase();
+  const scored = PARASITES.map(p => {
+    let score = 0;
+    if (q.includes(p.common_name.toLowerCase())) score += 10;
+    if (q.includes(p.scientific_name.toLowerCase())) score += 10;
+    p.aliases.forEach(a => { if (q.includes(a.toLowerCase())) score += 8; });
+    p.symptoms.forEach(s => { if (q.includes(s.toLowerCase().split(' ')[0])) score += 2; });
+    p.transmission.forEach(t => { if (q.includes(t.toLowerCase().split(' ')[0])) score += 1; });
+    return { p, score };
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 2);
+
+  if (!scored.length) return '';
+  return '\n\n━━ ENCYCLOPEDIA CONTEXT (use this for precise answers) ━━\n' +
+    scored.map(({ p }) =>
+      `${p.common_name} (${p.scientific_name}):\n` +
+      `Symptoms: ${p.symptoms.join(', ')}\n` +
+      `Transmission: ${p.transmission.join(', ')}\n` +
+      `Conventional treatment: ${p.conventional_treatment}\n` +
+      (p.remedies.length ? `Natural remedies: ${p.remedies.map(r => `${r.name} ${r.dosage} for ${r.duration} (evidence: ${r.evidence})`).join('; ')}\n` : '') +
+      `Urgency: ${p.urgency_level}`
+    ).join('\n\n');
+}
+
+// POST /api/chatbot/stream — streaming SSE version of /message
+router.post('/stream', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const send = (obj: object) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+
+  try {
+    const {
+      message, healthContext, reportData, conversationHistory = [],
+      currentPage = '/dashboard', userState = {}, triggerType = 'USER_MESSAGE',
+    } = req.body;
+
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      send({ t: 'error', v: 'Message is required' }); res.end(); return;
+    }
+
+    const safeMessage = message.trim().slice(0, 2000);
+    const pageName = getPageName(currentPage);
+    const credits = userState?.credits ?? userState?.imageCredits ?? '?';
+    const userName = userState?.firstName || 'there';
+    const isFirstVisit = userState?.isFirstVisit === true ? 'yes' : 'no';
+
+    let systemPrompt = PARA_SYSTEM_PROMPT
+      .replace(/{CURRENT_PAGE}/g, currentPage).replace(/{PAGE_NAME}/g, pageName)
+      .replace(/{CREDITS}/g, String(credits)).replace(/{USER_NAME}/g, userName)
+      .replace(/{IS_FIRST_VISIT}/g, isFirstVisit).replace(/{TRIGGER_TYPE}/g, triggerType)
+      .replace('{HEALTH_CONTEXT}',
+        healthContext && typeof healthContext === 'object'
+          ? `Age: ${healthContext.age||'Unknown'}, Symptoms: ${healthContext.symptoms||'None reported'}, Duration: ${healthContext.duration||'Unknown'}, Location: ${healthContext.location||'Unknown'}, Travel: ${healthContext.travel||'None'}, Pets: ${healthContext.pets||'Unknown'}`
+          : 'Not collected yet.');
+
+    // RAG-lite: inject relevant encyclopedia entries
+    systemPrompt += findRelevantParasites(safeMessage);
+
+    if (reportData) {
+      systemPrompt += '\n\n' + REPORT_NARRATOR_PROMPT.replace('{REPORT_DATA}', JSON.stringify(reportData, null, 2));
+    }
+
+    const safeHistory = Array.isArray(conversationHistory)
+      ? conversationHistory.slice(-18)
+          .filter((m: any) => m && (m.role==='user'||m.role==='assistant') && typeof m.content==='string' && !m.content.startsWith('[SYSTEM:'))
+          .map((m: any) => ({ role: m.role as 'user'|'assistant', content: m.content.slice(0,4000) }))
+      : [];
+
+    const messages: Anthropic.MessageParam[] = [...safeHistory, { role: 'user', content: safeMessage }];
+
+    let fullText = '';
+    let sentLength = 0;
+
+    const stream = anthropic.messages.stream({
+      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
+      max_tokens: 1400,
+      system: systemPrompt,
+      messages,
+    });
+
+    stream.on('text', (delta: string) => {
+      fullText += delta;
+      const cutAt = fullText.indexOf('|||SUGGESTIONS|||');
+      const displayable = cutAt >= 0 ? fullText.slice(0, cutAt) : fullText;
+      const newChars = displayable.slice(sentLength);
+      if (newChars) { sentLength = displayable.length; send({ t: 'd', v: newChars }); }
+    });
+
+    await stream.finalMessage();
+    const { message: cleanMessage, suggestions } = parseResponse(fullText);
+    send({ t: 'done', s: suggestions, full: cleanMessage });
+    res.end();
+  } catch (err: any) {
+    console.error('Chatbot stream error:', err?.message);
+    send({ t: 'error', v: 'AI error — please try again' });
+    res.end();
   }
 });
 
