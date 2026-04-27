@@ -56,10 +56,10 @@ const Navbar = () => {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   const publicLinks = [
-    { path: '/chat',         label: '💬 Chat with PARA' },
-    { path: '/how-it-works', label: 'How It Works' },
-    { path: '/tips',         label: 'Free Tips' },
-    { path: '/pricing',      label: 'Pricing' },
+    { path: '/chat',          label: '💬 Chat with PARA' },
+    { path: '/tips',          label: 'Free Tips' },
+    { path: '/sample-report', label: 'See a Report' },
+    { path: '/pricing',       label: 'Pricing' },
   ];
 
   const authLinks = [

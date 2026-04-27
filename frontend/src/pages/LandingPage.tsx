@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import SEO from '../components/SEO';
 import TrustBar from '../components/TrustBar';
+import TestimonialsSection from '../components/TestimonialsSection';
 import SignupAssistant from '../components/SignupAssistant';
 
 /* ─── Brand tokens — Image 4 reference ─────────────────────────────── */
@@ -252,17 +253,10 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated }  = useAuthStore();
   const [showModal, setShowModal] = useState(false);
-  const [scrolled, setScrolled]   = useState(false);
 
   useEffect(() => {
     const seen = sessionStorage.getItem('para_welcome_shown');
     if (!seen) { const t = setTimeout(() => setShowModal(true), 800); return () => clearTimeout(t); }
-  }, []);
-
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', fn, { passive:true });
-    return () => window.removeEventListener('scroll', fn);
   }, []);
 
   const handleStart = () => {
@@ -286,42 +280,6 @@ const LandingPage = () => {
           onStart={handleStart}
         />
       )}
-
-      {/* ── NAV ─────────────────────────────────────────────────────── */}
-      <nav style={{
-        position:'sticky', top:0, zIndex:100,
-        background: scrolled ? 'rgba(242,247,244,0.95)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? `1px solid ${C.border}` : '1px solid transparent',
-        transition:'all 0.2s ease', padding:'0 1.5rem',
-      }}>
-        <div style={{
-          maxWidth:1120, margin:'0 auto',
-          display:'flex', alignItems:'center', justifyContent:'space-between', height:64,
-        }}>
-          <Link to="/" style={{ textDecoration:'none' }}><Logo/></Link>
-
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            {user ? (
-              <Link to="/dashboard" style={{
-                padding:'8px 18px', borderRadius:20, background:C.teal, color:'white',
-                textDecoration:'none', fontSize:'0.875rem', fontWeight:700,
-              }}>Dashboard →</Link>
-            ) : (
-              <>
-                <Link to="/login" style={{
-                  padding:'8px 16px', borderRadius:20, fontSize:'0.875rem',
-                  color:C.navy, textDecoration:'none', fontWeight:500,
-                }}>Sign in</Link>
-                <button onClick={openModal} style={{
-                  padding:'8px 18px', borderRadius:20, background:C.teal, color:'white',
-                  border:'none', cursor:'pointer', fontSize:'0.875rem', fontWeight:700,
-                }}>Upload Free →</button>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section style={{
@@ -506,6 +464,9 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ── TESTIMONIALS ─────────────────────────────────────────────── */}
+      <TestimonialsSection />
+
       {/* ── PRICING ANCHOR ───────────────────────────────────────────── */}
       <section style={{ background:C.navy, padding:'clamp(3rem,6vw,4.5rem) 1.5rem' }}>
         <div style={{ maxWidth:700, margin:'0 auto', textAlign:'center' }}>
@@ -625,7 +586,7 @@ const LandingPage = () => {
         </div>
       </footer>
       {/* PARA signup assistant — shown to unauthenticated visitors only */}
-      {!isAuthenticated && <SignupAssistant />}
+      {!isAuthenticated && !showModal && <SignupAssistant />}
     </div>
   );
 };
