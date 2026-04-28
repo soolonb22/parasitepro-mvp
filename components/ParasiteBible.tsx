@@ -1,5 +1,33 @@
+import React, { useState, useMemo } from 'react';
 
-import React, { useState, useMemo } from "react";
+type RiskLevel = 'high' | 'medium' | 'low';
+type Category = 'protozoa' | 'nematode' | 'cestode' | 'trematode' | 'ectoparasite';
+
+interface Parasite {
+  id: number;
+  name: string;
+  common: string;
+  cat: Category;
+  risk: RiskLevel;
+  zones: string[];
+  hosts: string[];
+  region: string;
+  transmission: string;
+  symptoms: string[];
+  lifecycle: string;
+  diagnosis: string;
+  treatment: string;
+  prevention: string;
+  zoonotic: boolean;
+  notifiable: boolean;
+  rareFacts: string[];
+}
+
+interface ZoneShape {
+  t: 'e' | 'r';
+  cx?: number; cy?: number; rx?: number; ry?: number;
+  x?: number; y?: number; w?: number; h?: number; r?: number;
+}
 
 const T = {50:"#E1F5EE",100:"#9FE1CB",200:"#5DCAA5",400:"#1D9E75",600:"#0F6E56",800:"#085041",900:"#04342C"};
 const RC = {high:"#E24B4A",medium:"#EF9F27",low:"#1D9E75"};
@@ -59,7 +87,7 @@ function BodyMap({ zones = [] }) {
   );
 }
 
-function LifecycleFlow({ lifecycle }) {
+function LifecycleFlow({ lifecycle }: { lifecycle: string }) {
   const stages = lifecycle.split("→").map(s=>s.trim()).filter(Boolean);
   return (
     <div style={{overflowX:"auto",padding:"6px 0",WebkitOverflowScrolling:"touch"}}>
@@ -132,7 +160,7 @@ const CAT={protozoa:"Protozoa",nematode:"Nematode",cestode:"Cestode",trematode:"
 
 const ZONE_LABELS={brain:"Brain/CNS",eye:"Eyes",throat:"Throat",lung:"Lungs",heart:"Heart",liver:"Liver",intestine:"Intestines",bladder:"Bladder",genitourinary:"Genitourinary",muscle:"Muscle",lymph:"Lymphatics",joint:"Joints",skin:"Skin",blood:"Bloodstream"};
 
-const ZONE_SHAPES={
+const ZONE_SHAPES: Record<string, ZoneShape[]> = {
   brain:[{t:"e",cx:60,cy:14,rx:10,ry:10}],
   eye:[{t:"e",cx:54,cy:20,rx:3,ry:2},{t:"e",cx:66,cy:20,rx:3,ry:2}],
   throat:[{t:"e",cx:60,cy:32,rx:5,ry:4}],
@@ -149,12 +177,12 @@ const ZONE_SHAPES={
 
 import React, { useState, useMemo } from "react";
 
-function BodyMap({ zones=[] }) {
+function BodyMap({ zones = [] }: { zones: string[] }) {
   const hasSkin = zones.includes("skin");
   const hasBlood = zones.includes("blood");
   const bf = hasSkin ? T[100] : "#f0efea";
   const bs = hasSkin ? T[600] : "#ccc";
-  const renderEl = (el,k) => {
+  const renderEl = (el: ZoneShape, k: string) => {
     if(el.t==="e") return <ellipse key={k} cx={el.cx} cy={el.cy} rx={el.rx} ry={el.ry} fill={T[400]} stroke={T[800]} strokeWidth="0.8" opacity="0.82"/>;
     if(el.t==="r") return <rect key={k} x={el.x} y={el.y} width={el.w} height={el.h} rx={el.r||3} fill={T[400]} stroke={T[800]} strokeWidth="0.8" opacity="0.82"/>;
     return null;
@@ -179,7 +207,7 @@ function BodyMap({ zones=[] }) {
         <path d="M54 23 Q60 27 66 23" stroke="#999" strokeWidth="1" fill="none" opacity="0.5"/>
       </svg>
       <div style={{display:"flex",flexWrap:"wrap",gap:3,justifyContent:"center",maxWidth:200}}>
-        {zones.map(z=>ZONE_LABELS[z]&&<span key={z} style={{fontSize:9,padding:"2px 5px",background:T[50],color:T[800],border:`1px solid ${T[200]}`,borderRadius:3}}>{ZONE_LABELS[z]}</span>)}
+        {zones.map(z=>ZONE_LABELS[z]&&<span key={z} style={{fontSize:9,padding:"2px 5px",background:"#fff",color:T[800],border:`1px solid ${T[200]}`,borderRadius:3}}>{ZONE_LABELS[z]}</span>)}
       </div>
     </div>
   );
@@ -193,7 +221,7 @@ function LifecycleFlow({ lifecycle }) {
         {stages.map((s,i)=>(
           <React.Fragment key={i}>
             <div style={{
-              background:i===0||i===stages.length-1?T[400]:T[50],
+              background:i===0||i===stages.length-1?T[400]:"#fff",
               color:i===0||i===stages.length-1?"#fff":T[800],
               border:`1px solid ${i===0||i===stages.length-1?T[600]:T[200]}`,
               borderRadius:6,padding:"6px 8px",fontSize:10,lineHeight:1.45,
@@ -207,9 +235,9 @@ function LifecycleFlow({ lifecycle }) {
   );
 }
 
-function InfoBox({ label, children }) {
+function InfoBox({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{background:T[50],border:`1px solid ${T[100]}`,borderRadius:8,padding:"10px 12px"}}>
+    <div style={{background:"#fff",border:`1px solid ${T[100]}`,borderRadius:8,padding:"10px 12px"}}>
       <div style={{fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",color:T[600],fontFamily:"monospace",marginBottom:5}}>{label}</div>
       <div style={{fontSize:13,color:"#111",lineHeight:1.65}}>{children}</div>
     </div>
@@ -269,7 +297,7 @@ export default function ParasiteBible() {
         {/* Stats */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(90px,1fr))",gap:7,marginBottom:14}}>
           {[["Total",stats.total],["Protozoa",stats.protozoa],["Nematodes",stats.nematode],["Cestodes",stats.cestode],["Trematodes",stats.trematode],["Ectoparasites",stats.ectoparasite],["Zoonotic",stats.zoonotic],["High Risk",stats.high]].map(([l,n])=>(
-            <div key={l} style={{background:T[50],border:`1px solid ${T[100]}`,borderRadius:8,padding:"9px 6px",textAlign:"center"}}>
+            <div key={l} style={{background:"#fff",border:`1px solid ${T[100]}`,borderRadius:8,padding:"9px 6px",textAlign:"center"}}>
               <div style={{fontSize:19,fontWeight:700,color:T[800]}}>{n}</div>
               <div style={{fontSize:10,color:T[600],marginTop:1}}>{l}</div>
             </div>
@@ -306,7 +334,7 @@ export default function ParasiteBible() {
                 <div style={{fontSize:20,fontWeight:700,color:T[900]}}>{sel.common}</div>
                 <div style={{fontSize:12,color:T[600],fontStyle:"italic",fontFamily:"monospace",marginTop:2}}>{sel.name}</div>
                 <div style={{display:"flex",gap:5,flexWrap:"wrap",marginTop:7,alignItems:"center"}}>
-                  <span style={{fontSize:11,padding:"3px 8px",borderRadius:5,background:T[50],color:T[800],border:`1px solid ${T[200]}`}}>{CAT[sel.cat]}</span>
+                  <span style={{fontSize:11,padding:"3px 8px",borderRadius:5,background:"#fff",color:T[800],border:`1px solid ${T[200]}`}}>{CAT[sel.cat]}</span>
                   <span style={{fontSize:11,padding:"3px 8px",borderRadius:5,...RBG[sel.risk],fontWeight:600}}>{sel.risk.charAt(0).toUpperCase()+sel.risk.slice(1)} risk</span>
                   {sel.zoonotic&&<span style={{fontSize:11,padding:"3px 8px",borderRadius:5,background:"#F1EFE8",color:"#444",border:"1px solid #D3D1C7"}}>Zoonotic</span>}
                   {sel.notifiable&&<span style={{fontSize:11,padding:"3px 8px",borderRadius:5,background:"#FFF0F0",color:"#791F1F",border:"1px solid #F7C1C1"}}>Notifiable</span>}
@@ -342,7 +370,7 @@ export default function ParasiteBible() {
                     <LifecycleFlow lifecycle={sel.lifecycle}/>
                   </div>
                   <InfoBox label="Transmission">{sel.transmission}</InfoBox>
-                  <div style={{background:T[50],border:`1px solid ${T[100]}`,borderRadius:8,padding:"10px 12px"}}>
+                  <div style={{background:"#fff",border:`1px solid ${T[100]}`,borderRadius:8,padding:"10px 12px"}}>
                     <div style={{fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",color:T[600],fontFamily:"monospace",marginBottom:6}}>Hosts</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
                       {sel.hosts.map(h=><span key={h} style={{fontSize:11,padding:"2px 8px",background:"#fff",border:`1px solid ${T[200]}`,borderRadius:5,color:"#111"}}>{h}</span>)}
@@ -357,7 +385,7 @@ export default function ParasiteBible() {
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 <InfoBox label="Region">{sel.region}</InfoBox>
                 <InfoBox label="Transmission">{sel.transmission}</InfoBox>
-                <div style={{background:T[50],border:`1px solid ${T[100]}`,borderRadius:8,padding:"10px 12px"}}>
+                <div style={{background:"#fff",border:`1px solid ${T[100]}`,borderRadius:8,padding:"10px 12px"}}>
                   <div style={{fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",color:T[600],fontFamily:"monospace",marginBottom:6}}>Symptoms</div>
                   <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                     {sel.symptoms.map(s=><span key={s} style={{fontSize:11,padding:"3px 8px",background:"#fff",border:`1px solid ${T[200]}`,borderRadius:5,color:"#111"}}>{s}</span>)}
@@ -384,7 +412,7 @@ export default function ParasiteBible() {
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:9}}>
                   {sel.rareFacts.map((f,i)=>(
-                    <div key={i} style={{display:"flex",gap:12,background:T[50],border:`1px solid ${T[100]}`,borderRadius:8,padding:"12px 14px"}}>
+                    <div key={i} style={{display:"flex",gap:12,background:"#fff",border:`1px solid ${T[100]}`,borderRadius:8,padding:"12px 14px"}}>
                       <div style={{minWidth:22,height:22,borderRadius:"50%",background:T[400],color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,flexShrink:0,marginTop:1}}>{i+1}</div>
                       <div style={{fontSize:13,color:"#111",lineHeight:1.75}}>{f}</div>
                     </div>
@@ -417,7 +445,7 @@ export default function ParasiteBible() {
                   <div style={{width:8,height:8,borderRadius:"50%",flexShrink:0,marginTop:4,background:RC[item.risk]}}/>
                 </div>
                 <div style={{display:"flex",gap:4,flexWrap:"wrap",alignItems:"center"}}>
-                  <span style={{fontSize:10,padding:"2px 6px",borderRadius:4,background:T[50],color:T[800],border:`1px solid ${T[100]}`}}>{CAT[item.cat]}</span>
+                  <span style={{fontSize:10,padding:"2px 6px",borderRadius:4,background:"#fff",color:T[800],border:`1px solid ${T[100]}`}}>{CAT[item.cat]}</span>
                   {item.zoonotic&&<span style={{fontSize:10,color:T[600],fontFamily:"monospace"}}>⬡ zoo</span>}
                   {item.notifiable&&<span style={{fontSize:10,color:"#A32D2D",fontFamily:"monospace"}}>⚑</span>}
                 </div>
