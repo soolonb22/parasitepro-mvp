@@ -108,7 +108,7 @@ const ParaModal = ({ onClose, onStart }) => {
         animation:'pmSlide 0.32s cubic-bezier(0.22,0.68,0,1.2) both',
         boxShadow:'0 24px 64px rgba(0,0,0,0.45)',
       }}>
-        <button onClick={onClose} style={{
+        <button type="button" onClick={onClose} style={{
           position:'absolute', top:14, right:14, width:36, height:36,
           borderRadius:'50%', background:'rgba(255,255,255,0.15)', border:'none',
           cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
@@ -135,7 +135,7 @@ const ParaModal = ({ onClose, onStart }) => {
           Let me show you what we&apos;re all about.</p>
 
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem' }}>
-          <button onClick={handleSpeak} style={{
+          <button type="button" onClick={handleSpeak} style={{
             display:'flex', alignItems:'center', gap:8, background:'none', border:'none',
             cursor:'pointer', color:'rgba(255,255,255,0.85)', fontSize:'0.875rem', fontWeight:500,
           }}>
@@ -147,14 +147,14 @@ const ParaModal = ({ onClose, onStart }) => {
             </svg>
             Tap to hear PARA
           </button>
-          <button onClick={onClose} style={{
+          <button type="button" onClick={onClose} style={{
             padding:'8px 22px', background:'rgba(255,255,255,0.10)',
             border:'1.5px solid rgba(255,255,255,0.22)', borderRadius:20,
             cursor:'pointer', color:'white', fontSize:'0.875rem', fontWeight:500,
           }}>Skip</button>
         </div>
 
-        <button onClick={onStart} style={{
+        <button type="button" onClick={onStart} style={{
           width:'100%', padding:'14px', background:C.green, border:'none',
           borderRadius:14, cursor:'pointer', color:'white',
           fontSize:'1rem', fontWeight:800, letterSpacing:'0.01em',
@@ -274,6 +274,36 @@ const LandingPage = () => {
       <SEO
         title="notworms.com — AI parasite education for Australians"
         description="Found something weird? Upload a photo and get a structured educational report in 60 seconds. For Queensland parents, travellers, and pet owners."
+        canonical="/"
+        schema={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Parasite ID Pro",
+            "url": "https://notworms.com",
+            "description": "AI-powered parasite education for Australians",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://notworms.com/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "ParasitePro",
+            "operatingSystem": "Web",
+            "applicationCategory": "HealthApplication",
+            "description": "AI-powered parasite education platform for Australians. Upload a photo and receive a structured educational report to help prepare for GP visits.",
+            "url": "https://notworms.com",
+            "offers": [
+              { "@type": "Offer", "price": "0", "priceCurrency": "AUD", "name": "First analysis free" },
+              { "@type": "Offer", "price": "19.99", "priceCurrency": "AUD", "name": "5 Analysis Credits" },
+              { "@type": "Offer", "price": "34.99", "priceCurrency": "AUD", "name": "10 Analysis Credits" },
+              { "@type": "Offer", "price": "74.99", "priceCurrency": "AUD", "name": "25 Analysis Credits" }
+            ]
+          }
+        ]}
       />
 
       {showModal && (
@@ -334,8 +364,8 @@ const LandingPage = () => {
             margin: '0 0 clamp(1.5rem,3vw,2.5rem)',
             maxWidth: 820,
           }}>
-            Found something<br/>
-            concerning in your stool?<br/>
+            Found something{' '}<br/>
+            concerning in your stool?{' '}<br/>
             <span style={{ fontSize:'clamp(1.8rem,4.5vw,3.4rem)', fontWeight:700, opacity:0.88 }}>
               Get fast AI-powered analysis in{' '}
               60 seconds – no lab visit required
@@ -350,7 +380,7 @@ const LandingPage = () => {
             marginBottom: 'clamp(1.5rem,3vw,2rem)',
           }}>
             {/* Primary — dark black */}
-            <button
+            <button type="button"
               onClick={() => navigate(user ? '/upload' : '/signup?promo=BETA3FREE')}
               style={{
                 padding: 'clamp(13px,1.8vw,18px) clamp(22px,3vw,40px)',
@@ -371,9 +401,9 @@ const LandingPage = () => {
               Upload Photo for Analysis
             </button>
 
-            {/* Secondary — also dark, "Export report to My Health Record" */}
-            <button
-              onClick={openModal}
+            {/* Secondary — "See a Sample Report" navigates to sample report page */}
+            <button type="button"
+              onClick={() => navigate('/sample-report')}
               style={{
                 padding: 'clamp(13px,1.8vw,18px) clamp(22px,3vw,40px)',
                 background: '#0F2733',
@@ -391,7 +421,7 @@ const LandingPage = () => {
               onMouseEnter={e=>{e.currentTarget.style.background='#1A3D4F';e.currentTarget.style.transform='translateY(-2px)';}}
               onMouseLeave={e=>{e.currentTarget.style.background='#0F2733';e.currentTarget.style.transform='none';}}
             >
-              Export report to<br/>My Health Record
+              See a Sample GP Report
             </button>
           </div>
 
@@ -477,9 +507,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ─────────────────────────────────────────────── */}
-      <TestimonialsSection />
-
       {/* ── FAQ ──────────────────────────────────────────────────────── */}
       <HomepageFAQ />
 
@@ -522,7 +549,7 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
-          <button onClick={openModal} style={{
+          <button type="button" onClick={openModal} style={{
             padding:'14px 40px', background:C.green, color:'white',
             border:'none', borderRadius:12, fontSize:'1rem', fontWeight:800, cursor:'pointer',
           }}>Start free — no credit card needed</button>
@@ -567,7 +594,26 @@ const LandingPage = () => {
                 color:'rgba(255,255,255,0.45)', fontSize:'0.72rem', fontWeight:700,
                 letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'0.75rem',
               }}>Product</p>
-              {[['/upload','Upload Photo'],['/resources','Resources & Guides'],['/scientific-library','Scientific Library'],['/pricing','Pricing'],['/sample-report','Sample Report']].map(([h,l]) => (
+              {[['/upload','Upload Photo'],['/tips','Free Tips'],['/scientific-library','Scientific Library'],['/pricing','Pricing'],['/sample-report','Sample Report']].map(([h,l]) => (
+                <Link key={h} to={h} style={{
+                  display:'block', color:'rgba(255,255,255,0.6)',
+                  textDecoration:'none', fontSize:'0.82rem', marginBottom:'0.4rem',
+                }}>{l}</Link>
+              ))}
+            </div>
+            <div>
+              <p style={{
+                color:'rgba(255,255,255,0.45)', fontSize:'0.72rem', fontWeight:700,
+                letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'0.75rem',
+              }}>Learn</p>
+              {[
+                ['/worm-in-stool','Worm in Stool?'],
+                ['/giardia-symptoms-australia','Giardia Symptoms'],
+                ['/queensland-parasites','QLD Parasites'],
+                ['/dog-worms','Dog Worms'],
+                ['/tapeworm-symptoms','Tapeworm Signs'],
+                ['/pinworm-treatment','Pinworm Treatment'],
+              ].map(([h,l]) => (
                 <Link key={h} to={h} style={{
                   display:'block', color:'rgba(255,255,255,0.6)',
                   textDecoration:'none', fontSize:'0.82rem', marginBottom:'0.4rem',

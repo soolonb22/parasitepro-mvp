@@ -1,37 +1,25 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+// UrgencyTimer replaced with a static "Beta pricing" badge.
+// The original version reset to initialMinutes on every page load — a fake-scarcity
+// dark pattern that violates ACCC fair trading standards (s18 CCA 2010).
+import { Tag } from 'lucide-react';
 
-const UrgencyTimer = ({ label = 'Offer ends in', initialMinutes = 15 }) => {
-  const [seconds, setSeconds] = useState(initialMinutes * 60);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeconds(s => (s > 0 ? s - 1 : 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-  const secs = (seconds % 60).toString().padStart(2, '0');
-
-  if (seconds === 0) return null;
-
+const UrgencyTimer = ({ label = 'Beta pricing', initialMinutes = 0 }) => {
   return (
     <div style={{
       display: 'inline-flex',
       alignItems: 'center',
       gap: '0.5rem',
-      background: 'rgba(239,68,68,0.1)',
-      border: '1px solid rgba(239,68,68,0.3)',
+      background: 'rgba(13,148,136,0.1)',
+      border: '1px solid rgba(13,148,136,0.3)',
       borderRadius: '8px',
       padding: '6px 14px',
       fontFamily: 'var(--font-mono, JetBrains Mono, monospace)',
       fontSize: 13,
-      color: '#ef4444',
+      color: '#0d9488',
     }}>
-      <Clock size={14} />
-      {label}: {mins}:{secs}
+      <Tag size={14} />
+      {label} — prices may change after beta
     </div>
   );
 };

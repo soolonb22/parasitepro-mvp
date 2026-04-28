@@ -7,6 +7,7 @@ import ParasiteBot, { LandingPARA } from './components/ParasiteBot';
 import Navbar from './components/Navbar';
 import { ParaAuthPanel, ParaAuthBanner } from './components/ParaAuthChat';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
+import CookieConsent from './components/CookieConsent';
 
 // ── Core pages ────────────────────────────────────────────────────────────────
 import LandingPage from './pages/LandingPage';
@@ -310,6 +311,7 @@ function App() {
           error: { iconTheme: { primary: '#EF4444', secondary: 'var(--bg-elevated)' } },
         }} />
         <ParasiteBot />
+        <CookieConsent />
         <AppLayout>
         <Routes>
           {/* Public */}

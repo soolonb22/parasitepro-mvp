@@ -13,7 +13,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, firstName 
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 border border-gray-700 rounded-2xl max-w-lg w-full shadow-2xl">
         <div className="relative p-6 pb-0">
-          <button onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-gray-700 rounded-lg transition-colors" aria-label="Close welcome screen">
+          <button type="button" onClick={onClose} className="absolute top-4 right-4 p-2 hover:bg-gray-700 rounded-lg transition-colors" aria-label="Close welcome screen">
             <X size={20} className="text-gray-400" />
           </button>
           <div className="flex items-center gap-3 mb-2">
@@ -48,8 +48,8 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, firstName 
             <p className="text-yellow-200 text-xs"><strong>Medical Disclaimer:</strong> This tool is for informational purposes only and is not a substitute for professional medical diagnosis. Always consult a qualified healthcare professional.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors text-sm">Explore First</button>
-            <button
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors text-sm">Explore First</button>
+            <button type="button"
               onClick={() => { onClose(); window.location.href = '/pricing'; }}
               className="flex-1 py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
             >

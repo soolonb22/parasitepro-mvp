@@ -39,6 +39,11 @@ export default function HeroPhoneMockup({ style = {} }) {
             <style>{`@keyframes phone-ping{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.7);opacity:0.2}}`}</style>
           </div>
 
+          {/* Sample disclaimer label */}
+          <div style={{ background:'#FFF3CD', border:'1px solid #FFC107', borderRadius:6, padding:'3px 7px', marginBottom:8, textAlign:'center' }}>
+            <span style={{ fontSize:'0.52rem', fontWeight:700, color:'#856404', textTransform:'uppercase', letterSpacing:'0.04em' }}>Sample report only — educational output</span>
+          </div>
+
           {/* Confidence row */}
           <div style={{ display:'flex', gap:6, marginBottom:8 }}>
             <div style={{ flex:1, background:'#FEF3C7', borderRadius:8, padding:'5px 7px' }}>
@@ -46,15 +51,15 @@ export default function HeroPhoneMockup({ style = {} }) {
               <div style={{ fontSize:'0.75rem', fontWeight:800, color:'#92400E' }}>Moderate</div>
             </div>
             <div style={{ flex:1, background:'#E1F8F4', borderRadius:8, padding:'5px 7px' }}>
-              <div style={{ fontSize:'0.55rem', color:'#008B7A', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em' }}>Confidence</div>
-              <div style={{ fontSize:'0.75rem', fontWeight:800, color:'#008B7A' }}>87%</div>
+              <div style={{ fontSize:'0.55rem', color:'#008B7A', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em' }}>Pattern Match</div>
+              <div style={{ fontSize:'0.75rem', fontWeight:800, color:'#008B7A' }}>High</div>
             </div>
           </div>
 
           {/* Findings */}
           <div style={{ background:'white', borderRadius:10, padding:'8px 9px', marginBottom:8 }}>
             <div style={{ fontSize:'0.6rem', fontWeight:700, color:'#1A365D', marginBottom:5, textTransform:'uppercase', letterSpacing:'0.04em' }}>Visual patterns found</div>
-            {['Hookworm eggs — 71% match','Giardia cysts — 58% match'].map((f,i) => (
+            {['Morphology A — high similarity','Morphology B — moderate similarity'].map((f,i) => (
               <div key={i} style={{ display:'flex', alignItems:'center', gap:5, marginBottom:3 }}>
                 <div style={{ width:5, height:5, borderRadius:'50%', background:'#0d9488', flexShrink:0 }}/>
                 <span style={{ fontSize:'0.62rem', color:'#334155' }}>{f}</span>

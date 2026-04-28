@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, HelpCircle, ArrowLeft, Microscope, Mail } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const FAQ_ITEMS = [
   { category: 'Image Quality', question: 'What makes a good image for analysis?', answer: 'Use natural daylight or a bright torch. Hold steady and focus on the specimen. Include a ruler or coin for scale if possible. Make sure the subject fills at least 50% of the frame — blurry or dark images reduce accuracy.' },
@@ -28,6 +29,20 @@ const FAQPage = () => {
 
   return (
     <div className="pp-page">
+      <SEO
+        title="FAQ — Common Questions About ParasitePro"
+        description="Answers to common questions about ParasitePro: photo privacy, how AI analysis works, legal status in Australia, and how the educational reports help you prepare for your GP."
+        canonical="/faq"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": FAQ_ITEMS.slice(0, 8).map(f => ({
+            "@type": "Question",
+            "name": f.question,
+            "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+          }))
+        }}
+      />
       {/* Nav */}
       <nav className="pp-nav">
         <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-sm transition-colors hover:text-white" style={{ color: 'var(--text-muted)' }}>

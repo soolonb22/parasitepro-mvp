@@ -16,7 +16,7 @@ const FAQItem = ({ question, answer }) => {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ borderBottom: '1px solid #C8E6D8', padding: '1rem 0' }}>
-      <button onClick={() => setOpen(!open)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', background:'none', border:'none', padding:0, cursor:'pointer', textAlign:'left' }}>
+      <button type="button" onClick={() => setOpen(!open)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', background:'none', border:'none', padding:0, cursor:'pointer', textAlign:'left' }}>
         <span style={{ fontWeight:600, color:'var(--text-primary)', fontSize:'0.95rem' }}>{question}</span>
         {open ? <ChevronUp size={18} style={{ color:'var(--amber)', flexShrink:0 }} /> : <ChevronDown size={18} style={{ color:'var(--text-muted)', flexShrink:0 }} />}
       </button>
@@ -90,7 +90,7 @@ const PricingPage = () => {
     }}>
       <SEO title="Pricing — ParasitePro | Credit Bundles AUD" description="AI parasite analysis credits. Pay only for what you use — credits never expire." canonical="/pricing" />
       <div style={{ maxWidth:860, margin:'0 auto', padding:'48px 24px' }}>
-        <button onClick={() => navigate(user ? '/dashboard' : '/')} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, marginBottom:32, fontFamily:'var(--font-body)' }}>
+        <button type="button" onClick={() => navigate(user ? '/dashboard' : '/')} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, marginBottom:32, fontFamily:'var(--font-body)' }}>
           <ArrowLeft size={15} /> {user ? 'Dashboard' : 'Home'}
         </button>
 
@@ -131,7 +131,7 @@ const PricingPage = () => {
                   </div>
                 ))}
               </div>
-              <button className={b.popular ? 'pp-btn-primary' : 'pp-btn'} onClick={() => handlePurchase(b.id)} disabled={!!loading} style={{ width:'100%', padding:'12px', fontSize:14 }}>
+              <button type="button" className={b.popular ? 'pp-btn-primary' : 'pp-btn'} onClick={() => handlePurchase(b.id)} disabled={!!loading} style={{ width:'100%', padding:'12px', fontSize:14 }}>
                 {loading === b.id ? 'Processing…' : `Buy ${b.credits} Credits`}
               </button>
             </div>
@@ -150,7 +150,7 @@ const PricingPage = () => {
           <h3 style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:16, color:'var(--text-primary)', marginBottom:16, textAlign:'center' }}>Have a Coupon Code?</h3>
           <div style={{ display:'flex', gap:8, maxWidth:380, margin:'0 auto' }}>
             <input className="pp-input" type="text" placeholder="Enter coupon code" value={couponInput} onChange={e => setCouponInput(e.target.value)} onKeyDown={e => e.key==='Enter' && handleApplyCoupon()} style={{ flex:1 }} />
-            <button className="pp-btn" onClick={handleApplyCoupon} style={{ padding:'10px 18px', fontSize:13 }}>Apply</button>
+            <button type="button" className="pp-btn" onClick={handleApplyCoupon} style={{ padding:'10px 18px', fontSize:13 }}>Apply</button>
           </div>
           {couponMessage && <p style={{ color:'#10B981', fontSize:13, textAlign:'center', marginTop:10 }}>✓ {couponMessage}</p>}
         </div>

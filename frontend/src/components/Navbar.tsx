@@ -129,7 +129,7 @@ const Navbar = () => {
 
               {/* User dropdown */}
               <div ref={userMenuRef} style={{ position:'relative' }}>
-                <button
+                <button type="button"
                   onClick={() => setUserMenuOpen((v) => !v)}
                   aria-label="Account menu"
                   style={{
@@ -169,7 +169,7 @@ const Navbar = () => {
                       </Link>
                     ))}
                     <div style={{ borderTop:'1px solid #f1f5f9' }}>
-                      <button onClick={handleLogout} style={{
+                      <button type="button" onClick={handleLogout} style={{
                         display:'flex', alignItems:'center', gap:'0.6rem',
                         width:'100%', padding:'0.65rem 1rem',
                         background:'none', border:'none', cursor:'pointer',
@@ -203,7 +203,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile hamburger */}
-        <button
+        <button type="button"
           className="md:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle menu"
@@ -268,7 +268,7 @@ const Navbar = () => {
                 }}>
                   ⚙️ Settings
                 </Link>
-                <button onClick={handleLogout} style={{
+                <button type="button" onClick={handleLogout} style={{
                   width:'100%', padding:'0.7rem', borderRadius:12,
                   border:'1.5px solid #fecaca', background:'none',
                   color:'#ef4444', fontWeight:500, fontSize:'0.9rem', cursor:'pointer',

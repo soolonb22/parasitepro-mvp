@@ -444,7 +444,7 @@ export function LandingPARA() {
             <div style={{ width:7, height:7, borderRadius:'50%', background:'#0d9488', boxShadow:'0 0 9px #0d9488', animation:'lp-pulse 1.8s ease-in-out infinite' }}/>
             <span style={{ color:'#2dd4bf', fontFamily:'monospace', fontSize:11, letterSpacing:'0.16em', fontWeight:600 }}>PARA · YOUR GUIDE</span>
           </div>
-          <button onClick={dismiss} style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'#9ca3af', borderRadius:8, padding:'5px 12px', fontSize:12, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:6 }}>
+          <button type="button" onClick={dismiss} style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'#9ca3af', borderRadius:8, padding:'5px 12px', fontSize:12, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:6 }}>
             <X size={12}/> Skip
           </button>
         </div>
@@ -484,20 +484,20 @@ export function LandingPARA() {
             <p style={{ color:'#94a3b8', fontSize:14, lineHeight:1.65, marginBottom:8 }}>Sign up now and use code <strong style={{ color:'#2dd4bf', fontFamily:'monospace' }}>BETA3FREE</strong> to get your first 3 analyses completely free.</p>
             <p style={{ color:'#475569', fontSize:12, fontFamily:'monospace', marginBottom:24 }}>Educational tool only · Not a medical diagnosis · Always confirm with your GP · Emergency: 000</p>
             <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-              <button onClick={goSignup} style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:12, padding:'14px 28px', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit', letterSpacing:'-0.01em' }}>Claim 3 free analyses →</button>
-              <button onClick={dismiss} style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.12)', color:'#64748b', borderRadius:12, padding:'14px 20px', fontSize:14, cursor:'pointer', fontFamily:'inherit' }}>Maybe later</button>
+              <button type="button" onClick={goSignup} style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:12, padding:'14px 28px', fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'inherit', letterSpacing:'-0.01em' }}>Claim 3 free analyses →</button>
+              <button type="button" onClick={dismiss} style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.12)', color:'#64748b', borderRadius:12, padding:'14px 20px', fontSize:14, cursor:'pointer', fontFamily:'inherit' }}>Maybe later</button>
             </div>
           </div>
         )}
         {/* Controls */}
         <div style={{ position:'absolute', bottom:16, display:'flex', alignItems:'center', gap:12 }}>
           {!voiceStarted && robotY === 0 && !showCTA && (
-            <button onClick={handleTapToStart} style={{ background:'rgba(13,148,136,0.12)', border:'2px solid rgba(13,148,136,0.5)', color:'#2dd4bf', borderRadius:20, padding:'8px 16px', fontSize:13, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:7 }}>
+            <button type="button" onClick={handleTapToStart} style={{ background:'rgba(13,148,136,0.12)', border:'2px solid rgba(13,148,136,0.5)', color:'#2dd4bf', borderRadius:20, padding:'8px 16px', fontSize:13, cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:7 }}>
               <span style={{ fontSize:16 }}>🔊</span> Tap to hear PARA
             </button>
           )}
           {voiceStarted && (
-            <button onClick={() => { const nm=!muted; setMuted(nm); if(nm) AudioEngine.cancel(); }} style={{ width:34, height:34, borderRadius:'50%', background:'rgba(13,148,136,0.1)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
+            <button type="button" onClick={() => { const nm=!muted; setMuted(nm); if(nm) AudioEngine.cancel(); }} style={{ width:34, height:34, borderRadius:'50%', background:'rgba(13,148,136,0.1)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
               {muted ? '🔇' : '🔊'}
             </button>
           )}
@@ -656,10 +656,10 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
           <span style={{ color:'#2dd4bf', fontFamily:'monospace', fontSize:12, letterSpacing:'0.17em', fontWeight:600 }}>PARA · PARASITEPRO</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <button onClick={() => { const nm = !muted; if(nm) AudioEngine.cancel(); }} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.07)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
+          <button type="button" onClick={() => { const nm = !muted; if(nm) AudioEngine.cancel(); }} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.07)', border:`1px solid ${muted?'rgba(255,255,255,0.1)':'rgba(13,148,136,0.4)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>
             {muted ? '🔇' : '🔊'}
           </button>
-          {skippable && <button onClick={() => triggerExit(intakeData)} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color:'#9ca3af', borderRadius:8, padding:'5px 12px', fontSize:12, cursor:'pointer', fontFamily:'inherit' }}>Skip ×</button>}
+          {skippable && <button type="button" onClick={() => triggerExit(intakeData)} style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color:'#9ca3af', borderRadius:8, padding:'5px 12px', fontSize:12, cursor:'pointer', fontFamily:'inherit' }}>Skip ×</button>}
         </div>
       </div>
       {/* Progress */}
@@ -711,19 +711,19 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
                   {currentQ.options.map(opt => {
                     const sel = multiSel.includes(opt);
                     return (
-                      <button key={opt} onClick={() => setMultiSel(prev => sel ? prev.filter(o=>o!==opt) : [...prev, opt])}
+                      <button type="button" key={opt} onClick={() => setMultiSel(prev => sel ? prev.filter(o=>o!==opt) : [...prev, opt])}
                         style={{ background:sel?'rgba(13,148,136,0.22)':'rgba(13,148,136,0.07)', border:`1px solid ${sel?'rgba(13,148,136,0.7)':'rgba(13,148,136,0.28)'}`, color:sel?'#2dd4bf':'#94a3b8', borderRadius:12, padding:'11px 16px', fontSize:14, cursor:'pointer', textAlign:'left', fontFamily:'inherit', display:'flex', alignItems:'center', gap:10, transition:'all 0.15s' }}>
                         <span style={{ width:18, height:18, borderRadius:4, border:`2px solid ${sel?'#0d9488':'rgba(13,148,136,0.4)'}`, background:sel?'#0d9488':'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:11, color:'white', transition:'all 0.15s' }}>{sel?'✓':''}</span>
                         {opt}
                       </button>
                     );
                   })}
-                  <button onClick={handleMultiConfirm} style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:12, padding:'13px 18px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit', marginTop:4 }}>
+                  <button type="button" onClick={handleMultiConfirm} style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:12, padding:'13px 18px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit', marginTop:4 }}>
                     {multiSel.length > 0 ? `Confirm ${multiSel.length} selected →` : 'None apply — continue →'}
                   </button>
                 </>
               ) : currentQ?.options.map(opt => (
-                <button key={opt} onClick={() => handleSingleAnswer(opt)}
+                <button type="button" key={opt} onClick={() => handleSingleAnswer(opt)}
                   style={{ background:'rgba(13,148,136,0.08)', border:'1px solid rgba(13,148,136,0.28)', color:'#5eead4', borderRadius:13, padding:'12px 16px', fontSize:14, cursor:'pointer', textAlign:'left', fontFamily:'inherit', lineHeight:1.4, transition:'all 0.15s' }}
                   onMouseEnter={e => { e.currentTarget.style.background='rgba(13,148,136,0.20)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.65)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background='rgba(13,148,136,0.08)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.28)'; }}>
@@ -737,7 +737,7 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
       {/* Tap to start */}
       {!voiceOk && robotY===0 && (
         <div style={{ position:'absolute', inset:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(6,18,24,0.75)', backdropFilter:'blur(4px)', animation:'para-fadein 0.5s ease' }}>
-          <button onClick={handleTapToStart} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:13, background:'rgba(13,148,136,0.12)', border:'2px solid rgba(13,148,136,0.6)', borderRadius:22, padding:'26px 38px', cursor:'pointer', fontFamily:'inherit', transition:'all 0.18s', userSelect:'none' }}
+          <button type="button" onClick={handleTapToStart} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:13, background:'rgba(13,148,136,0.12)', border:'2px solid rgba(13,148,136,0.6)', borderRadius:22, padding:'26px 38px', cursor:'pointer', fontFamily:'inherit', transition:'all 0.18s', userSelect:'none' }}
             onMouseEnter={e => { e.currentTarget.style.background='rgba(13,148,136,0.22)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.9)'; }}
             onMouseLeave={e => { e.currentTarget.style.background='rgba(13,148,136,0.12)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.6)'; }}>
             <span style={{ fontSize:40 }}>🔊</span>
@@ -754,8 +754,8 @@ function IntroScreen({ userName, muted, onDone }: { userName: string; muted: boo
             <h3 style={{ color:'#2dd4bf', fontSize:17, fontWeight:700, margin:'0 0 9px' }}>Can I use your mic?</h3>
             <p style={{ color:'#94a3b8', fontSize:14, lineHeight:1.65, margin:'0 0 22px' }}>Speak your answers instead of typing! Just needs a quick permission grant.</p>
             <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
-              <button onClick={async () => { setShowMic(false); const r=await SpeechEngine.requestMic(); setMicStatus(r); }} style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:11, padding:'12px 18px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>Yes! Enable microphone 🎙️</button>
-              <button onClick={() => { setShowMic(false); setMicStatus('denied'); }} style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.1)', color:'#64748b', borderRadius:11, padding:'10px 18px', fontSize:13, cursor:'pointer', fontFamily:'inherit' }}>No thanks, I'll type</button>
+              <button type="button" onClick={async () => { setShowMic(false); const r=await SpeechEngine.requestMic(); setMicStatus(r); }} style={{ background:'linear-gradient(135deg,#0d9488,#0891b2)', border:'none', color:'white', borderRadius:11, padding:'12px 18px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>Yes! Enable microphone 🎙️</button>
+              <button type="button" onClick={() => { setShowMic(false); setMicStatus('denied'); }} style={{ background:'transparent', border:'1px solid rgba(255,255,255,0.1)', color:'#64748b', borderRadius:11, padding:'10px 18px', fontSize:13, cursor:'pointer', fontFamily:'inherit' }}>No thanks, I'll type</button>
             </div>
           </div>
         </div>
@@ -779,7 +779,7 @@ function SuggestionChips({ suggestions, onSelect, disabled }: any) {
   return (
     <div style={{ display:'flex', flexWrap:'wrap', gap:7, marginTop:8, paddingLeft:31 }}>
       {suggestions.map((s: string, i: number) => (
-        <button key={i} onClick={() => onSelect(s)}
+        <button type="button" key={i} onClick={() => onSelect(s)}
           style={{ background:'rgba(13,148,136,0.08)', border:'1px solid rgba(13,148,136,0.3)', color:'#5eead4', borderRadius:20, padding:'5px 13px', fontSize:12.5, cursor:'pointer', fontFamily:'inherit', transition:'all 0.15s', whiteSpace:'nowrap', lineHeight:1.4 }}
           onMouseEnter={e => { e.currentTarget.style.background='rgba(13,148,136,0.20)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.6)'; }}
           onMouseLeave={e => { e.currentTarget.style.background='rgba(13,148,136,0.08)'; e.currentTarget.style.borderColor='rgba(13,148,136,0.3)'; }}>
@@ -824,8 +824,8 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
           <span style={{ color:'#475569', fontSize:12 }}>· Your ParasitePro Guide</span>
         </div>
         <div style={{ display:'flex', gap:4 }}>
-          {messages.length > 1 && <button onClick={onClear} title="Fresh start" style={{ background:'none', border:'none', color:'#475569', cursor:'pointer', padding:5, borderRadius:7, display:'flex', alignItems:'center', transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}><RotateCcw size={14}/></button>}
-          <button onClick={onClose} style={{ background:'none', border:'none', color:'#475569', cursor:'pointer', padding:5, borderRadius:7, display:'flex', alignItems:'center' }}><ChevronDown size={17}/></button>
+          {messages.length > 1 && <button type="button" onClick={onClear} title="Fresh start" style={{ background:'none', border:'none', color:'#475569', cursor:'pointer', padding:5, borderRadius:7, display:'flex', alignItems:'center', transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}><RotateCcw size={14}/></button>}
+          <button type="button" onClick={onClose} style={{ background:'none', border:'none', color:'#475569', cursor:'pointer', padding:5, borderRadius:7, display:'flex', alignItems:'center' }}><ChevronDown size={17}/></button>
         </div>
       </div>
       <div style={{ flex:1, overflowY:'auto', padding:'13px 13px 7px', display:'flex', flexDirection:'column', gap:11, scrollbarWidth:'thin', scrollbarColor:'rgba(13,148,136,0.25) transparent' }}>
@@ -837,7 +837,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
                 <div style={{ padding:'10px 14px', borderRadius:m.role==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', background:m.role==='user'?'rgba(13,148,136,0.18)':'rgba(15,32,46,0.95)', border:m.role==='user'?'1px solid rgba(13,148,136,0.4)':'1px solid rgba(13,148,136,0.1)' }}>
                   {m.role==='user' ? <p style={{ color:'#f1f5f9', fontSize:14, lineHeight:1.58, margin:0, whiteSpace:'pre-wrap' }}>{m.content}</p> : <MarkdownText text={m.content}/>}
                 </div>
-                {m.role==='assistant' && <button onClick={() => AudioEngine.unlockAndSpeak(m.content, { rate:0.92, pitch:1.05 })} title="Listen" style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}>🔊</button>}
+                {m.role==='assistant' && <button type="button" onClick={() => AudioEngine.unlockAndSpeak(m.content, { rate:0.92, pitch:1.05 })} title="Listen" style={{ marginTop:4, marginLeft:2, background:'none', border:'none', color:'#475569', cursor:'pointer', fontSize:13, padding:'2px 6px', borderRadius:6, transition:'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#0d9488'} onMouseLeave={e => e.currentTarget.style.color='#475569'}>🔊</button>}
               </div>
             </div>
             {m.role==='assistant' && idx===lastAssistantIdx && !loading && m.suggestions && <SuggestionChips suggestions={m.suggestions} onSelect={onSend} disabled={loading}/>}
@@ -856,7 +856,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
       </div>
       <div style={{ padding:'9px 11px', borderTop:'1px solid rgba(255,255,255,0.05)', display:'flex', gap:8, alignItems:'flex-end', flexShrink:0, background:'rgba(6,16,26,0.7)' }}>
         <textarea ref={textareaRef} value={input} onChange={e => { setInput(e.target.value); const ta=textareaRef.current; if(ta){ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,120)+'px';} }} onKeyDown={e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();} }} placeholder="Ask PARA anything…" rows={1} style={{ flex:1, background:'rgba(15,32,46,0.9)', border:'1px solid rgba(13,148,136,0.25)', borderRadius:12, color:'#f1f5f9', fontSize:14, padding:'9px 13px', resize:'none', outline:'none', lineHeight:1.45, overflow:'hidden', fontFamily:'inherit', transition:'border-color 0.2s' }} onFocus={e => e.target.style.borderColor='rgba(13,148,136,0.6)'} onBlur={e => e.target.style.borderColor='rgba(13,148,136,0.25)'}/>
-        <button onClick={submit} disabled={!input.trim()||loading} style={{ width:38, height:38, borderRadius:10, flexShrink:0, background:input.trim()?'#0d9488':'rgba(13,148,136,0.12)', border:'none', cursor:input.trim()?'pointer':'default', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', transform:input.trim()?'scale(1.04)':'scale(1)' }}><Send size={15} color={input.trim()?'white':'#475569'}/></button>
+        <button type="button" onClick={submit} disabled={!input.trim()||loading} style={{ width:38, height:38, borderRadius:10, flexShrink:0, background:input.trim()?'#0d9488':'rgba(13,148,136,0.12)', border:'none', cursor:input.trim()?'pointer':'default', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', transform:input.trim()?'scale(1.04)':'scale(1)' }}><Send size={15} color={input.trim()?'white':'#475569'}/></button>
       </div>
     </div>
   );
@@ -868,7 +868,7 @@ function ChatPanel({ open, onClose, messages, onSend, onClear, loading }: any) {
 function FloatingBot({ mood, speaking, muted, chatOpen, onToggleChat, onToggleMute }: any) {
   return (
     <div style={{ position:'fixed', bottom:76, right:16, zIndex:9991, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
-      <button onClick={onToggleMute} title={muted?'Unmute':'Mute'} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(8,20,28,0.95)', border:`1px solid ${muted?'rgba(255,255,255,0.08)':'rgba(13,148,136,0.5)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
+      <button type="button" onClick={onToggleMute} title={muted?'Unmute':'Mute'} style={{ width:32, height:32, borderRadius:'50%', background:'rgba(8,20,28,0.95)', border:`1px solid ${muted?'rgba(255,255,255,0.08)':'rgba(13,148,136,0.5)'}`, color:muted?'#475569':'#0d9488', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s' }}>
         {muted ? <VolumeX size={13}/> : <Volume2 size={13}/>}
       </button>
       <div onClick={onToggleChat} title="Chat with PARA" style={{ cursor:'pointer', position:'relative', animation:chatOpen?'none':'para-float 3.2s ease-in-out infinite', willChange:'transform' }}>

@@ -44,15 +44,16 @@ const FAQS = [
 const FAQItem = ({ q, a, open, onToggle }) => (
   <div style={{ borderBottom:`1px solid ${C.border}` }}>
     <button
+      type="button"
       onClick={onToggle}
+      aria-expanded={open}
       style={{
         width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
         gap:16, padding:'1.1rem 0', background:'none', border:'none', cursor:'pointer', textAlign:'left',
       }}
     >
       <span style={{ fontWeight:600, fontSize:'0.95rem', color:C.navy, lineHeight:1.4 }}>{q}</span>
-      <span style={{
-        width:24, height:24, borderRadius:'50%', background: open ? C.teal : C.tealSoft,
+      <span aria-hidden="true" style={{
         border:`1.5px solid ${open ? C.teal : C.border}`,
         display:'flex', alignItems:'center', justifyContent:'center',
         color: open ? 'white' : C.tealDark, fontSize:'1rem', fontWeight:700, flexShrink:0,

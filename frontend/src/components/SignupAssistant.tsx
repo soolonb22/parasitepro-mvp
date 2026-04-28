@@ -240,8 +240,11 @@ const ALL_STEPS     = [...INTRO,...INTAKE];
 
 /* ── Main component ──────────────────────────────────────────── */
 export default function SignupAssistant() {
+  // Check if this visitor has interacted before — only auto-open for returning users
+  const hasSeenPara = typeof window !== 'undefined' && !!localStorage.getItem('para_intro_done_guest');
   const [visible,      setVisible]      = useState(false);
-  const [closed,       setClosed]       = useState(false);
+  const [closed,       setClosed]       = useState(!hasSeenPara); // new visitors start closed
+  const [minimised,    setMinimised]    = useState(!hasSeenPara); // show bubble instead
   const [exiting,      setExiting]      = useState(false);
   const [stepIdx,      setStepIdx]      = useState(0);
   const [messages,     setMessages]     = useState([]);
@@ -290,10 +293,18 @@ export default function SignupAssistant() {
     return () => { if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = null; };
   }, []);
 
-  // Auto fly-in — first message silent (no gesture yet)
+  // Auto fly-in — only for returning visitors (hasSeenPara). New visitors see the bubble.
   useEffect(() => {
-    setVisible(true);
-    deliverStep(0, false);
+    if (hasSeenPara) {
+      setVisible(true);
+      setClosed(false);
+      setMinimised(false);
+      deliverStep(0, false);
+    } else {
+      // Show the bubble after a short delay so it doesn't fire instantly on load
+      const t = setTimeout(() => setVisible(true), 3000);
+      return () => clearTimeout(t);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -480,7 +491,7 @@ export default function SignupAssistant() {
     };
     console.log('[SignupAssistant] Intake complete:', collectedData);
     document.dispatchEvent(new CustomEvent('assistant:complete', { detail: collectedData }));
-    setExiting(true); setTimeout(() => setClosed(true), 400);
+    setExiting(true); setTimeout(() => { setMinimised(true); setExiting(false); }, 400);
   }
 
   function renderText(text: string) {
@@ -493,7 +504,30 @@ export default function SignupAssistant() {
   const currentStep = ALL_STEPS[stepIdx];
   const showOptions = !thinking && !showSummary && currentStep?.options;
 
-  if (!visible || closed) return null;
+  if (!visible) return null;
+
+  // New visitors see a floating bubble — clicking opens the assistant
+  if (minimised || closed) {
+    return (
+      <button
+        onClick={() => { setClosed(false); setMinimised(false); deliverStep(0, false); }}
+        aria-label="Chat with PARA, your ParasitePro guide"
+        style={{
+          position:'fixed', bottom:20, right:20,
+          width:58, height:58, borderRadius:'50%',
+          background:'linear-gradient(135deg,#0d9488,#0891b2)',
+          border:'2px solid rgba(255,255,255,0.25)',
+          boxShadow:'0 8px 24px rgba(0,0,0,0.4)',
+          cursor:'pointer', zIndex:9999,
+          display:'flex', alignItems:'center', justifyContent:'center',
+          animation:'sa-flyin 0.45s cubic-bezier(0.34,1.56,0.64,1)',
+        }}
+      >
+        <span style={{ fontSize:'1.5rem' }}>🦠</span>
+        <style>{`@keyframes sa-flyin{from{transform:translateY(80px) scale(0.8);opacity:0}to{transform:none;opacity:1}}`}</style>
+      </button>
+    );
+  }
 
   return (
     <>
@@ -531,7 +565,7 @@ export default function SignupAssistant() {
           >{voiceOn?'🔊':'🔇'}</button>
 
           {/* ✕ Close */}
-          <button onClick={() => { window.speechSynthesis?.cancel(); stopMic(); setExiting(true); setTimeout(()=>setClosed(true),400); }}
+          <button onClick={() => { window.speechSynthesis?.cancel(); stopMic(); setExiting(true); setTimeout(()=>{ setMinimised(true); setExiting(false); },400); }}
             aria-label="Close assistant"
             style={{background:'rgba(255,255,255,0.1)',border:'1.5px solid rgba(255,255,255,0.25)',borderRadius:8,width:32,height:32,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'white',fontSize:17,flexShrink:0}}
           >✕</button>

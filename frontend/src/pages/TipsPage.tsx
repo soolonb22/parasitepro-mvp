@@ -1,9 +1,16 @@
 // @ts-nocheck
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 export default function TipsPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      <SEO
+        title="Free Parasite Tips & Guides for Australians"
+        description="Free educational articles on parasites in Australia — wet season risks, pet worms, Bali gut, pinworms in kids, and camping safety. Learn the signs and when to see your GP."
+        canonical="/tips"
+        ogType="article"
+      />
       <div className="max-w-4xl mx-auto px-6 py-16">
 
         {/* Header */}
