@@ -5,6 +5,8 @@ import { useAuthStore } from '../store/authStore';
 import SEO from '../components/SEO';
 import TrustBar from '../components/TrustBar';
 import TestimonialsSection from '../components/TestimonialsSection';
+import HomepageFAQ from '../components/HomepageFAQ';
+import HeroPhoneMockup from '../components/HeroPhoneMockup';
 import SignupAssistant from '../components/SignupAssistant';
 
 /* ─── Brand tokens — Image 4 reference ─────────────────────────────── */
@@ -303,6 +305,17 @@ const LandingPage = () => {
           <ParaWoman style={{ width:'100%', height:'100%', objectFit:'contain', objectPosition:'bottom right' }}/>
         </div>
 
+        {/* ── Phone mockup — bottom right, above PARA watermark ── */}
+        <div style={{
+          position: 'absolute',
+          right: 'clamp(1rem, 6vw, 5rem)',
+          bottom: 'clamp(1.5rem, 4vw, 3rem)',
+          zIndex: 2,
+          display: 'none',
+        }} className="hero-phone-mockup">
+          <HeroPhoneMockup />
+        </div>
+
         {/* ── Text + CTAs — positioned over the full width ── */}
         <div style={{
           position: 'relative',
@@ -466,6 +479,9 @@ const LandingPage = () => {
 
       {/* ── TESTIMONIALS ─────────────────────────────────────────────── */}
       <TestimonialsSection />
+
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <HomepageFAQ />
 
       {/* ── PRICING ANCHOR ───────────────────────────────────────────── */}
       <section style={{ background:C.navy, padding:'clamp(3rem,6vw,4.5rem) 1.5rem' }}>

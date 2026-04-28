@@ -15,7 +15,7 @@ import { Check, Zap, Shield, Clock, HelpCircle, ChevronDown, ChevronUp, ArrowLef
 const FAQItem = ({ question, answer }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '1rem 0' }}>
+    <div style={{ borderBottom: '1px solid #C8E6D8', padding: '1rem 0' }}>
       <button onClick={() => setOpen(!open)} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', width:'100%', background:'none', border:'none', padding:0, cursor:'pointer', textAlign:'left' }}>
         <span style={{ fontWeight:600, color:'var(--text-primary)', fontSize:'0.95rem' }}>{question}</span>
         {open ? <ChevronUp size={18} style={{ color:'var(--amber)', flexShrink:0 }} /> : <ChevronDown size={18} style={{ color:'var(--text-muted)', flexShrink:0 }} />}
@@ -73,7 +73,21 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="pp-page" style={{ minHeight:'100vh' }}>
+    <div style={{
+      minHeight:'100vh',
+      background:'#F2F7F4',
+      '--bg-base': '#F2F7F4',
+      '--bg-surface': '#FFFFFF',
+      '--bg-elevated': '#FFFFFF',
+      '--bg-border': '#C8E6D8',
+      '--text-primary': '#1A365D',
+      '--text-secondary': '#334155',
+      '--text-muted': '#6B7280',
+      '--amber': '#0d9488',
+      '--amber-bright': '#0d9488',
+      '--amber-dim': '#0f766e',
+      fontFamily:'"Inter","DM Sans",system-ui,sans-serif',
+    }}>
       <SEO title="Pricing — ParasitePro | Credit Bundles AUD" description="AI parasite analysis credits. Pay only for what you use — credits never expire." canonical="/pricing" />
       <div style={{ maxWidth:860, margin:'0 auto', padding:'48px 24px' }}>
         <button onClick={() => navigate(user ? '/dashboard' : '/')} style={{ background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer', display:'flex', alignItems:'center', gap:6, fontSize:13, marginBottom:32, fontFamily:'var(--font-body)' }}>
@@ -89,8 +103,8 @@ const PricingPage = () => {
           <UrgencyTimer label="Beta pricing ends" initialMinutes={20} />
         </div>
 
-        <div style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.12) 0%,rgba(99,102,241,0.12) 100%)', border:'1px solid rgba(124,58,237,0.25)', borderRadius:12, padding:'16px 20px', marginBottom:32, textAlign:'center' }}>
-          <span style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'#a78bfa', letterSpacing:'0.06em' }}>BETA TESTER? </span>
+        <div style={{ background:'#E1F8F4', border:'1px solid #C8E6D8', borderRadius:12, padding:'16px 20px', marginBottom:32, textAlign:'center' }}>
+          <span style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'#008B7A', letterSpacing:'0.06em' }}>BETA TESTER? </span>
           <span style={{ color:'var(--text-secondary)', fontSize:14 }}>Use code <code style={{ color:'var(--amber)', fontFamily:'var(--font-mono)', background:'rgba(217,119,6,0.1)', padding:'2px 6px', borderRadius:4 }}>BETA3FREE</code> at signup for 3 free credits</span>
         </div>
 
@@ -102,7 +116,7 @@ const PricingPage = () => {
           {bundles.map(b => (
             <div key={b.id} className="pp-card" style={{ padding:'28px 24px', position:'relative', border:b.popular?'1px solid rgba(217,119,6,0.5)':undefined, textAlign:'center' }}>
               {b.popular && (
-                <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:'var(--amber)', color:'#0E0F11', padding:'3px 14px', borderRadius:20, fontSize:11, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.06em', whiteSpace:'nowrap' }}>MOST POPULAR</div>
+                <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:'#0d9488', color:'#FFFFFF', padding:'3px 14px', borderRadius:20, fontSize:11, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.06em', whiteSpace:'nowrap' }}>MOST POPULAR</div>
               )}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:12 }}>
                 <Zap size={18} style={{ color:'var(--amber)' }} />

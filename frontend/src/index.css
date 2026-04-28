@@ -151,3 +151,8 @@ body {
 
 /* ─── Legacy ──────────────────────────────────────────────────────────────── */
 .para-hat { filter: brightness(1.05); }
+
+/* ─── Hero phone mockup — show on large screens only ──────────────────────── */
+@media (min-width: 900px) {
+  .hero-phone-mockup { display: block !important; }
+}
