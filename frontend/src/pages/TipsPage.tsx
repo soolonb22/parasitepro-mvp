@@ -26,6 +26,7 @@ export default function TipsPage() {
             <span className="text-5xl">🌧️</span>
             <h2 className="text-2xl md:text-3xl font-semibold">Wet Season Parasites in Mackay & North Queensland</h2>
           </div>
+          <img src="/tips/tips-wet-season.png" alt="Queensland wet season flooding — parasite risk season in tropical QLD" style={{ width:'100%', borderRadius:12, marginBottom:'1.5rem', maxHeight:340, objectFit:'cover', objectPosition:'center' }} />
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
               Queensland's wet season brings more rain, warmer soil, and increased activity of certain parasites in both people and pets.
@@ -77,6 +78,7 @@ export default function TipsPage() {
             <span className="text-5xl">🐶</span>
             <h2 className="text-2xl md:text-3xl font-semibold">Pet Worms & Zoonotic Risks for QLD Families</h2>
           </div>
+          <img src="/tips/tips-kids-feet-dirt.png" alt="Child's bare feet on Queensland soil — zoonotic parasite exposure risk from pets" style={{ width:'100%', borderRadius:12, marginBottom:'1.5rem', maxHeight:340, objectFit:'cover', objectPosition:'center' }} />
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
               Many families in Queensland share their home with dogs or cats. Some worms can pass between pets and people — these are called zoonotic parasites.
@@ -128,6 +130,7 @@ export default function TipsPage() {
             <span className="text-5xl">✈️</span>
             <h2 className="text-2xl md:text-3xl font-semibold">Gut Symptoms After Travel to Bali or SE Asia</h2>
           </div>
+          <img src="/tips/tips-bali.png" alt="Bali street food market — gut parasite exposure risk for Australian travellers" style={{ width:'100%', borderRadius:12, marginBottom:'1.5rem', maxHeight:340, objectFit:'cover', objectPosition:'center' }} />
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
               Many Australians return from Bali or Southeast Asia with changes in bowel habits.
@@ -179,6 +182,7 @@ export default function TipsPage() {
             <span className="text-5xl">👶</span>
             <h2 className="text-2xl md:text-3xl font-semibold">Pinworms in Kids — What Queensland Parents Often Notice</h2>
           </div>
+          <img src="/tips/tips-pinworms.png" alt="Pinworms in children — common in Queensland classrooms and childcare" style={{ width:'100%', borderRadius:12, marginBottom:'1.5rem', maxHeight:340, objectFit:'cover', objectPosition:'center' }} />
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
               Pinworms (threadworms) are one of the most common parasitic infections in Australian children.
@@ -231,6 +235,7 @@ export default function TipsPage() {
             <span className="text-5xl">🏕️</span>
             <h2 className="text-2xl md:text-3xl font-semibold">Camping & Bushwalking — Parasite Awareness for Outdoor Lovers</h2>
           </div>
+          <img src="/tips/tips-camping.png" alt="Camping at Eungella National Park QLD — parasite awareness for outdoor lovers" style={{ width:'100%', borderRadius:12, marginBottom:'1.5rem', maxHeight:340, objectFit:'cover', objectPosition:'center' }} />
           <div className="space-y-5 text-gray-300 text-base leading-relaxed">
             <p>
               Queensland's Whitsundays, Eungella National Park, and Cape Hillsborough attract thousands of campers each year.
