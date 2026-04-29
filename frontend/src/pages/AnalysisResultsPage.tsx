@@ -448,6 +448,44 @@ const AnalysisResultsPage = () => {
           </p>
         </div>
 
+        {/* Low / zero credit nudge — shows when ≤ 1 credit remaining */}
+        {userCredits <= 1 && (
+          <div style={{
+            background: userCredits === 0
+              ? 'linear-gradient(135deg,#7f1d1d,#991b1b)'
+              : 'linear-gradient(135deg,#78350f,#92400e)',
+            border: userCredits === 0
+              ? '1.5px solid rgba(239,68,68,0.5)'
+              : '1.5px solid rgba(245,158,11,0.5)',
+            borderRadius: 14, padding: '1rem 1.25rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 12, flexWrap: 'wrap', marginBottom: '1rem',
+          }}>
+            <div>
+              <p style={{ color: 'white', fontWeight: 800, fontSize: '0.9rem', margin: '0 0 0.2rem' }}>
+                {userCredits === 0
+                  ? '⚠️ You\'re out of credits'
+                  : '⚠️ Last credit remaining'}
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.78rem', margin: 0 }}>
+                {userCredits === 0
+                  ? 'Get more credits to run another analysis — household pack covers everyone.'
+                  : 'After this, you\'ll need to top up. Household pack = 10 credits for $34.99.'}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/pricing')}
+              style={{
+                background: 'white', color: '#0F2733',
+                border: 'none', borderRadius: 10, padding: '9px 18px',
+                fontSize: '0.82rem', fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+              }}
+            >
+              Get more credits →
+            </button>
+          </div>
+        )}
+
         {/* Disclaimer banners */}
         <DisclaimerBanner />
 

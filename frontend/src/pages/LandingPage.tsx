@@ -560,6 +560,9 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ── TESTIMONIALS ─────────────────────────────────────────────── */}
+      <TestimonialsSection />
+
       {/* ── FAQ ──────────────────────────────────────────────────────── */}
       <HomepageFAQ />
 
@@ -577,10 +580,11 @@ const LandingPage = () => {
             First analysis completely free. Credits in bundles — no subscription, no monthly fee.
           </p>
           <div style={{
-            display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',
+            display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',
             gap:'1rem', marginBottom:'2rem',
           }}>
             {[
+              { credits:2,  price:'$9.99',  ppc:'$4.99 each', tag:'Not sure yet?' },
               { credits:5,  price:'$19.99', ppc:'$4.00 each' },
               { credits:10, price:'$34.99', ppc:'$3.50 each', hot:true },
               { credits:25, price:'$74.99', ppc:'$3.00 each' },
@@ -595,6 +599,11 @@ const LandingPage = () => {
                   background:C.green, color:'white', fontSize:'0.65rem', fontWeight:800,
                   padding:'2px 10px', borderRadius:20, letterSpacing:'0.06em', whiteSpace:'nowrap',
                 }}>BEST VALUE</div>}
+                {b.tag && !b.hot && <div style={{
+                  position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)',
+                  background:'#64748b', color:'white', fontSize:'0.62rem', fontWeight:800,
+                  padding:'2px 10px', borderRadius:20, letterSpacing:'0.06em', whiteSpace:'nowrap',
+                }}>{b.tag.toUpperCase()}</div>}
                 <div style={{ fontSize:'1.75rem', fontWeight:900, color:'white', marginBottom:2 }}>{b.credits}</div>
                 <div style={{ fontSize:'0.7rem', color:'rgba(255,255,255,0.65)', marginBottom:4 }}>analyses</div>
                 <div style={{ fontSize:'1.15rem', fontWeight:800, color:'white' }}>{b.price}</div>

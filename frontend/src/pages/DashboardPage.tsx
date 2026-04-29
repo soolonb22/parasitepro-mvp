@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 import { PARA } from '../utils/para-copy';
+import ReferralSection from '../components/ReferralSection';
 
 /* ── PARA video for welcome modal (cycles WELCOME_1 → WELCOME_2) ── */
 const WELCOME_VIDEOS = [
@@ -291,6 +292,11 @@ const DashboardPage: React.FC = () => {
               <span>{icon}</span>{label}
             </button>
           ))}
+        </div>
+
+        {/* Refer a friend — viral loop */}
+        <div className="mt-6">
+          <ReferralSection userId={user?.id || ''} />
         </div>
       </div>
     </div>

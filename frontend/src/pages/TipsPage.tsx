@@ -49,6 +49,28 @@ export default function TipsPage() {
           </div>
         </article>
 
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
+
         {/* Article 2 - Pet Worms */}
         <article className="mb-16 pb-16 border-b border-white/10">
           <div className="flex items-center gap-4 mb-6">
@@ -78,6 +100,28 @@ export default function TipsPage() {
           </div>
         </article>
 
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
+
         {/* Article 3 - Travel Gut Issues */}
         <article className="mb-16 pb-16 border-b border-white/10">
           <div className="flex items-center gap-4 mb-6">
@@ -106,6 +150,28 @@ export default function TipsPage() {
             </ul>
           </div>
         </article>
+
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
 
         {/* Article 4 - Pinworms in Kids */}
         <article className="mb-16 pb-16 border-b border-white/10">
@@ -137,6 +203,28 @@ export default function TipsPage() {
           </div>
         </article>
 
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
+
         {/* Article 5 - Camping */}
         <article className="mb-16">
           <div className="flex items-center gap-4 mb-6">
@@ -167,6 +255,28 @@ export default function TipsPage() {
           </div>
         </article>
 
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
+
         {/* Article 6 - Bristol Stool Chart */}
         <article className="mb-16 pb-16 border-b border-white/10">
           <div className="flex items-center gap-4 mb-6">
@@ -194,6 +304,28 @@ export default function TipsPage() {
             <p className="text-sm text-gray-400 mt-6">This is general educational information only. It does not replace professional medical advice.</p>
           </div>
         </article>
+
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
 
         {/* Article 7 - Skin Rash Patterns */}
         <article className="mb-16 pb-16 border-b border-white/10">
@@ -223,6 +355,28 @@ export default function TipsPage() {
             <p className="text-sm text-gray-400 mt-6">This is general educational information only. It does not replace professional medical advice.</p>
           </div>
         </article>
+
+        {/* ── Upload CTA strip ─── */}
+        <div style={{
+          background:'linear-gradient(135deg,#0F2733 0%,#1B6B5F 100%)',
+          borderRadius:16, padding:'1.25rem 1.5rem',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          gap:16, flexWrap:'wrap', marginBottom:'3.5rem',
+        }}>
+          <div>
+            <p style={{ color:'white', fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.2rem' }}>
+              Seen something that looks like this?
+            </p>
+            <p style={{ color:'rgba(255,255,255,0.65)', fontSize:'0.8rem', margin:0 }}>
+              Upload a photo and get a structured educational report in 60 seconds.
+            </p>
+          </div>
+          <a href="/upload" style={{
+            background:'#5AB89A', color:'white', fontWeight:800,
+            fontSize:'0.85rem', padding:'10px 20px', borderRadius:10,
+            textDecoration:'none', whiteSpace:'nowrap', flexShrink:0,
+          }}>Upload a photo — first one's free →</a>
+        </div>
 
         {/* Upsell */}
         <div className="mt-12 bg-white/5 border border-emerald-500/30 rounded-3xl p-10 text-center">
