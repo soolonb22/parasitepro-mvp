@@ -478,6 +478,21 @@ export default function UploadPage() {
         <input ref={fileInputRef} type="file" accept="image/jpeg,image/png" className="hidden"
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
 
+        {/* Privacy reassurance — removes the #1 abandonment trigger for health apps */}
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: 10,
+          background: 'rgba(27,107,95,0.06)',
+          border: '1px solid rgba(27,107,95,0.18)',
+          borderRadius: 12, padding: '10px 14px',
+        }}>
+          <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: 1 }}>🔒</span>
+          <p style={{ fontSize: '0.74rem', color: '#4A6B62', margin: 0, lineHeight: 1.55 }}>
+            <strong>Your photos are private.</strong> Images are processed securely and are not
+            stored on our servers beyond your session. We never use your photos to train AI models,
+            and we don't know who you are unless you tell us.
+          </p>
+        </div>
+
         {error && (
           <p className="text-sm text-center rounded-xl p-3"
             style={{ color: '#EF4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>

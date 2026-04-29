@@ -79,6 +79,8 @@ const GPReportPage = () => {
   const [copying, setCopying]   = useState(false);
   const [showMHR, setShowMHR]             = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showUpsell, setShowUpsell]       = useState(false);
+  const [upsellLoading, setUpsellLoading] = useState('');
 
   useEffect(() => { fetchAnalysis(); }, [id]);
 
@@ -103,10 +105,27 @@ const GPReportPage = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setAnalysis(res.data);
+      // Fire upsell modal 3.5s after report loads — peak concern moment
+      setTimeout(() => setShowUpsell(true), 3500);
     } catch {
       toast.error('Failed to load report');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpsellPurchase = async (bundleId) => {
+    if (!user) { navigate('/login'); return; }
+    setUpsellLoading(bundleId);
+    try {
+      const res = await axios.post(`${API_URL}/payment/create-checkout-session`,
+        { bundleId },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      window.location.href = res.data.sessionUrl;
+    } catch {
+      toast.error('Payment failed — please try again.');
+      setUpsellLoading('');
     }
   };
 
@@ -522,6 +541,132 @@ const GPReportPage = () => {
               style={{ width: '100%', background: '#111', color: '#fff', border: 'none', borderRadius: 14, padding: '14px', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer' }}
             >
               Got it, thanks
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── POST-ANALYSIS UPSELL MODAL ─────────────────────────────────
+          Fires 3.5s after report loads. Peak concern moment.
+          Primary: 10-credit household pack. Downsell: 5 credits.
+          Dismiss copy: "No thanks, I'll risk it" (intentional friction).
+      ───────────────────────────────────────────────────────────────── */}
+      {showUpsell && (
+        <div
+          onClick={e => e.target === e.currentTarget && setShowUpsell(false)}
+          className="no-print"
+          style={{
+            position: 'fixed', inset: 0, zIndex: 99999,
+            background: 'rgba(0,0,0,0.75)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '1rem',
+            backdropFilter: 'blur(6px)',
+            animation: 'upsellFadeIn 0.35s ease both',
+          }}
+        >
+          <style>{`@keyframes upsellFadeIn { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }`}</style>
+          <div style={{
+            background: '#fff', borderRadius: 24,
+            width: '100%', maxWidth: 400,
+            padding: '2rem 1.75rem', position: 'relative',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.55)',
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setShowUpsell(false)}
+              style={{
+                position: 'absolute', top: 14, right: 14,
+                background: '#f1f5f9', border: 'none', color: '#64748b',
+                width: 30, height: 30, borderRadius: '50%',
+                cursor: 'pointer', fontSize: '1rem', fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >×</button>
+
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '2.2rem', marginBottom: '0.4rem' }}>⚠️</div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F2733', margin: '0 0 0.5rem', lineHeight: 1.2 }}>
+                Your report is ready.
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: '#4B5563', margin: 0, lineHeight: 1.65 }}>
+                If you have <strong>pets, a partner, or kids in the same house</strong> —
+                this usually isn't a one-person situation.
+              </p>
+            </div>
+
+            {/* Primary CTA — 10 credit household pack */}
+            <div style={{
+              background: '#FFFBEB', border: '2.5px solid #F59E0B',
+              borderRadius: 16, padding: '1.25rem', marginBottom: '0.75rem', position: 'relative',
+            }}>
+              <div style={{
+                position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)',
+                background: '#F59E0B', color: 'white',
+                fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.07em',
+                padding: '3px 14px', borderRadius: 20, whiteSpace: 'nowrap',
+              }}>
+                MOST POPULAR — HOUSEHOLD PACK
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F2733' }}>10 Credits</div>
+                <div style={{ fontSize: '0.75rem', color: '#9CA3AF', textDecoration: 'line-through' }}>$39.99</div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>AUD $34.99</div>
+                <div style={{ fontSize: '0.7rem', color: '#6B7280', margin: '0.2rem 0 0.75rem' }}>
+                  Covers the whole family — credits never expire
+                </div>
+                <button
+                  onClick={() => handleUpsellPurchase('bundle_10')}
+                  disabled={!!upsellLoading}
+                  style={{
+                    width: '100%', padding: '13px',
+                    background: upsellLoading === 'bundle_10' ? '#9CA3AF' : '#0F2733',
+                    color: 'white', border: 'none', borderRadius: 12,
+                    fontSize: '0.93rem', fontWeight: 800, cursor: 'pointer',
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  {upsellLoading === 'bundle_10' ? 'Opening checkout…' : 'Get 10 Credits — $34.99'}
+                </button>
+              </div>
+            </div>
+
+            {/* Downsell — 5 credits */}
+            <button
+              onClick={() => handleUpsellPurchase('bundle_5')}
+              disabled={!!upsellLoading}
+              style={{
+                width: '100%', padding: '11px',
+                background: 'white', color: '#374151',
+                border: '1.5px solid #D1D5DB', borderRadius: 12,
+                fontSize: '0.86rem', fontWeight: 600, cursor: 'pointer',
+                marginBottom: '0.75rem',
+              }}
+            >
+              {upsellLoading === 'bundle_5' ? 'Opening checkout…' : '5 Credits — AUD $19.99'}
+            </button>
+
+            {/* Subscription micro-pitch */}
+            <p style={{ textAlign: 'center', fontSize: '0.73rem', color: '#9CA3AF', margin: 0 }}>
+              Or{' '}
+              <span
+                onClick={() => { setShowUpsell(false); navigate('/pricing'); }}
+                style={{ color: '#0d9488', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}
+              >
+                get unlimited peace of mind for $6/mo →
+              </span>
+            </p>
+
+            {/* Dismiss — psychological friction wording */}
+            <button
+              onClick={() => setShowUpsell(false)}
+              style={{
+                display: 'block', margin: '0.85rem auto 0',
+                background: 'none', border: 'none',
+                color: '#C4C9D0', fontSize: '0.7rem', cursor: 'pointer',
+              }}
+            >
+              No thanks, I'll risk it
             </button>
           </div>
         </div>

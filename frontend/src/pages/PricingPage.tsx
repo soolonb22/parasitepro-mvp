@@ -36,9 +36,10 @@ const PricingPage = () => {
   const [showMobilePurchase, setShowMobilePurchase] = useState(false);
 
   const bundles = [
-    { id:'bundle_5',  name:'5 Credits',  price:'AUD $19.99', credits:5,  perCredit:'$4.00', popular:false },
-    { id:'bundle_10', name:'10 Credits', price:'AUD $34.99', credits:10, perCredit:'$3.50', popular:true  },
-    { id:'bundle_25', name:'25 Credits', price:'AUD $74.99', credits:25, perCredit:'$3.00', popular:false },
+    { id:'bundle_2',  name:'Starter Pack', price:'AUD $9.99',  credits:2,  perCredit:'$4.99', popular:false, tag:'Not sure yet?' },
+    { id:'bundle_5',  name:'5 Credits',    price:'AUD $19.99', credits:5,  perCredit:'$4.00', popular:false, tag:null },
+    { id:'bundle_10', name:'10 Credits',   price:'AUD $34.99', credits:10, perCredit:'$3.50', popular:true,  tag:null },
+    { id:'bundle_25', name:'25 Credits',   price:'AUD $74.99', credits:25, perCredit:'$3.00', popular:false, tag:'Best value' },
   ];
 
   const faqs = [
@@ -114,9 +115,12 @@ const PricingPage = () => {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))', gap:20, marginBottom:40 }}>
           {bundles.map(b => (
-            <div key={b.id} className="pp-card" style={{ padding:'28px 24px', position:'relative', border:b.popular?'1px solid rgba(217,119,6,0.5)':undefined, textAlign:'center' }}>
+            <div key={b.id} className="pp-card" style={{ padding:'28px 24px', position:'relative', border:b.popular?'1px solid rgba(217,119,6,0.5)':b.tag==='Best value'?'1px solid rgba(34,197,94,0.4)':undefined, textAlign:'center' }}>
               {b.popular && (
                 <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:'#0d9488', color:'#FFFFFF', padding:'3px 14px', borderRadius:20, fontSize:11, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.06em', whiteSpace:'nowrap' }}>MOST POPULAR</div>
+              )}
+              {!b.popular && b.tag && (
+                <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:b.tag==='Best value'?'#16a34a':'#64748b', color:'#FFFFFF', padding:'3px 14px', borderRadius:20, fontSize:11, fontFamily:'var(--font-mono)', fontWeight:700, letterSpacing:'0.06em', whiteSpace:'nowrap' }}>{b.tag.toUpperCase()}</div>
               )}
               <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, marginBottom:12 }}>
                 <Zap size={18} style={{ color:'var(--amber)' }} />

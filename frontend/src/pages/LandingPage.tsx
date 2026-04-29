@@ -364,11 +364,11 @@ const LandingPage = () => {
             margin: '0 0 clamp(1.5rem,3vw,2.5rem)',
             maxWidth: 820,
           }}>
-            Found something{' '}<br/>
-            concerning in your stool?{' '}<br/>
-            <span style={{ fontSize:'clamp(1.8rem,4.5vw,3.4rem)', fontWeight:700, opacity:0.88 }}>
-              Get fast AI-powered analysis in{' '}
-              60 seconds – no lab visit required
+            You worm the dog.<br/>
+            Who worms the kids?
+            <span style={{ fontSize:'clamp(1.4rem,3.2vw,2.2rem)', fontWeight:600, opacity:0.82, lineHeight:1.4, display:'block', marginTop:'0.6rem' }}>
+              Upload a photo. Get a structured educational report in 60 seconds.
+              Take it to your GP with confidence — not panic.
             </span>
           </h1>
 
@@ -398,7 +398,7 @@ const LandingPage = () => {
               onMouseEnter={e=>{e.currentTarget.style.background='#1A3D4F';e.currentTarget.style.transform='translateY(-2px)';}}
               onMouseLeave={e=>{e.currentTarget.style.background='#0F2733';e.currentTarget.style.transform='none';}}
             >
-              Upload Photo for Analysis
+              Upload Your Photo — First One's Free
             </button>
 
             {/* Secondary — "See a Sample Report" navigates to sample report page */}
@@ -427,6 +427,59 @@ const LandingPage = () => {
 
           {/* Trust bar — pill component */}
           <TrustBar variant="sage" />
+        </div>
+      </section>
+
+      {/* ── TRUST STATS STRIP ────────────────────────────────────────── */}
+      <section style={{ background: '#0F2733', padding: 'clamp(1.5rem,3vw,2.5rem) 1.5rem' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+          <p style={{
+            textAlign: 'center', color: 'rgba(255,255,255,0.4)',
+            fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.1em',
+            textTransform: 'uppercase', marginBottom: '1.5rem',
+          }}>
+            Built for Australians · Australian Privacy Act Compliant
+          </p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(155px, 1fr))',
+            gap: '1rem', marginBottom: '1.5rem',
+          }}>
+            {[
+              { num: '44',   label: 'Organisms in Scientific Library', icon: '🔬' },
+              { num: 'QLD',  label: 'Geographic context in every report', icon: '🗺️' },
+              { num: '60s',  label: 'Average report generation time', icon: '⚡' },
+              { num: 'FREE', label: 'First analysis — no credit card', icon: '🎁' },
+            ].map(({ num, label, icon }) => (
+              <div key={num} style={{
+                textAlign: 'center',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: 14, padding: '1.25rem 1rem',
+              }}>
+                <div style={{ fontSize: '1.3rem', marginBottom: '0.3rem' }}>{icon}</div>
+                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#5AB89A', letterSpacing: '-0.03em', lineHeight: 1 }}>{num}</div>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.4rem', lineHeight: 1.4 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            {[
+              '🔒 Educational Use Only — Not a Medical Device',
+              '🛡️ Images Not Stored Beyond Your Session',
+              '📋 GP-Ready Report Format',
+            ].map(badge => (
+              <span key={badge} style={{
+                fontSize: '0.68rem',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: '9999px', padding: '5px 13px',
+                color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap',
+              }}>
+                {badge}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 

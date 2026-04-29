@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-
+import SeasonalBanner from './SeasonalBanner';
 const CreditPill = ({ credits }) => {
   const colour =
     credits === 0 ? '#ef4444' : credits <= 2 ? '#f59e0b' : '#0d9488';
@@ -73,6 +73,8 @@ const Navbar = () => {
   const navLinks = isAuthenticated ? authLinks : publicLinks;
 
   return (
+    <>
+    <SeasonalBanner />
     <nav style={{
       position: 'sticky', top: 0, zIndex: 50,
       background: 'white', borderBottom: '1px solid #e2e8f0',
@@ -298,6 +300,7 @@ const Navbar = () => {
         </div>
       )}
     </nav>
+    </>
   );
 };
 
