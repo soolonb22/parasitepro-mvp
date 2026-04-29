@@ -12,7 +12,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '20
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.notworms.com';
 
 // Credit bundles — live Stripe price IDs (AUD)
-const BUNDLES: Record<string, { credits: number; priceId: string; label: string; aud: number; popular?: boolean }> = {
+// bundle_2 uses inline price_data (no pre-created Stripe price needed)
+const BUNDLES: Record<string, { credits: number; priceId?: string; priceData?: { unit_amount: number; currency: string; product_data: { name: string; description: string } }; label: string; aud: number; popular?: boolean }> = {
+  bundle_2:  {
+    credits: 2,
+    priceData: {
+      unit_amount: 999,
+      currency: 'aud',
+      product_data: { name: 'ParasitePro Starter Pack — 2 Credits', description: '2 AI parasite analysis credits. Perfect for a first look. Credits never expire.' },
+    },
+    label: 'Starter Pack (2 Credits)', aud: 999,
+  },
   bundle_5:  { credits: 5,  priceId: 'price_1T9ZvVI3iOfYVCAUk9F9LnbV', label: '5 Credits',  aud: 1999 },
   bundle_10: { credits: 10, priceId: 'price_1T9ZvVI3iOfYVCAUKy6XHMnR', label: '10 Credits', aud: 3499, popular: true },
   bundle_25: { credits: 25, priceId: 'price_1T9ZvWI3iOfYVCAUarVuV29g', label: '25 Credits', aud: 7499 },
@@ -44,7 +54,14 @@ router.post('/create-checkout-session', authenticateToken,
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        line_items: [{ price: bundle.priceId, quantity: 1 }],
+        line_items: [{
+          // Use pre-created Stripe price if available, otherwise use inline price_data
+          ...(bundle.priceId
+            ? { price: bundle.priceId }
+            : { price_data: bundle.priceData }
+          ),
+          quantity: 1,
+        }],
         success_url: `${FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${FRONTEND_URL}/pricing?cancelled=1`,
         customer_email: email,
