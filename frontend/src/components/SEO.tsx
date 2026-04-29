@@ -14,7 +14,7 @@ interface SEOProps {
 
 const SITE_NAME = 'Parasite ID Pro';
 const BASE_URL = 'https://notworms.com';
-const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
+const DEFAULT_OG_IMAGE = `${BASE_URL}/hero-ad.jpg`;
 const DEFAULT_KEYWORDS =
   'parasite identification Australia, worms in stool, parasite symptoms, gut health, AI health education, Queensland parasites, post-travel gut symptoms, tapeworm, pinworm, roundworm, hookworm';
 

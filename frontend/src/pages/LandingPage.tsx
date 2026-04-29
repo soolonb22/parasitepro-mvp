@@ -322,6 +322,16 @@ const LandingPage = () => {
         overflow: 'hidden',
         minHeight: 'clamp(360px, 55vw, 560px)',
       }}>
+        {/* ── Atmospheric hero image — low opacity background ── */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url(/hero-ad.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center right',
+          opacity: 0.08,
+          pointerEvents: 'none',
+          borderRadius: 24,
+        }} />
         {/* ── PARA woman — absolute right, large watermark ── */}
         <div style={{
           position: 'absolute',
