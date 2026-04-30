@@ -388,6 +388,14 @@ export default function UploadPage() {
         body: fd,
       });
       const data = await res.json();
+
+      // Expired / invalid token — clear session and redirect to login
+      if (res.status === 401 || res.status === 403) {
+        useAuthStore.getState().logout?.();
+        navigate('/login?reason=session_expired');
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error || 'Upload failed');
       clearForm();
       navigate(`/analysis/${data.analysisId}`);

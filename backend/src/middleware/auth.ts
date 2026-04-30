@@ -38,5 +38,5 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 
 export const generateAccessToken = (userId: string, email: string): string => {
   const secret = process.env.JWT_SECRET!;
-  return jwt.sign({ userId, email }, secret, { expiresIn: '1h' });
+  return jwt.sign({ userId, email }, secret, { expiresIn: '7d' });
 };

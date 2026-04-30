@@ -124,6 +124,9 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [showPass, setShowPass] = useState(false);
 
+  // Show friendly message when redirected due to session expiry
+  const sessionExpired = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('reason') === 'session_expired';
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setError(''); setLoading(true);
     const form = e.currentTarget;
@@ -132,7 +135,7 @@ function LoginPage() {
     try {
       const res = await fetch(`${API_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
       const data = await res.json();
-      if (res.ok) { login(data.user, data.accessToken, data.refreshToken); window.location.href = '/dashboard'; }
+      if (res.ok) { login(data.user, data.accessToken, data.refreshToken); window.location.href = '/upload'; }
       else setError(data.error || 'Login failed. Check your credentials.');
     } catch { setError('Unable to connect. Please try again.'); }
     finally { setLoading(false); }
@@ -141,6 +144,16 @@ function LoginPage() {
   return (
     <AuthShell mode="login">
       <div className="animate-slide-up space-y-7">
+        {/* Session expired notice */}
+        {sessionExpired && (
+          <div style={{
+            background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.4)',
+            borderRadius: 10, padding: '10px 14px',
+            fontSize: '0.82rem', color: '#FCD34D', lineHeight: 1.5,
+          }}>
+            🔒 Your session expired — just sign back in and you'll go straight back to your analysis.
+          </div>
+        )}
         {/* PARA greeting — mobile only (desktop has side panel) */}
         <div className="lg:hidden">
           <ParaAuthBanner mode="login" />
