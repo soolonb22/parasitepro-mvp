@@ -308,6 +308,7 @@ export default function UploadPage() {
   const [form, setForm] = useState<FormState>(loadForm);
   const [error, setError] = useState('');
   const [quality, setQuality] = useState<QualityResult | null>(null);
+  const [showPoorQualityConfirm, setShowPoorQualityConfirm] = useState(false);
 
   // Persist form to sessionStorage on every change
   React.useEffect(() => { saveForm(form); }, [form]);
@@ -837,7 +838,14 @@ export default function UploadPage() {
               ← Change photo
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => {
+                // Intercept if image quality is poor — warn before burning a credit
+                if (quality?.status === 'poor') {
+                  setShowPoorQualityConfirm(true);
+                } else {
+                  handleSubmit();
+                }
+              }}
               disabled={!form.q1_sampleType}
               className="flex-1 py-4 rounded-2xl font-display font-bold text-lg transition-all flex items-center justify-center gap-2"
               style={{
@@ -854,6 +862,84 @@ export default function UploadPage() {
           </p>
         </div>
       </div>
+
+      {/* ── Poor quality confirmation modal ──────────────────────────────────
+          Shows when user tries to submit a 'poor' rated photo.
+          Gives them a clear choice: retake (free) or proceed (uses credit).
+      ──────────────────────────────────────────────────────────────────── */}
+      {showPoorQualityConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+        }}>
+          <div style={{
+            background: 'var(--bg-surface)', borderRadius: 20,
+            width: '100%', maxWidth: 380, padding: '1.75rem',
+            border: '1px solid rgba(239,68,68,0.3)',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📸</div>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 0.6rem' }}>
+                This photo may limit accuracy
+              </h2>
+              <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>
+                Our quality check flagged issues with this image. A poor photo can result in a vague, low-confidence report — which wastes your credit.
+              </p>
+            </div>
+
+            {/* Show the specific tips */}
+            {quality?.tips && (
+              <div style={{
+                background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
+                borderRadius: 12, padding: '0.875rem', marginBottom: '1.25rem',
+              }}>
+                {quality.tips.filter(t => !t.startsWith('✅')).map((tip, i) => (
+                  <p key={i} style={{ fontSize: '0.78rem', color: '#f87171', margin: i > 0 ? '0.4rem 0 0' : 0, lineHeight: 1.5 }}>
+                    {tip}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {/* Primary: retake */}
+              <button
+                onClick={() => {
+                  setShowPoorQualityConfirm(false);
+                  setStep('drop');
+                  setQuality(null);
+                }}
+                style={{
+                  width: '100%', padding: '13px',
+                  background: 'var(--amber)', color: '#000',
+                  border: 'none', borderRadius: 12,
+                  fontSize: '0.95rem', fontWeight: 800, cursor: 'pointer',
+                }}
+              >
+                📷 Retake photo (recommended)
+              </button>
+
+              {/* Secondary: proceed anyway */}
+              <button
+                onClick={() => {
+                  setShowPoorQualityConfirm(false);
+                  handleSubmit();
+                }}
+                style={{
+                  width: '100%', padding: '11px',
+                  background: 'transparent', color: 'var(--text-muted)',
+                  border: '1px solid var(--bg-border)', borderRadius: 12,
+                  fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                Proceed anyway — use 1 credit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

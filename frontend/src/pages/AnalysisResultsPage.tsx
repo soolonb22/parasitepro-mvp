@@ -329,6 +329,7 @@ const AnalysisResultsPage = () => {
   const [feedbackDone, setFeedbackDone] = useState(false);
   const [showDeepDive, setDeepDive]     = useState(false);
   const [userCredits, setUserCredits]   = useState(0);
+  const [creditsLoaded, setCreditsLoaded] = useState(false);
   const [showMHR, setShowMHR]           = useState(false);
   const [isSaved, setIsSaved]           = useState(false);
   const [saving, setSaving]             = useState(false);
@@ -354,6 +355,7 @@ const AnalysisResultsPage = () => {
       setAnalysis(res.data);
       if (res.data?.isSaved !== undefined) setIsSaved(res.data.isSaved);
       if (profileRes?.data?.imageCredits !== undefined) setUserCredits(profileRes.data.imageCredits);
+      setCreditsLoaded(true);
     } catch { toast.error('Failed to load analysis'); }
     finally { setLoading(false); }
   };
@@ -448,8 +450,8 @@ const AnalysisResultsPage = () => {
           </p>
         </div>
 
-        {/* Low / zero credit nudge — shows when ≤ 1 credit remaining */}
-        {userCredits <= 1 && (
+        {/* Low / zero credit nudge — only shows AFTER credits have loaded from API */}
+        {creditsLoaded && userCredits <= 1 && (
           <div style={{
             background: userCredits === 0
               ? 'linear-gradient(135deg,#7f1d1d,#991b1b)'
