@@ -2,11 +2,15 @@
 import { useState, useEffect } from 'react';
 
 const STEPS = [
-  "On it! Enhancing your image for the best possible read…",
-  "Examining every pixel — looking for shapes, textures, patterns…",
-  "Cross-referencing against known organisms and visual signatures…",
-  "Checking geographic context and risk factors…",
-  "Putting your report together — nearly there!",
+  "Scanning image quality — brightness, focus, contrast…",
+  "Applying gamma correction and adaptive contrast enhancement…",
+  "Running local contrast analysis to reveal hidden structure…",
+  "Detecting specimen area and generating precision zoom…",
+  "Sending 4 enhanced versions to the analysis engine…",
+  "Examining morphological features across all image versions…",
+  "Cross-referencing visual patterns against organism signatures…",
+  "Checking geographic context and Queensland-specific risk factors…",
+  "Compiling your GP-ready educational report — almost done!",
 ];
 
 const AnalysingScreen: React.FC<{ onComplete?: () => void }> = ({ onComplete }) => {

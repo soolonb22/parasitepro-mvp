@@ -122,7 +122,7 @@ router.post(
         }
       }
 
-      analyzeImage(url, sampleType, userContext, enhancedUrl)
+      analyzeImage(url, sampleType, userContext, undefined, originalFile.buffer)
         .then(async (aiResult) => {
           const { detections, summary, overallAssessment, visualFindings, urgencyLevel, imageQuality,
                   differentialDiagnoses, recommendedActions, healthRisks, treatmentOptions,

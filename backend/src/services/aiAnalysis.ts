@@ -1,5 +1,6 @@
 // services/aiAnalysis.ts — Deep Assessment Engine with Dual-Image + Context Support
 import Anthropic from '@anthropic-ai/sdk';
+import { enhanceImageForAnalysis } from './imageEnhancement';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -235,27 +236,69 @@ export async function analyzeImage(
   originalUrl: string,
   sampleType?: string,
   userContext?: UserContext,
-  enhancedUrl?: string,
+  enhancedUrl?: string,   // legacy param — kept for compatibility but ignored
+  rawBuffer?: Buffer,     // NEW: raw image buffer for server-side enhancement
 ): Promise<AIAnalysisResult> {
-  console.log('🔬 Deep analysis starting. Enhanced image:', !!enhancedUrl);
+  console.log('🔬 Deep analysis starting — server-side enhancement pipeline active');
 
   try {
-    const original = await fetchBase64(originalUrl);
-    const enhanced = enhancedUrl ? await fetchBase64(enhancedUrl) : null;
+    // ── Step 1: Get raw image buffer ────────────────────────────────────────
+    let imageBuffer: Buffer;
+    if (rawBuffer) {
+      imageBuffer = rawBuffer;
+      console.log('📦 Using raw buffer from upload');
+    } else {
+      const res = await fetch(originalUrl);
+      if (!res.ok) throw new Error(`Image fetch failed: ${res.status}`);
+      imageBuffer = Buffer.from(await res.arrayBuffer());
+      console.log('📥 Fetched image from URL for enhancement');
+    }
 
+    // ── Step 2: Run server-side enhancement pipeline ─────────────────────────
+    console.log('🎨 Running server-side enhancement pipeline...');
+    const enhanced = await enhanceImageForAnalysis(imageBuffer);
+    const q = enhanced.qualityReport;
+    console.log(`📊 Quality: brightness=${q.brightness.toFixed(0)} contrast=${q.contrast.toFixed(0)} sharpness=${q.sharpness.toFixed(0)} issue=${q.dominantIssue}`);
+    console.log('✅ Enhancement complete:', q.processingApplied.join(' | '));
+
+    // ── Step 3: Also fetch original from URL (for Claude comparison) ─────────
+    const original = await fetchBase64(originalUrl);
+
+    // ── Step 4: Build context ─────────────────────────────────────────────────
     const contextBlock = buildContextBlock(userContext);
     const sampleHint = sampleType && sampleType !== 'auto' ? `Sample type indicated by user: ${sampleType}.\n` : '';
-    const fullPrompt = [contextBlock, sampleHint, DEEP_ANALYSIS_PROMPT].filter(Boolean).join('\n\n');
+    const qualityNote = `IMAGE PRE-PROCESSING APPLIED (server-side, before this analysis):
+- Quality scan: brightness=${q.brightness.toFixed(0)}/255, contrast=${q.contrast.toFixed(0)}, sharpness=${q.sharpness.toFixed(0)}, dominant issue: ${q.dominantIssue}
+- ${q.processingApplied.join('\n- ')}
+You are receiving FOUR versions of the same image. Compare all four and use whichever reveals the most diagnostic detail. Synthesise findings across versions — a feature visible in one version but not others is still valid evidence.`;
 
-    // Build content array — send both images if available
-    const contentBlocks: any[] = [];
-    contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: original.mediaType, data: original.data } });
-    if (enhanced) {
-      contentBlocks.push({ type: 'text', text: 'The image above is the ORIGINAL. The image below is the AI-ENHANCED version (contrast boosted, sharpened, colour normalised). Compare both and use whichever reveals more diagnostic detail.' });
-      contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: enhanced.mediaType, data: enhanced.data } });
-    }
-    contentBlocks.push({ type: 'text', text: fullPrompt });
+    const fullPrompt = [qualityNote, contextBlock, sampleHint, DEEP_ANALYSIS_PROMPT].filter(Boolean).join('\n\n');
 
+    // ── Step 5: Build multi-image content blocks ──────────────────────────────
+    const toBase64 = (buf: Buffer) => buf.toString('base64');
+
+    const contentBlocks: any[] = [
+      // Version 1: Original
+      { type: 'text', text: 'VERSION 1 — ORIGINAL (unmodified upload):' },
+      { type: 'image', source: { type: 'base64', media_type: original.mediaType, data: original.data } },
+
+      // Version 2: Auto-correct (gamma + saturation + normalise)
+      { type: 'text', text: 'VERSION 2 — AUTO-CORRECTED (adaptive gamma correction, saturation +35%, percentile normalisation — best for most photos):' },
+      { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: toBase64(enhanced.autoCorrect) } },
+
+      // Version 3: Local contrast (CLAHE-style)
+      { type: 'text', text: 'VERSION 3 — LOCAL CONTRAST ENHANCED (tile-based CLAHE-style — reveals structure hidden in uniform-toned areas, best for specimens in liquid):' },
+      { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: toBase64(enhanced.localContrast) } },
+
+      // Version 4: ROI zoom (specimen-focused crop)
+      { type: 'text', text: 'VERSION 4 — SPECIMEN ZOOM (auto-detected region of interest, upscaled — use this for fine morphological detail: segmentation, surface texture, size estimation):' },
+      { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: toBase64(enhanced.roiZoom) } },
+
+      { type: 'text', text: fullPrompt },
+    ];
+
+    // ── Step 6: Send to Claude ────────────────────────────────────────────────
+    console.log('🤖 Sending 4-version image set to Claude...');
     const response = await anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-6',
       max_tokens: 4096,
@@ -264,7 +307,16 @@ export async function analyzeImage(
 
     const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
     console.log('✅ Deep analysis complete. First 400 chars:', rawText.substring(0, 400));
-    return parseAnalysisResponse(rawText);
+
+    const result = parseAnalysisResponse(rawText);
+
+    // ── Attach quality report to result ──────────────────────────────────────
+    result.imageUsed = 'both';
+    if (q.retakeAdvice) {
+      result.imageQuality = `${result.imageQuality || 'processed'} — Note: ${q.retakeAdvice}`;
+    }
+
+    return result;
 
   } catch (error: any) {
     console.error('❌ Analysis error:', error.message);
