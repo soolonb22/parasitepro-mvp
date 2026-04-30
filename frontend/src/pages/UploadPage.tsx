@@ -308,7 +308,6 @@ export default function UploadPage() {
   const [form, setForm] = useState<FormState>(loadForm);
   const [error, setError] = useState('');
   const [quality, setQuality] = useState<QualityResult | null>(null);
-  const [showPoorQualityConfirm, setShowPoorQualityConfirm] = useState(false);
 
   // Persist form to sessionStorage on every change
   React.useEffect(() => { saveForm(form); }, [form]);
@@ -593,27 +592,56 @@ export default function UploadPage() {
             style={{
               background: quality.status === 'good'
                 ? 'rgba(34,197,94,0.07)' : quality.status === 'warn'
-                ? 'rgba(234,179,8,0.07)' : 'rgba(239,68,68,0.07)',
-              border: `1.5px solid ${quality.status === 'good' ? 'rgba(34,197,94,0.3)' : quality.status === 'warn' ? 'rgba(234,179,8,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                ? 'rgba(234,179,8,0.07)' : 'rgba(99,102,241,0.08)',
+              border: `1.5px solid ${quality.status === 'good' ? 'rgba(34,197,94,0.3)' : quality.status === 'warn' ? 'rgba(234,179,8,0.3)' : 'rgba(99,102,241,0.35)'}`,
             }}>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">
-                {quality.status === 'good' ? '✅' : quality.status === 'warn' ? '⚠️' : '🔴'}
+                {quality.status === 'good' ? '✅' : quality.status === 'warn' ? '⚠️' : '🔧'}
               </span>
               <p className="text-sm font-semibold"
-                style={{ color: quality.status === 'good' ? '#4ade80' : quality.status === 'warn' ? '#fbbf24' : '#f87171' }}>
-                Photo quality: {quality.status === 'good' ? 'Good' : quality.status === 'warn' ? 'Fair — could be better' : 'Poor — retake recommended'}
+                style={{ color: quality.status === 'good' ? '#4ade80' : quality.status === 'warn' ? '#fbbf24' : '#a5b4fc' }}>
+                {quality.status === 'good'
+                  ? 'Photo quality: Good'
+                  : quality.status === 'warn'
+                  ? 'Photo quality: Fair — AI will compensate'
+                  : '🔧 Photo quality: Low — AI will auto-enhance before analysis'}
               </p>
               <span className="ml-auto text-xs" style={{ color: 'var(--text-muted)' }}>
                 {quality.resolution.w > 0 ? `${quality.resolution.w}×${quality.resolution.h}px` : ''}
               </span>
             </div>
-            <ul className="space-y-1">
-              {quality.tips.map((tip, i) => (
-                <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{tip}</li>
-              ))}
-            </ul>
-            {quality.status !== 'good' && (
+
+            {/* Poor quality: show what the AI will do, not what the user did wrong */}
+            {quality.status === 'poor' ? (
+              <div style={{
+                background: 'rgba(99,102,241,0.08)',
+                border: '1px solid rgba(99,102,241,0.2)',
+                borderRadius: 10, padding: '0.75rem', marginTop: '0.25rem',
+              }}>
+                <p className="text-xs font-semibold" style={{ color: '#a5b4fc', marginBottom: '0.4rem' }}>
+                  ✨ Automatic AI enhancement will be applied:
+                </p>
+                <ul className="space-y-1">
+                  <li className="text-xs" style={{ color: 'var(--text-secondary)' }}>🌓 Adaptive gamma correction — lifts dark shadows and recovers detail</li>
+                  <li className="text-xs" style={{ color: 'var(--text-secondary)' }}>🔬 Local contrast enhancement — reveals structure in flat-toned areas</li>
+                  <li className="text-xs" style={{ color: 'var(--text-secondary)' }}>🎯 Specimen zoom — auto-detects and crops to the area of interest</li>
+                  <li className="text-xs" style={{ color: 'var(--text-secondary)' }}>📊 Claude analyses all enhanced versions simultaneously</li>
+                </ul>
+                <p className="text-xs mt-2" style={{ color: 'rgba(165,180,252,0.7)' }}>
+                  A retake in better lighting will always give more detail — but we'll do our best with what you have.
+                </p>
+              </div>
+            ) : (
+              <ul className="space-y-1">
+                {quality.tips.map((tip, i) => (
+                  <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{tip}</li>
+                ))}
+              </ul>
+            )}
+
+            {/* Retake only shown for warn, not poor — poor just proceeds with enhancement */}
+            {quality.status === 'warn' && (
               <button
                 onClick={() => { setStep('drop'); setQuality(null); }}
                 className="mt-3 text-xs font-semibold underline"
@@ -838,14 +866,7 @@ export default function UploadPage() {
               ← Change photo
             </button>
             <button
-              onClick={() => {
-                // Intercept if image quality is poor — warn before burning a credit
-                if (quality?.status === 'poor') {
-                  setShowPoorQualityConfirm(true);
-                } else {
-                  handleSubmit();
-                }
-              }}
+              onClick={() => { handleSubmit(); }}
               disabled={!form.q1_sampleType}
               className="flex-1 py-4 rounded-2xl font-display font-bold text-lg transition-all flex items-center justify-center gap-2"
               style={{
@@ -862,84 +883,6 @@ export default function UploadPage() {
           </p>
         </div>
       </div>
-
-      {/* ── Poor quality confirmation modal ──────────────────────────────────
-          Shows when user tries to submit a 'poor' rated photo.
-          Gives them a clear choice: retake (free) or proceed (uses credit).
-      ──────────────────────────────────────────────────────────────────── */}
-      {showPoorQualityConfirm && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 99999,
-          background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(6px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
-        }}>
-          <div style={{
-            background: 'var(--bg-surface)', borderRadius: 20,
-            width: '100%', maxWidth: 380, padding: '1.75rem',
-            border: '1px solid rgba(239,68,68,0.3)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
-          }}>
-            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📸</div>
-              <h2 style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 0.6rem' }}>
-                This photo may limit accuracy
-              </h2>
-              <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>
-                Our quality check flagged issues with this image. A poor photo can result in a vague, low-confidence report — which wastes your credit.
-              </p>
-            </div>
-
-            {/* Show the specific tips */}
-            {quality?.tips && (
-              <div style={{
-                background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
-                borderRadius: 12, padding: '0.875rem', marginBottom: '1.25rem',
-              }}>
-                {quality.tips.filter(t => !t.startsWith('✅')).map((tip, i) => (
-                  <p key={i} style={{ fontSize: '0.78rem', color: '#f87171', margin: i > 0 ? '0.4rem 0 0' : 0, lineHeight: 1.5 }}>
-                    {tip}
-                  </p>
-                ))}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {/* Primary: retake */}
-              <button
-                onClick={() => {
-                  setShowPoorQualityConfirm(false);
-                  setStep('drop');
-                  setQuality(null);
-                }}
-                style={{
-                  width: '100%', padding: '13px',
-                  background: 'var(--amber)', color: '#000',
-                  border: 'none', borderRadius: 12,
-                  fontSize: '0.95rem', fontWeight: 800, cursor: 'pointer',
-                }}
-              >
-                📷 Retake photo (recommended)
-              </button>
-
-              {/* Secondary: proceed anyway */}
-              <button
-                onClick={() => {
-                  setShowPoorQualityConfirm(false);
-                  handleSubmit();
-                }}
-                style={{
-                  width: '100%', padding: '11px',
-                  background: 'transparent', color: 'var(--text-muted)',
-                  border: '1px solid var(--bg-border)', borderRadius: 12,
-                  fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer',
-                }}
-              >
-                Proceed anyway — use 1 credit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

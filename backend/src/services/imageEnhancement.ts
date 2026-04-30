@@ -214,8 +214,59 @@ export async function enhanceImageForAnalysis(inputBuffer: Buffer): Promise<Enha
     retakeAdvice = 'The specimen is hard to distinguish. Try photographing against a plain white background (like white toilet paper or a white plate).';
   }
 
-  // Step 2 — Normalise input: ensure 1200px minimum, consistent format
-  const normalised = await sharp(inputBuffer)
+  // Step 2 — Pre-remediation: if image is poor quality, auto-fix it BEFORE
+  // the standard pipeline so all 4 versions are working from a better base
+  let workingBuffer = inputBuffer;
+  const remediationApplied: string[] = [];
+
+  if (dominantIssue === 'too_dark' || quality.brightness < 60) {
+    console.log('🌓 Pre-remediation: applying aggressive dark photo recovery...');
+    workingBuffer = await sharp(workingBuffer)
+      .gamma(0.45)                                    // extreme gamma lift
+      .modulate({ saturation: 1.6, brightness: 1.2 })
+      .linear(1.5, -15)                               // contrast stretch
+      .normalise()
+      .jpeg({ quality: 95 })
+      .toBuffer();
+    remediationApplied.push('Dark photo recovery: gamma 0.45, saturation +60%, linear contrast stretch');
+  } else if (dominantIssue === 'too_bright' || quality.brightness > 210) {
+    console.log('☀️ Pre-remediation: recovering overexposed photo...');
+    workingBuffer = await sharp(workingBuffer)
+      .gamma(1.6)                                     // darken
+      .modulate({ saturation: 1.3, brightness: 0.85 })
+      .normalise()
+      .jpeg({ quality: 95 })
+      .toBuffer();
+    remediationApplied.push('Overexposure recovery: gamma 1.6, brightness -15%');
+  } else if (dominantIssue === 'low_contrast') {
+    console.log('📊 Pre-remediation: boosting low contrast photo...');
+    workingBuffer = await sharp(workingBuffer)
+      .normalise()
+      .modulate({ saturation: 1.5 })
+      .linear(1.4, -20)
+      .jpeg({ quality: 95 })
+      .toBuffer();
+    remediationApplied.push('Low contrast boost: full normalise + saturation +50% + linear stretch');
+  } else if (dominantIssue === 'too_blurry') {
+    console.log('🔍 Pre-remediation: applying aggressive sharpening for blurry photo...');
+    workingBuffer = await sharp(workingBuffer)
+      .sharpen({ sigma: 2.5, m1: 1.5, m2: 5.0 })    // very aggressive unsharp mask
+      .modulate({ saturation: 1.3 })
+      .normalise()
+      .jpeg({ quality: 95 })
+      .toBuffer();
+    remediationApplied.push('Blurry photo: aggressive unsharp mask sigma=2.5, m1=1.5, m2=5.0');
+  }
+
+  if (remediationApplied.length > 0) {
+    processingApplied.push('=== PRE-REMEDIATION (poor quality detected) ===');
+    processingApplied.push(...remediationApplied);
+    processingApplied.push('=== STANDARD PIPELINE (applied to remediated base) ===');
+    console.log('✅ Pre-remediation complete — running standard pipeline on improved image');
+  }
+
+  // Step 3 — Normalise: ensure 1200px minimum — uses workingBuffer (remediated if poor quality)
+  const normalised = await sharp(workingBuffer)
     .resize(1200, 1200, { fit: 'inside', withoutEnlargement: false })
     .jpeg({ quality: 95 })
     .toBuffer();

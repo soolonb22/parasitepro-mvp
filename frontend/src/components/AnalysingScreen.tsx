@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 
 const STEPS = [
   "Scanning image quality — brightness, focus, contrast…",
-  "Applying gamma correction and adaptive contrast enhancement…",
-  "Running local contrast analysis to reveal hidden structure…",
+  "Auto-correcting your photo for best analysis accuracy…",
+  "Applying local contrast enhancement to reveal hidden detail…",
   "Detecting specimen area and generating precision zoom…",
-  "Sending 4 enhanced versions to the analysis engine…",
-  "Examining morphological features across all image versions…",
+  "Sending enhanced image set to the analysis engine…",
+  "Examining morphological features across all versions…",
   "Cross-referencing visual patterns against organism signatures…",
-  "Checking geographic context and Queensland-specific risk factors…",
+  "Checking Queensland geographic context and risk factors…",
   "Compiling your GP-ready educational report — almost done!",
 ];
 
