@@ -91,44 +91,19 @@ const DisclaimerBanner = () => (
 
 // ─── PARA woman avatar — small version for report card corner ────────────────
 const ParaWomanSmall = () => (
-  <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="72" height="96">
-    {/* Body */}
-    <path d="M40 115 Q38 145 36 158 L84 158 Q82 145 80 115 Q68 122 60 122 Q52 122 40 115Z" fill="#5A8E7A"/>
-    {/* Collar */}
-    <path d="M50 112 Q60 118 70 112 L73 120 Q60 126 47 120Z" fill="#3D7060"/>
-    {/* Neck */}
-    <rect x="55" y="94" width="10" height="20" rx="5" fill="#C49A7A"/>
-    {/* Left arm */}
-    <path d="M40 116 Q28 128 25 148" stroke="#5A8E7A" strokeWidth="10" strokeLinecap="round" fill="none"/>
-    {/* Right arm */}
-    <path d="M80 116 Q92 128 95 148" stroke="#5A8E7A" strokeWidth="10" strokeLinecap="round" fill="none"/>
-    {/* Head */}
-    <ellipse cx="60" cy="72" rx="22" ry="24" fill="#C49A7A"/>
-    {/* Hair */}
-    <path d="M38 72 Q36 96 44 114 Q52 118 55 116 L55 94 Q44 92 38 72Z" fill="#5C3D28"/>
-    <path d="M82 72 Q84 96 76 114 Q68 118 65 116 L65 94 Q76 92 82 72Z" fill="#5C3D28"/>
-    {/* Eyes */}
-    <ellipse cx="53" cy="68" rx="4" ry="4.5" fill="white"/>
-    <ellipse cx="67" cy="68" rx="4" ry="4.5" fill="white"/>
-    <circle cx="54" cy="69" r="2.8" fill="#3D2810"/>
-    <circle cx="68" cy="69" r="2.8" fill="#3D2810"/>
-    <circle cx="55" cy="67.5" r="1" fill="white"/>
-    <circle cx="69" cy="67.5" r="1" fill="white"/>
-    {/* Lips */}
-    <path d="M55 82 Q60 87 65 82" fill="#C0725A"/>
-    {/* Cheeks */}
-    <ellipse cx="47" cy="76" rx="5" ry="3.5" fill="#E8A090" opacity="0.4"/>
-    <ellipse cx="73" cy="76" rx="5" ry="3.5" fill="#E8A090" opacity="0.4"/>
-    {/* Hat brim */}
-    <ellipse cx="60" cy="51" rx="38" ry="7" fill="#4A7A5E"/>
-    <ellipse cx="60" cy="49" rx="38" ry="7" fill="#5A9070"/>
-    {/* Hat crown */}
-    <path d="M30 50 Q33 22 60 20 Q87 22 90 50Z" fill="#6AAB84"/>
-    {/* Hat band */}
-    <rect x="33" y="44" width="54" height="6" rx="2" fill="#3D7060"/>
-  </svg>
+  <img
+    src="/para-avatar.png"
+    alt="PARA"
+    style={{
+      width: 72, height: 72,
+      borderRadius: '50%',
+      objectFit: 'cover',
+      objectPosition: 'center top',
+      filter: 'drop-shadow(0 4px 12px rgba(0,180,120,0.4))',
+      flexShrink: 0,
+    }}
+  />
 );
-
 // ─── White GP Report Card ─────────────────────────────────────────────────────
 const ReportCard = ({ analysis }) => {
   const urgency    = getUrgency(analysis.urgencyLevel);

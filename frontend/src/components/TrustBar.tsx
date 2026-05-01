@@ -56,34 +56,20 @@ const TrustBar = ({ variant = 'dark' }: { variant?: 'dark' | 'light' | 'sage' })
   );
 };
 
-/* ─── PARA mini avatar — woman with hat, emoji-style ─────────── */
+/* ─── PARA mini avatar ─────────────────────────────────────────── */
 const ParaMiniAvatar = () => (
-  <svg width="34" height="38" viewBox="0 0 34 38" fill="none">
-    {/* Body */}
-    <path d="M9 28 Q8 34 7 37 L27 37 Q26 34 25 28 Q21 31 17 31 Q13 31 9 28Z" fill="#5A8E7A"/>
-    <rect x="14.5" y="21" width="5" height="8" rx="2.5" fill="#C8956A"/>
-    {/* Head */}
-    <ellipse cx="17" cy="16" rx="8" ry="9" fill="#D4A07A"/>
-    {/* Hair */}
-    <path d="M9 16 Q8 22 10 27 Q13 30 15 29 L15 21 Q11 20 9 16Z" fill="#5C3820"/>
-    <path d="M25 16 Q26 22 24 27 Q21 30 19 29 L19 21 Q23 20 25 16Z" fill="#5C3820"/>
-    {/* Eyes */}
-    <circle cx="14" cy="15" r="1.6" fill="#3D2810"/>
-    <circle cx="20" cy="15" r="1.6" fill="#3D2810"/>
-    <circle cx="14.5" cy="14.2" r="0.7" fill="white"/>
-    <circle cx="20.5" cy="14.2" r="0.7" fill="white"/>
-    {/* Lips */}
-    <path d="M14.5 20 Q17 22.5 19.5 20" fill="#C07060"/>
-    {/* Cheeks */}
-    <ellipse cx="11.5" cy="18" rx="3" ry="2" fill="#E8A080" opacity="0.35"/>
-    <ellipse cx="22.5" cy="18" rx="3" ry="2" fill="#E8A080" opacity="0.35"/>
-    {/* Hat brim */}
-    <ellipse cx="17" cy="8.5" rx="13.5" ry="3" fill="#5A9070"/>
-    <ellipse cx="17" cy="7.5" rx="13.5" ry="3" fill="#6AAB84"/>
-    {/* Hat crown */}
-    <path d="M8 8 Q9.5 1 17 0 Q24.5 1 26 8Z" fill="#7DC498"/>
-    <rect x="8.5" y="6" width="17" height="3" rx="1" fill="#4A8A64"/>
-  </svg>
+  <img
+    src="/para-avatar-small.png"
+    alt="PARA"
+    style={{
+      width: 34, height: 34,
+      borderRadius: '50%',
+      objectFit: 'cover',
+      objectPosition: 'center top',
+      flexShrink: 0,
+    }}
+  />
 );
+
 
 export default TrustBar;

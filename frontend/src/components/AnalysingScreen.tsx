@@ -45,9 +45,9 @@ const AnalysingScreen: React.FC<{ onComplete?: () => void }> = ({ onComplete }) 
         <div className="relative mx-auto w-28 h-28 mb-8">
           <div className="absolute inset-0 rounded-full animate-pulse-amber"
             style={{ background: 'rgba(217,119,6,0.12)', border: '1px solid rgba(217,119,6,0.3)' }} />
-          <div className="relative z-10 w-full h-full rounded-full flex items-center justify-center text-5xl"
+          <div className="relative z-10 w-full h-full rounded-full overflow-hidden"
             style={{ background: 'var(--bg-elevated)' }}>
-            🔬
+            <img src="/para-avatar.png" alt="PARA" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
           </div>
           <svg className="absolute inset-0 w-full h-full animate-spin" style={{ animationDuration: '3s' }} viewBox="0 0 112 112">
             <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(217,119,6,0.4)"

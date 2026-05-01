@@ -77,7 +77,7 @@ const Para = ({
       }}
     >
       <img
-        src="/para-avatar.jpg"
+        src="/para-avatar.png"
         alt="PARA"
         draggable={false}
         style={{

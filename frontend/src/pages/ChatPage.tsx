@@ -200,11 +200,12 @@ const ChatPage = () => {
           {/* PARA avatar */}
           <div style={{
             width: 38, height: 38, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #0d9488, #0f766e)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(13,148,136,0.3)', flexShrink: 0,
-            fontSize: '1.1rem',
-          }}>🦠</div>
+            background: 'transparent',
+            overflow: 'hidden',
+            flexShrink: 0,
+          }}>
+            <img src="/para-avatar.png" alt="PARA" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+          </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#0f172a' }}>PARA</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.7rem', color: '#0d9488' }}>
@@ -307,10 +308,11 @@ const ChatPage = () => {
                 {!isUser && (
                   <div style={{
                     width: 30, height: 30, borderRadius: '50%', flexShrink: 0, marginTop: 2,
-                    background: 'linear-gradient(135deg, #0d9488, #0f766e)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.8rem', boxShadow: '0 1px 4px rgba(13,148,136,0.25)',
-                  }}>🦠</div>
+                    background: 'transparent',
+                    overflow: 'hidden',
+                  }}>
+                    <img src="/para-avatar.png" alt="PARA" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  </div>
                 )}
 
                 <div style={{ maxWidth: '82%' }}>

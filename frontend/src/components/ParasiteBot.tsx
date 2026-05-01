@@ -311,7 +311,7 @@ function Robot({ mood, speaking, size = 1 }: { mood: Mood; speaking: boolean; si
   return (
     <div style={{ width: w, height: h, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       <img
-        src="/para-avatar.jpg"
+        src="/para-avatar.png"
         alt="PARA"
         draggable={false}
         style={{

@@ -24,14 +24,14 @@ const C = {
 /* ─── PARA — line-art sketch figure with wide-brim hat (exact match to mockup) ── */
 const ParaWoman = ({ style = {} }) => (
   <img
-    src="/para-avatar.jpg"
+    src="/para-avatar.png"
     alt="PARA"
     draggable={false}
     style={{
       display: 'block', width: '100%', height: '100%',
       objectFit: 'contain', objectPosition: 'bottom center',
       borderRadius: '50% 50% 40% 40%',
-      filter: 'drop-shadow(0 8px 32px rgba(255,100,200,0.5))',
+      filter: 'drop-shadow(0 8px 32px rgba(0,180,120,0.35))',
       animation: 'para-hero-float 3s ease-in-out infinite',
       ...style,
     }}
@@ -54,7 +54,7 @@ const ParaFig = ({ size = 110, waving = false, style = {} }) => {
   return (
     <div style={{ width: size, height: Math.round(size * 1.18), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, ...style }}>
       <img
-        src="/para-avatar.jpg"
+        src="/para-avatar.png"
         alt="PARA"
         draggable={false}
         style={{
@@ -62,7 +62,7 @@ const ParaFig = ({ size = 110, waving = false, style = {} }) => {
           objectFit: 'contain',
           borderRadius: '50% 50% 40% 40%',
           animation: anim,
-          filter: 'drop-shadow(0 4px 16px rgba(255,100,200,0.5))',
+          filter: 'drop-shadow(0 4px 16px rgba(0,180,120,0.35))',
           transformOrigin: 'bottom center',
           userSelect: 'none',
         }}
