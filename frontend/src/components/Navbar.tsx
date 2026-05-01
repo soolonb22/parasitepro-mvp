@@ -63,11 +63,12 @@ const Navbar = () => {
   ];
 
   const authLinks = [
-    { path: '/chat',      label: '💬 Chat with PARA' },
-    { path: '/upload',    label: 'Analyse' },
-    { path: '/dashboard', label: 'Dashboard' },
-    { path: '/tips',      label: 'Free Tips' },
-    { path: '/pricing',   label: 'Pricing' },
+    { path: '/chat',                label: '💬 Chat with PARA' },
+    { path: '/upload',              label: 'Analyse' },
+    { path: '/dashboard',           label: 'Dashboard' },
+    { path: '/health-intelligence', label: '🧬 Health Intel' },
+    { path: '/tips',                label: 'Free Tips' },
+    { path: '/pricing',             label: 'Pricing' },
   ];
 
   const navLinks = isAuthenticated ? authLinks : publicLinks;

@@ -167,6 +167,14 @@ try {
   console.error('❌ Failed to load encyclopedia routes:', e.message);
 }
 
+try {
+  const healthIntelligenceRouter = require('./routes/healthIntelligence').default;
+  app.use('/api/health-intelligence', healthIntelligenceRouter);
+  console.log('✅ Health Intelligence routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load health intelligence routes:', e.message);
+}
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found', path: req.path });
@@ -199,8 +207,9 @@ const server = app.listen(Number(PORT), '0.0.0.0', () => {
   // Run migrations and test DB connection (non-fatal)
   (async () => {
     try {
-      const { runMigrations } = await import('./migrate');
+      const { runMigrations, runHealthIntelligenceMigrations } = await import('./migrate');
       await runMigrations();
+      await runHealthIntelligenceMigrations();
     } catch (err: any) {
       console.error('⚠️  Startup migration failed (non-fatal):', err.message);
     }

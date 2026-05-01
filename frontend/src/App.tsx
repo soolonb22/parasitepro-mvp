@@ -68,6 +68,7 @@ import OnboardingSurvey from './pages/OnboardingSurvey';
 import PromoLandingPage from './pages/PromoLandingPage';
 import ResultsPage from './pages/ResultsPage';
 import SymptomJournalPage from './pages/SymptomJournalPage';
+import HealthIntelligencePage from './pages/HealthIntelligencePage';
 import TravelRiskMapPage from './pages/TravelRiskMapPage';
 
 const _BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -384,6 +385,7 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/food-diary" element={<ProtectedRoute><FoodDiaryPage /></ProtectedRoute>} />
           <Route path="/symptom-journal" element={<ProtectedRoute><SymptomJournalPage /></ProtectedRoute>} />
+          <Route path="/health-intelligence" element={<ProtectedRoute><HealthIntelligencePage /></ProtectedRoute>} />
           <Route path="/treatment-tracker" element={<ProtectedRoute><TreatmentTrackerPage /></ProtectedRoute>} />
           <Route path="/health-forms" element={<ProtectedRoute><HealthFormsPage /></ProtectedRoute>} />
           <Route path="/travel-risk" element={<ProtectedRoute><TravelRiskMapPage /></ProtectedRoute>} />

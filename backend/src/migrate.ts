@@ -120,3 +120,48 @@ export async function runMigrations(): Promise<void> {
     console.error('⚠️  Migration error (non-fatal):', err.message);
   }
 }
+
+export async function runHealthIntelligenceMigrations(): Promise<void> {
+  console.log('🔄 Running Health Intelligence migrations...');
+  try {
+    await pool.query(`
+      -- Subscription flag on users
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_subscriber BOOLEAN DEFAULT FALSE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_started_at TIMESTAMPTZ;
+
+      -- Health journal entries
+      CREATE TABLE IF NOT EXISTS health_journal_entries (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        entry_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        symptoms TEXT[] DEFAULT '{}',
+        severity INTEGER CHECK (severity >= 1 AND severity <= 10),
+        energy_level INTEGER CHECK (energy_level >= 1 AND energy_level <= 10),
+        sleep_quality VARCHAR(50),
+        mood VARCHAR(50),
+        bowel_movements INTEGER,
+        notes TEXT,
+        diet_notes TEXT,
+        supplements TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_hje_user ON health_journal_entries(user_id);
+      CREATE INDEX IF NOT EXISTS idx_hje_date ON health_journal_entries(entry_date DESC);
+
+      -- AI intelligence sessions
+      CREATE TABLE IF NOT EXISTS health_intelligence_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        query_symptoms TEXT[] NOT NULL,
+        query_context TEXT,
+        ai_brief TEXT NOT NULL,
+        credits_used INTEGER DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_his_user ON health_intelligence_sessions(user_id);
+    `);
+    console.log('✅ Health Intelligence migrations complete');
+  } catch (err: any) {
+    console.error('⚠️ Health Intelligence migration error:', err.message);
+  }
+}
