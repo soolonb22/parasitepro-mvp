@@ -6,6 +6,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import CldImage from '../components/CldImage';
+import { CourseUpsellBox } from '../components/CourseUpsellBox';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -459,6 +460,11 @@ const GPReportPage = () => {
           <button onClick={handlePrint} style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.3)', color:'white', padding:'12px 28px', borderRadius:10, cursor:'pointer', fontSize:'0.9rem', fontWeight:600 }}>
             <ExternalLink size={16} /> Save PDF for your GP
           </button>
+        </div>
+
+        {/* ── Course Upsell Box (new) ── */}
+        <div className="no-print">
+          <CourseUpsellBox />
         </div>
       </div>
 

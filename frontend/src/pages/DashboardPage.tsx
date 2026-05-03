@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
 import { PARA } from '../utils/para-copy';
 import ReferralSection from '../components/ReferralSection';
+import { DashboardCourseBanner } from '../components/DashboardCourseBanner';
 
 /* ── PARA video for welcome modal (cycles WELCOME_1 → WELCOME_2) ── */
 const WELCOME_VIDEOS = [
@@ -186,6 +187,9 @@ const DashboardPage: React.FC = () => {
             🔬 New analysis
           </button>
         </div>
+
+        {/* Course banner (new) */}
+        <DashboardCourseBanner />
 
         <div className="grid md:grid-cols-3 gap-6">
 

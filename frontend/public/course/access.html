@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clearing the Body of Toxins &amp; Parasites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1A1714;--ink2:#4A4840;--ink3:#8A8880;
+  --bg:#F7F5EF;--sur:#FFFFFF;--sur2:#F0EDE4;
+  --bdr:#E2DED4;--bdr2:#C8C4B8;
+  --grn:#0A5C3E;--grnm:#147A52;--grnl:#D6EFE4;--grnd:#073D2B;
+  --gold:#7A5A0A;--goldm:#A07A14;--goldl:#F5EDD4;
+  --rust:#7A2A0A;--rustm:#A03A14;--rustl:#F5E0D4;
+  --blue:#0A3A6E;--bluem:#1450A0;--bluel:#D4E4F5;
+  --pur:#3A1A6E;--purm:#5A30A0;--purl:#E4D4F5;
+  --r4:4px;--r8:8px;--r12:12px;--r20:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;}
+
+/* ── LAYOUT ── */
+.page{display:flex;min-height:100vh;}
+.sidebar{width:260px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--ink);padding:1.5rem 0;display:flex;flex-direction:column;}
+.main{flex:1;min-width:0;}
+@media(max-width:900px){.sidebar{display:none;}.main{width:100%;}}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:0 1.25rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo-txt{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:400;color:#fff;line-height:1.4;letter-spacing:-.01em;}
+.sb-logo-sub{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
+.sb-nav{padding:.75rem 0;flex:1;}
+.sb-mod{margin-bottom:.25rem;}
+.sb-mod-hd{display:flex;align-items:center;gap:8px;padding:.5rem 1.25rem;cursor:pointer;transition:background .15s;user-select:none;}
+.sb-mod-hd:hover{background:rgba(255,255,255,.05);}
+.sb-num{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:500;}
+.sb-mod-name{font-size:12px;color:rgba(255,255,255,.7);font-weight:500;line-height:1.3;}
+.sb-lessons{display:none;padding-bottom:.25rem;}
+.sb-lessons.open{display:block;}
+.sb-lesson{display:block;padding:.35rem 1.25rem .35rem 3rem;font-size:11px;color:rgba(255,255,255,.45);text-decoration:none;line-height:1.4;transition:color .12s;}
+.sb-lesson:hover{color:rgba(255,255,255,.85);}
+.sb-tools-link{display:flex;align-items:center;gap:6px;padding:.6rem 1.25rem;margin:.5rem .75rem 0;border-radius:var(--r8);background:rgba(20,122,82,.25);border:1px solid rgba(20,122,82,.4);font-size:11px;color:rgba(255,255,255,.7);text-decoration:none;transition:all .12s;}
+.sb-tools-link:hover{background:rgba(20,122,82,.4);color:#fff;}
+.sb-tools-dot{width:6px;height:6px;border-radius:50%;background:var(--grnm);}
+
+/* ── HERO ── */
+.hero{background:var(--ink);padding:5rem 4rem 4rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,rgba(20,122,82,.18) 0%,transparent 70%),radial-gradient(ellipse 40% 80% at 10% 80%,rgba(160,122,20,.08) 0%,transparent 60%);pointer-events:none;}
+.hero-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.4);margin-bottom:1rem;}
+.hero-title{font-family:'Fraunces',Georgia,serif;font-size:clamp(32px,5vw,56px);font-weight:300;color:#fff;line-height:1.1;letter-spacing:-.02em;margin-bottom:1rem;max-width:700px;}
+.hero-title em{font-style:italic;color:rgba(255,255,255,.6);}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.55);max-width:560px;line-height:1.7;margin-bottom:2rem;}
+.hero-meta{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.hero-tag{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);}
+
+/* ── MODULE INDEX ── */
+.mod-index{background:var(--sur2);border-bottom:1px solid var(--bdr);padding:2.5rem 4rem;}
+.mi-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:1.5rem;}
+.mi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;}
+.mi-card{padding:1rem 1.25rem;border:1px solid var(--bdr);border-radius:var(--r12);background:var(--sur);text-decoration:none;transition:all .15s;display:block;}
+.mi-card:hover{border-color:var(--grnm);background:var(--grnl);}
+.mi-num{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:4px;}
+.mi-name{font-size:13px;font-weight:500;color:var(--ink);line-height:1.35;}
+.mi-time{font-size:11px;color:var(--ink3);margin-top:3px;}
+
+/* ── CORE PHILOSOPHY ── */
+.philosophy{padding:3rem 4rem;background:var(--grnl);border-bottom:1px solid rgba(10,92,62,.15);}
+.ph-inner{max-width:720px;margin:0 auto;text-align:center;}
+.ph-tag{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--grnd);margin-bottom:.75rem;}
+.ph-quote{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:300;font-style:italic;color:var(--grnd);line-height:1.5;}
+.ph-bullets{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:1.5rem;}
+.ph-pill{font-size:12px;padding:5px 14px;border-radius:20px;background:var(--sur);border:1px solid rgba(10,92,62,.2);color:var(--grnd);font-weight:500;}
+
+/* ── CONTENT ── */
+.content{padding:0 4rem;}
+@media(max-width:700px){.content{padding:0 1.25rem;}.hero{padding:3rem 1.25rem 2.5rem;}.mod-index{padding:2rem 1.25rem;}.philosophy{padding:2rem 1.25rem;}}
+
+/* ── MODULE SECTIONS ── */
+.module{padding:4rem 0;border-bottom:1px solid var(--bdr);}
+.module:last-child{border-bottom:none;}
+.mod-header{display:flex;align-items:flex-start;gap:1.25rem;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--bdr);}
+.mod-num-big{width:52px;height:52px;border-radius:var(--r12);background:var(--ink);color:#fff;font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:400;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mod-meta{}
+.mod-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:4px;}
+.mod-title{font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:400;letter-spacing:-.01em;line-height:1.2;margin-bottom:4px;}
+.mod-time{font-size:12px;color:var(--ink3);}
+.mod-overview{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r12);padding:1.25rem 1.5rem;margin-bottom:2rem;}
+.mo-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:.75rem;}
+.mo-list{display:flex;flex-direction:column;gap:5px;}
+.mo-item{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--ink2);}
+.mo-dot{width:5px;height:5px;border-radius:50%;background:var(--grnm);flex-shrink:0;margin-top:7px;}
+
+/* ── LESSONS ── */
+.lesson{margin-bottom:3rem;}
+.lesson-hd{margin-bottom:1.5rem;}
+.lesson-tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:4px;}
+.lesson-title{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:400;letter-spacing:-.01em;margin-bottom:.35rem;}
+.lesson-sub{font-size:13px;color:var(--ink3);}
+.lesson-body{font-size:15px;color:var(--ink2);line-height:1.75;}
+.lesson-body p{margin-bottom:1rem;}
+.lesson-body p:last-child{margin-bottom:0;}
+
+/* ── SECTION HEADERS within lessons ── */
+.sec-h{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:400;color:var(--ink);margin:2rem 0 .75rem;letter-spacing:-.01em;}
+.sec-h2{font-size:15px;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;}
+
+/* ── CALLOUTS ── */
+.callout{border-radius:var(--r12);padding:1.25rem 1.5rem;margin:1.5rem 0;}
+.callout-insight{background:var(--grnl);border:1px solid rgba(10,92,62,.2);border-left:3px solid var(--grnm);}
+.callout-warning{background:var(--goldl);border:1px solid rgba(122,90,10,.2);border-left:3px solid var(--goldm);}
+.callout-danger{background:var(--rustl);border:1px solid rgba(122,42,10,.2);border-left:3px solid var(--rustm);}
+.callout-fact{background:var(--bluel);border:1px solid rgba(10,58,110,.15);border-left:3px solid var(--bluem);}
+.callout-mystery{background:var(--purl);border:1px solid rgba(58,26,110,.15);border-left:3px solid var(--purm);}
+.callout-tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:500;margin-bottom:5px;}
+.callout-insight .callout-tag{color:var(--grnd);}
+.callout-warning .callout-tag{color:var(--gold);}
+.callout-danger .callout-tag{color:var(--rust);}
+.callout-fact .callout-tag{color:var(--blue);}
+.callout-mystery .callout-tag{color:var(--pur);}
+.callout-text{font-size:14px;line-height:1.65;}
+.callout-insight .callout-text{color:var(--grnd);}
+.callout-warning .callout-text{color:var(--gold);}
+.callout-danger .callout-text{color:var(--rust);}
+.callout-fact .callout-text{color:var(--blue);}
+.callout-mystery .callout-text{color:var(--pur);}
+
+/* ── PULL QUOTE ── */
+.pullquote{border-left:3px solid var(--grnm);padding:.75rem 1.25rem;margin:1.5rem 0;font-family:'Fraunces',Georgia,serif;font-size:17px;font-style:italic;color:var(--grnd);line-height:1.6;}
+
+/* ── TWO-COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0;}
+@media(max-width:600px){.two-col{grid-template-columns:1fr;}}
+.info-box{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r12);padding:1rem 1.25rem;}
+.ib-title{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em;}
+.ib-body{font-size:13px;color:var(--ink2);line-height:1.6;}
+
+/* ── PROTOCOL BOX ── */
+.protocol{background:var(--ink);border-radius:var(--r20);padding:2rem;margin:2rem 0;color:#fff;}
+.prot-title{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:400;color:#fff;margin-bottom:1.25rem;letter-spacing:-.01em;}
+.prot-section{margin-bottom:1.25rem;}
+.prot-section:last-child{margin-bottom:0;}
+.prot-tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:.5rem;}
+.prot-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:14px;color:rgba(255,255,255,.8);line-height:1.5;}
+.prot-dot{width:5px;height:5px;border-radius:50%;background:var(--grnm);flex-shrink:0;margin-top:7px;}
+.prot-rule{border-top:1px solid rgba(255,255,255,.1);margin:1rem 0;}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;margin:1.5rem 0;border-radius:var(--r12);border:1px solid var(--bdr);}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--sur);}
+th{background:var(--ink);color:#fff;padding:.65rem .85rem;text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+td{padding:.65rem .85rem;border-bottom:1px solid var(--bdr);color:var(--ink2);vertical-align:top;line-height:1.5;}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:#FAFAF7;}
+
+/* ── CHECKLIST ── */
+.checklist{list-style:none;padding:0;margin:.75rem 0;}
+.checklist li{display:flex;align-items:flex-start;gap:9px;padding:6px 0;font-size:14px;color:var(--ink2);line-height:1.5;}
+.cl-icon{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.cl-grn{background:var(--grnl);color:var(--grnd);}
+.cl-red{background:var(--rustl);color:var(--rustm);}
+.cl-gold{background:var(--goldl);color:var(--gold);}
+.cl-dot{width:5px;height:5px;border-radius:50%;}
+.cl-grn .cl-dot{background:var(--grnd);}
+.cl-red .cl-dot{background:var(--rustm);}
+.cl-gold .cl-dot{background:var(--gold);}
+
+/* ── RED FLAGS ── */
+.red-flags{background:var(--rustl);border:1px solid rgba(122,42,10,.2);border-radius:var(--r12);padding:1.25rem 1.5rem;margin:1.5rem 0;}
+.rf-title{font-size:13px;font-weight:500;color:var(--rust);margin-bottom:.75rem;display:flex;align-items:center;gap:6px;}
+.rf-item{font-size:13px;color:var(--rust);padding:4px 0;border-bottom:1px solid rgba(122,42,10,.1);display:flex;gap:8px;align-items:flex-start;line-height:1.5;}
+.rf-item:last-child{border-bottom:none;}
+.rf-bullet{width:14px;height:14px;border-radius:50%;background:rgba(160,58,20,.15);color:var(--rustm);font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+
+/* ── QUESTIONS ── */
+.questions{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r12);padding:1.5rem;margin:2rem 0;}
+.q-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:1rem;}
+.q-section{margin-bottom:1.25rem;}
+.q-section:last-child{margin-bottom:0;}
+.q-section-name{font-size:11px;font-weight:500;color:var(--ink);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem;}
+.q-item{font-size:13px;color:var(--ink2);padding:5px 0;padding-left:14px;position:relative;line-height:1.5;}
+.q-item::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%;background:var(--bdr2);}
+
+/* ── ASSIGNMENT ── */
+.assignment{background:var(--goldl);border:1px solid rgba(122,90,10,.2);border-radius:var(--r20);padding:2rem;margin:2.5rem 0;}
+.assign-tag{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:.5rem;}
+.assign-title{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:400;color:var(--ink);margin-bottom:1rem;letter-spacing:-.01em;}
+.assign-item{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(122,90,10,.1);font-size:14px;color:var(--ink2);align-items:flex-start;line-height:1.5;}
+.assign-item:last-child{border-bottom:none;}
+.assign-num{width:22px;height:22px;border-radius:50%;background:var(--goldm);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:500;}
+
+/* ── TIER SYSTEM ── */
+.tier{display:flex;gap:10px;margin-bottom:.75rem;align-items:flex-start;}
+.tier-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.tier-1{background:#D4EFDC;color:#0A5C3E;}
+.tier-2{background:#FFF0CC;color:#7A5A0A;}
+.tier-3{background:#FFE0CC;color:#7A2A0A;}
+.tier-text{font-size:14px;color:var(--ink2);line-height:1.5;}
+
+/* ── PRINCIPLE BOX ── */
+.principle{display:flex;gap:12px;padding:1rem 1.25rem;border:1px solid var(--bdr);border-radius:var(--r12);margin-bottom:.6rem;background:var(--sur);align-items:flex-start;}
+.prin-num{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Fraunces',Georgia,serif;}
+.prin-body{}
+.prin-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px;}
+.prin-text{font-size:13px;color:var(--ink2);line-height:1.5;}
+
+/* ── PATHWAY DIAGRAM ── */
+.pathway{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r12);padding:1.5rem;margin:1.5rem 0;text-align:center;}
+.pw-step{display:inline-flex;align-items:center;justify-content:center;padding:.5rem 1rem;border-radius:var(--r8);font-size:13px;font-weight:500;margin:.25rem;border:1px solid;}
+.pw-arrow{font-size:18px;color:var(--ink3);display:block;margin:.25rem 0;}
+.pw-grn{background:var(--grnl);border-color:rgba(10,92,62,.2);color:var(--grnd);}
+.pw-gold{background:var(--goldl);border-color:rgba(122,90,10,.2);color:var(--gold);}
+.pw-rust{background:var(--rustl);border-color:rgba(122,42,10,.2);color:var(--rust);}
+.pw-ink{background:var(--ink);border-color:var(--ink);color:#fff;}
+.pw-blue{background:var(--bluel);border-color:rgba(10,58,110,.15);color:var(--blue);}
+.pw-row{display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;}
+
+/* ── RESOURCES ── */
+.resources{background:var(--ink);border-radius:var(--r20);padding:2rem;margin:2rem 0;}
+.res-title{font-family:'Fraunces',Georgia,serif;font-size:20px;color:#fff;margin-bottom:1.5rem;}
+.res-item{display:flex;gap:10px;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.08);align-items:flex-start;}
+.res-item:last-child{border-bottom:none;}
+.res-icon{width:28px;height:28px;border-radius:var(--r4);background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.res-name{font-size:13px;color:rgba(255,255,255,.85);}
+.res-url{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;word-break:break-all;}
+
+/* ── FINAL TRUTHS ── */
+.final-truths{background:var(--grnl);border:1px solid rgba(10,92,62,.2);border-radius:var(--r20);padding:2rem;margin:2rem 0;}
+.ft-title{font-family:'Fraunces',Georgia,serif;font-size:20px;color:var(--grnd);margin-bottom:1.25rem;}
+.ft-item{display:flex;gap:10px;padding:.65rem 0;border-bottom:1px solid rgba(10,92,62,.1);font-size:14px;color:var(--grnd);align-items:flex-start;line-height:1.5;}
+.ft-item:last-child{border-bottom:none;}
+.ft-dot{width:7px;height:7px;border-radius:50%;background:var(--grnm);flex-shrink:0;margin-top:7px;}
+
+/* ── HEALTH SUITE — Tab switcher ── */
+.suite-embed{margin:1.5rem 0;}
+.suite-tabs{display:flex;gap:3px;background:var(--bdr);padding:3px;border-radius:var(--r12);margin-bottom:1.75rem;}
+.suite-tab{flex:1;padding:10px 14px;border-radius:var(--r8);background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--ink2);transition:all .15s;font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.3;text-align:center;}
+.suite-tab:hover{background:rgba(255,255,255,.6);color:var(--ink);}
+.suite-tab.on{background:var(--sur);color:var(--ink);font-weight:500;}
+.suite-tab-label{display:block;font-size:13px;}
+.suite-tab-sub{display:block;font-size:10px;color:var(--ink3);margin-top:1px;font-weight:400;}
+.suite-tool{display:none;}.suite-tool.on{display:block;}
+/* ── HEALTH SUITE — Blue/red notice variants ── */
+.n-bl{background:var(--bluel);color:var(--bld);border-color:rgba(21,88,168,.2);}
+.n-bl .ndot{background:var(--bluem);}
+.n-rd{background:var(--rustl);color:var(--rust);border-color:rgba(122,42,10,.2);}
+.n-rd .ndot{background:var(--rustm);}
+/* ── HEALTH SUITE — Form inputs ── */
+.form-sec{margin-bottom:1.25rem;}
+.form-sec-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--bdr);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.frow{margin-bottom:.6rem;}
+.flabel{font-size:12px;color:var(--ink2);margin-bottom:4px;display:block;}
+.ti{width:100%;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r8);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--sur);transition:border-color .15s;}
+.ti:focus{outline:none;border-color:var(--tlm);}
+select.ti{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2398988E'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.ta{resize:vertical;min-height:68px;line-height:1.5;}
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sl-label{font-size:12px;color:var(--ink);min-width:120px;}
+.slider-row input[type=range]{flex:1;accent-color:var(--tlm);}
+.sl-val{font-size:12px;font-weight:500;min-width:28px;text-align:right;}
+.cb-row{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r8);cursor:pointer;margin-bottom:6px;transition:all .12s;}
+.cb-row:hover{border-color:var(--bluem);}
+.cb-row.on{border-color:var(--bluem);background:var(--bluel);}
+.cb-box2{width:16px;height:16px;border:1.5px solid var(--bdr2);border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.cb-row.on .cb-box2{background:var(--bluem);border-color:var(--bluem);}
+.ckm2{width:8px;height:5px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px);display:none;}
+.cb-row.on .ckm2{display:block;}
+.cb-txt{font-size:13px;color:var(--ink);line-height:1.4;}
+.cb-sub{font-size:11px;color:var(--ink3);margin-top:1px;}
+/* ── HEALTH SUITE — Decision tree ── */
+.flow{display:flex;align-items:center;gap:5px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.fnode{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--bdr);color:var(--ink3);background:var(--sur);}
+.fnode.act{background:var(--bluem);color:#fff;border-color:var(--bluem);}
+.fnode.done{background:var(--tll);color:var(--tld);border-color:var(--tlm);}
+.farr{font-size:10px;color:var(--ink3);}
+.symlist{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem;}
+.sym{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border:1px solid var(--bdr);border-radius:var(--r8);cursor:pointer;font-size:13px;color:var(--ink);line-height:1.4;transition:all .12s;}
+.sym:hover{border-color:var(--bluem);background:var(--bluel);}
+.sym.chk{border-color:var(--bluem);background:var(--bluel);color:var(--bld);}
+.sym-box{width:16px;height:16px;border:1.5px solid var(--bdr2);border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.sym.chk .sym-box{background:var(--bluem);border-color:var(--bluem);}
+.ckm3{width:8px;height:5px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px);display:none;}
+.sym.chk .ckm3{display:block;}
+.sym-flag{font-size:10px;padding:2px 6px;border-radius:3px;background:var(--rustl);color:var(--rust);font-weight:500;margin-left:auto;flex-shrink:0;}
+.qhdr{display:flex;align-items:center;gap:10px;padding:.85rem 1.25rem;border-radius:var(--r16);margin-bottom:1rem;background:var(--bluel);border:1px solid rgba(21,88,168,.15);}
+.qnum-circle{width:32px;height:32px;border-radius:50%;background:var(--bluem);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.qhdr-text{font-size:14px;color:var(--bld);line-height:1.5;}
+.yn-row{display:flex;gap:8px;margin-top:.75rem;}
+.yn{flex:1;padding:11px;border-radius:var(--r12);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--bdr);background:var(--sur);color:var(--ink);transition:all .12s;text-align:center;}
+.yn:hover{border-color:var(--bluem);background:var(--bluel);color:var(--bld);}
+.yn-yes{border-color:var(--bluem);background:var(--bluem);color:#fff;}
+.yn-yes:hover{background:var(--bld);border-color:var(--bld);}
+.result-nat{background:var(--gl);border:1px solid rgba(58,107,16,.2);border-radius:var(--r16);padding:1.25rem;text-align:center;margin-bottom:.75rem;}
+.rnat-title{font-family:'Fraunces',Georgia,serif;font-size:18px;margin-bottom:5px;color:var(--gc);}
+.rsub{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:1rem;}
+/* ── HEALTH SUITE — Loading spinner ── */
+.gen-wrap{text-align:center;padding:3rem 1rem;}
+.gen-spinner{width:40px;height:40px;border:3px solid var(--bdr);border-top-color:var(--bluem);border-radius:50%;animation:suite-spin 1s linear infinite;margin:0 auto 1.25rem;}
+@keyframes suite-spin{to{transform:rotate(360deg);}}
+.gen-title{font-family:'Fraunces',Georgia,serif;font-size:20px;margin-bottom:.5rem;}
+.gen-sub{font-size:13px;color:var(--ink2);}
+.gen-dots{display:inline-flex;gap:4px;margin-top:.75rem;}
+.gdot{width:6px;height:6px;border-radius:50%;background:var(--bdr2);animation:suite-bounce .9s ease-in-out infinite;}
+.gdot:nth-child(2){animation-delay:.15s;}
+.gdot:nth-child(3){animation-delay:.3s;}
+@keyframes suite-bounce{0%,80%,100%{transform:scale(.8);opacity:.5;}40%{transform:scale(1.1);opacity:1;}}
+/* ── HEALTH SUITE — Letter results ── */
+.res-sec{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r16);margin-bottom:.75rem;overflow:hidden;}
+.res-hdr{display:flex;align-items:center;gap:10px;padding:.85rem 1.25rem;border-bottom:1px solid var(--bdr);}
+.res-hdr-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.res-hdr-title{font-size:14px;font-weight:500;flex:1;}
+.res-body{padding:1rem 1.25rem;}
+.letter-edit{width:100%;padding:12px;border:1px solid var(--bdr);border-radius:var(--r8);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--sur);resize:vertical;min-height:200px;line-height:1.8;transition:border-color .15s;}
+.letter-edit:focus{outline:none;border-color:var(--bluem);}
+.test-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr);}
+.test-item:last-child{border-bottom:none;}
+.test-num{width:22px;height:22px;border-radius:50%;background:var(--bluel);color:var(--bld);font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.test-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px;}
+.test-reason{font-size:12px;color:var(--ink2);line-height:1.5;}
+.script-item{padding:10px 12px;background:var(--bg);border-radius:var(--r8);margin-bottom:6px;font-size:13px;color:var(--ink);line-height:1.55;border-left:3px solid var(--goldm);}
+.script-item:last-child{margin-bottom:0;}
+.copy-btn{font-size:12px;padding:5px 12px;border-radius:var(--r8);border:1px solid var(--bdr);background:var(--sur);cursor:pointer;color:var(--ink2);font-family:'DM Sans',sans-serif;transition:all .12s;}
+.copy-btn:hover{border-color:var(--bluem);color:var(--bluem);}
+.copy-btn.copied{border-color:var(--tlm);color:var(--tld);background:var(--tll);}
+
+/* ── MISSING CSS VARIABLES (used by embedded tools) ── */
+:root{
+  --tlm:#1C9C73;--tll:#DFF3EC;--tld:#07503D;--tl:#0D6B51;
+  --gl:#E8F2DC;--gc:#3A6B10;
+  --bld:#0C3D7A;
+  --r16:16px;
+}
+/* ── PROTOCOL BUILDER — progress bar ── */
+.prog{margin-bottom:1.5rem;}
+.prog-track{display:flex;gap:4px;margin-bottom:6px;}
+.pt{flex:1;height:4px;border-radius:2px;background:var(--bdr);transition:background .3s;}
+.pt.done{background:var(--tlm);}
+.pt.now{background:var(--tll);outline:1px solid var(--tlm);}
+.prog-info{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);}
+/* ── PROTOCOL BUILDER — answer progress ── */
+.aprog{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+.aprog-t{flex:1;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;}
+.aprog-f{height:100%;background:var(--tlm);border-radius:3px;transition:width .3s;}
+.aprog-l{font-size:12px;color:var(--ink3);white-space:nowrap;}
+/* ── PROTOCOL BUILDER — accordion ── */
+.acc{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r16);margin-bottom:.6rem;overflow:hidden;}
+.acc-hd{display:flex;align-items:center;gap:10px;padding:.85rem 1rem;cursor:pointer;user-select:none;}
+.acc-hd:hover{background:#F2F1ED;}
+.acc-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;}
+.acc-mt{flex:1;}
+.acc-nm{font-size:14px;font-weight:500;}
+.acc-ht{font-size:11px;color:var(--ink3);margin-top:1px;}
+.acc-bd{font-size:11px;font-weight:500;padding:3px 9px;border-radius:var(--r8);min-width:46px;text-align:center;}
+.chv{font-size:9px;color:var(--ink3);transition:transform .22s;margin-left:2px;flex-shrink:0;}
+.chv.op{transform:rotate(180deg);}
+.acc-body{border-top:1px solid var(--bdr);padding:0 1rem .9rem;}
+/* ── PROTOCOL BUILDER — question blocks ── */
+.qblk{padding:.85rem 0;border-bottom:1px solid var(--bdr);}
+.qblk:last-child{border-bottom:none;padding-bottom:0;}
+.qnum{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:4px;}
+.qtxt{font-size:13px;color:var(--ink);margin-bottom:.55rem;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:4px;}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r8);cursor:pointer;font-size:12px;color:var(--ink);line-height:1.45;transition:all .12s;}
+.opt:hover{border-color:var(--tlm);background:var(--tll);}
+.opt.sel{border-color:var(--tlm);background:var(--tll);color:var(--tld);}
+.rb{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--bdr2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.opt.sel .rb{background:var(--tlm);border-color:var(--tlm);}
+.rbd{width:5px;height:5px;border-radius:50%;background:#fff;display:none;}
+.opt.sel .rbd{display:block;}
+/* ── PROTOCOL BUILDER — results flash ── */
+.rflash{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r16);padding:1.25rem;margin-bottom:.75rem;}
+.rf-hero{display:flex;align-items:center;gap:1rem;padding-bottom:1rem;margin-bottom:1rem;border-bottom:1px solid var(--bdr);}
+.rf-circ{width:68px;height:68px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.rf-big{font-family:'Fraunces',Georgia,serif;font-size:25px;line-height:1;}
+.rf-sm{font-size:10px;margin-top:2px;}
+.rf-tier{font-family:'Fraunces',Georgia,serif;font-size:17px;margin-bottom:3px;}
+.rf-desc{font-size:12px;color:var(--ink2);line-height:1.55;}
+.rbar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.rbar-row:last-child{margin-bottom:0;}
+.rbar-lbl{font-size:11px;color:var(--ink2);min-width:98px;}
+.rbar-t{flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;}
+.rbar-f{height:100%;border-radius:3px;transition:width .4s;}
+.rbar-v{font-size:11px;font-weight:500;min-width:24px;text-align:right;}
+.pri-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg);border-radius:var(--r8);margin-bottom:6px;}
+.pri-item:last-child{margin-bottom:0;}
+.pri-sc{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
+.pri-txt{font-size:12px;color:var(--ink);line-height:1.5;}
+/* ── PROTOCOL BUILDER — notices (tl + am) ── */
+.notice{display:flex;gap:8px;padding:10px 12px;border-radius:var(--r12);margin-bottom:.75rem;font-size:12px;line-height:1.5;border:1px solid;}
+.n-tl{background:var(--tll);color:var(--tld);border-color:rgba(28,156,115,.2);}
+.n-am{background:var(--goldl);color:var(--gold);border-color:rgba(184,115,22,.2);}
+.ndot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.n-tl .ndot{background:var(--tlm);}
+.n-am .ndot{background:var(--goldm);}
+/* ── PROTOCOL BUILDER — choice grid ── */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:.75rem;}
+@media(max-width:500px){.cgrid{grid-template-columns:1fr;}}
+.ch{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid var(--bdr);border-radius:var(--r12);cursor:pointer;transition:all .12s;}
+.ch:hover{border-color:var(--tlm);}
+.ch.sel{border-color:var(--tlm);background:var(--tll);}
+.chbox{width:16px;height:16px;border:1.5px solid var(--bdr2);border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.ch.sel .chbox{background:var(--tlm);border-color:var(--tlm);}
+.ckm{width:8px;height:5px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px);display:none;}
+.ch.sel .ckm{display:block;}
+.cht{font-size:13px;color:var(--ink);line-height:1.4;}
+.chs{font-size:11px;color:var(--ink3);margin-top:2px;}
+.rec-tag{font-size:10px;color:var(--tl);font-weight:500;margin-left:4px;}
+.ctr{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:var(--r8);background:var(--sur);border:1px solid var(--bdr);color:var(--ink2);margin-bottom:.75rem;}
+.ctr .cn{font-weight:500;color:var(--tl);}
+/* ── PROTOCOL BUILDER — reset radio options ── */
+.ropt{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid var(--bdr);border-radius:var(--r12);cursor:pointer;transition:all .12s;margin-bottom:6px;}
+.ropt:hover{border-color:var(--tlm);}
+.ropt.sel{border-color:var(--tlm);background:var(--tll);}
+.ropt .chbox{margin-top:1px;}
+.ropt.sel .chbox{background:var(--tlm);border-color:var(--tlm);}
+.ropt.sel .ckm{display:block;}
+.ropt-rb{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--bdr2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.ropt.sel .ropt-rb{background:var(--tlm);border-color:var(--tlm);}
+.ropt-rbd{width:5px;height:5px;border-radius:50%;background:#fff;display:none;}
+.ropt.sel .ropt-rbd{display:block;}
+/* ── PROTOCOL BUILDER — flag row ── */
+.flag-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.fn{width:22px;height:22px;border-radius:50%;background:var(--goldl);color:var(--gold);font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* ── PROTOCOL BUILDER — plan output ── */
+.psec{margin-bottom:1.25rem;}
+.pst{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:.5rem;}
+.sg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:.75rem;}
+.sc{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r12);padding:10px 5px;text-align:center;}
+.scn{font-size:10px;color:var(--ink3);margin-bottom:3px;}
+.scv{font-size:22px;font-family:'Fraunces',Georgia,serif;}
+.prow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bdr);}
+.prow:last-child{border-bottom:none;}
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ptx{font-size:13px;color:var(--ink);}
+.tier-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:.85rem;border:1px solid transparent;}
+/* ── PROTOCOL BUILDER — weekly tracker ── */
+.trkwrap{overflow-x:auto;}
+.trk{display:grid;grid-template-columns:88px repeat(7,minmax(0,1fr));gap:3px;min-width:360px;}
+.tkh{font-size:10px;font-weight:500;color:var(--ink2);text-align:center;padding:3px 1px;}
+.tkl{font-size:10px;color:var(--ink);display:flex;align-items:center;padding-right:4px;}
+.tkc{border:1px solid var(--bdr);border-radius:4px;height:26px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink3);cursor:pointer;transition:all .12s;}
+.tkc:hover{background:var(--tll);border-color:var(--tlm);}
+.tkc.hv{background:var(--tll);color:var(--tld);font-weight:500;border-color:var(--tlm);}
+/* ── PROTOCOL BUILDER + TOOL — nav buttons ── */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;gap:8px;}
+.btn{padding:10px 20px;border-radius:var(--r12);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--bdr);background:var(--sur);color:var(--ink);transition:all .12s;font-weight:400;}
+.btn:hover{background:#EDECE6;}
+.btn-tl{background:var(--tlm);color:#fff;border-color:var(--tlm);}
+.btn-tl:hover{background:var(--tl);border-color:var(--tl);}
+.btn:disabled{opacity:.38;cursor:not-allowed;pointer-events:none;}
+
+/* ── PROTOCOL BUILDER — tracker INPUT cells ── */
+.tkc-in{width:100%;height:26px;border:1px solid var(--bdr);border-radius:4px;text-align:center;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--sur);color:var(--ink3);padding:0 2px;transition:all .12s;-moz-appearance:textfield;}
+.tkc-in::-webkit-inner-spin-button,.tkc-in::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.tkc-in:focus{outline:none;border-color:var(--tlm);}
+.tkc-in.filled{background:var(--tll);border-color:var(--tlm);color:var(--tld);font-weight:500;}
+/* ── PROTOCOL BUILDER — save / export buttons ── */
+.save-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:1rem;}
+.save-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r8);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--bdr);background:var(--sur);color:var(--ink2);transition:all .12s;font-weight:400;}
+.save-btn:hover{border-color:var(--tlm);color:var(--tl);}
+.save-btn-primary{background:var(--tlm);color:#fff;border-color:var(--tlm);}
+.save-btn-primary:hover{background:var(--tl);border-color:var(--tl);}
+.save-btn-icon{font-size:14px;line-height:1;}
+/* ── PRINT — plan only ── */
+@media print{
+  body.printing-plan > *{display:none!important;}
+  body.printing-plan #pb-plan-print{display:block!important;}
+}
+#pb-plan-print{display:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#1A1714;padding:1rem;}
+#pb-plan-print h1{font-size:22px;font-weight:400;margin-bottom:.5rem;}
+#pb-plan-print .pp-section{margin-bottom:1.25rem;}
+#pb-plan-print .pp-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:.35rem;}
+#pb-plan-print .pp-item{padding:4px 0;border-bottom:1px solid #eee;font-size:13px;}
+#pb-plan-print .pp-item:last-child{border:none;}
+#pb-plan-print .pp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:1rem;}
+#pb-plan-print .pp-score{border:1px solid #ddd;border-radius:6px;padding:8px 4px;text-align:center;}
+#pb-plan-print .pp-score-lbl{font-size:9px;color:#888;margin-bottom:2px;}
+#pb-plan-print .pp-score-val{font-size:20px;font-weight:500;}
+#pb-plan-print table{width:100%;border-collapse:collapse;font-size:11px;}
+#pb-plan-print th{background:#1A1714;color:#fff;padding:5px 6px;text-align:left;font-size:10px;}
+#pb-plan-print td{padding:5px 6px;border-bottom:1px solid #eee;vertical-align:top;}
+#pb-plan-print .pp-reflection{border-left:3px solid #1C9C73;padding:.5rem .75rem;font-style:italic;color:#444;margin-top:.5rem;}
+
+/* ── PRINT ── */
+@media print{
+  .sidebar{display:none!important;}
+  .hero{background:#1A1714;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .module{page-break-inside:avoid;}
+  .tbl-wrap{page-break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     PAYWALL OVERLAY
+══════════════════════════════════════════════════ -->
+<style>
+#pw-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:rgba(20,18,15,.92);backdrop-filter:blur(6px);}
+#pw-overlay.hidden{display:none;}
+.pw-card{background:#FFFFFF;border-radius:20px;max-width:460px;width:100%;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.4);}
+.pw-head{background:#1A1714;padding:2rem 2rem 1.5rem;text-align:center;}
+.pw-logo{font-family:'Fraunces',Georgia,serif;font-size:13px;color:rgba(255,255,255,.35);margin-bottom:.75rem;letter-spacing:.02em;}
+.pw-title{font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:400;color:#fff;line-height:1.2;margin-bottom:.35rem;}
+.pw-sub{font-size:12px;color:rgba(255,255,255,.35);}
+.pw-body{padding:1.75rem 2rem 2rem;}
+.pw-section-title{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#98988E;margin-bottom:.85rem;}
+.pw-buy{display:block;width:100%;padding:15px;background:#1C9C73;color:#fff;border:none;border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;text-align:center;font-weight:500;transition:background .15s;margin-bottom:.65rem;}
+.pw-buy:hover{background:#0D6B51;}
+.pw-buy-note{text-align:center;font-size:12px;color:#98988E;margin-bottom:1.5rem;}
+.pw-divider{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;}
+.pw-divider::before,.pw-divider::after{content:'';flex:1;height:1px;background:#E2DED4;}
+.pw-divider span{font-size:11px;color:#98988E;white-space:nowrap;}
+.pw-code-label{font-size:13px;color:#4A4840;margin-bottom:.5rem;}
+.pw-input-row{display:flex;gap:8px;}
+.pw-input{flex:1;padding:10px 13px;border:1.5px solid #E2DED4;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1714;background:#fff;transition:border-color .15s;letter-spacing:.05em;}
+.pw-input:focus{outline:none;border-color:#1C9C73;}
+.pw-input.error{border-color:#E14848;animation:pw-shake .3s ease;}
+@keyframes pw-shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+.pw-unlock-btn{padding:10px 16px;background:#1A1714;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:background .15s;white-space:nowrap;font-weight:500;}
+.pw-unlock-btn:hover{background:#2A2520;}
+.pw-err{font-size:12px;color:#E14848;margin-top:.5rem;min-height:18px;}
+.pw-footer{text-align:center;font-size:12px;color:#C8C4B8;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #E2DED4;}
+.pw-footer a{color:#1C9C73;text-decoration:none;}
+/* Stripe buy button sizing inside paywall */
+.pw-stripe-wrap{margin-bottom:.65rem;}
+.pw-stripe-wrap stripe-buy-button{display:block;}
+</style>
+
+<!-- Stripe JS — loaded once here, works for both paywall and any other instance -->
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
+
+<div id="pw-overlay">
+  <div class="pw-card">
+    <div class="pw-head">
+      <div class="pw-logo">Nrf2 Health Course</div>
+      <div class="pw-title">Clearing the Body of<br>Toxins &amp; Parasites</div>
+      <div class="pw-sub">Evidence-based · 5 modules · Interactive tools</div>
+    </div>
+    <div class="pw-body">
+      <div class="pw-section-title">Purchase to access</div>
+      <div class="pw-stripe-wrap">
+        <stripe-buy-button
+          buy-button-id="buy_btn_1TSsWgJVcqhzyDheCu5yI9PD"
+          publishable-key="pk_live_51TSrn2JVcqhzyDhek4ilj0NuzHn2v2ITBezd5ISjfiVeqt2FH4s0g6q17Ub1ASqV1mp8IDTAwdWv1pJAf7MTsWVo00b9Xz8yhi"
+        ></stripe-buy-button>
+      </div>
+      <div class="pw-buy-note">🔒 Secure checkout via Stripe &nbsp;·&nbsp; 30-day guarantee</div>
+      <div class="pw-divider"><span>Already purchased? Enter your access code</span></div>
+      <div class="pw-code-label">Access code from your purchase confirmation email</div>
+      <div class="pw-input-row">
+        <input type="text" id="pw-code-input" class="pw-input" placeholder="e.g. NRF2DETOX2025" autocomplete="off" spellcheck="false" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')pw_unlock()">
+        <button class="pw-unlock-btn" onclick="pw_unlock()">Unlock →</button>
+      </div>
+      <div class="pw-err" id="pw-err"></div>
+      <div class="pw-footer">
+        Questions? <a href="mailto:your@email.com">Contact support</a>
+        &nbsp;·&nbsp;
+        <a href="index.html">Back to course info</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   PAYWALL LOGIC
+   Access code: change ACCESS_CODE below.
+   Stripe redirect: in your Stripe Payment Link settings,
+   set the "After payment" success URL to:
+     https://yoursite.com/course_toxins_parasites.html?code=NRF2DETOX2025
+   Stripe will redirect buyers there and the code
+   auto-unlocks on arrival.
+══════════════════════════════════════════ */
+const ACCESS_CODE='NRF2DETOX2025'; // ← change to your preferred code
+
+function pw_check(){
+  if(localStorage.getItem('nrf2_unlocked')==='true'){pw_hide(false);return;}
+  const params=new URLSearchParams(window.location.search);
+  const c=params.get('code')||params.get('unlock')||params.get('access')||'';
+  if(c.trim().toUpperCase()===ACCESS_CODE){
+    localStorage.setItem('nrf2_unlocked','true');
+    pw_hide(false);
+    window.history.replaceState({},'',window.location.pathname);
+    return;
+  }
+  document.getElementById('pw-overlay').classList.remove('hidden');
+}
+
+function pw_unlock(){
+  const input=document.getElementById('pw-code-input');
+  const errEl=document.getElementById('pw-err');
+  if(input.value.trim().toUpperCase()===ACCESS_CODE){
+    localStorage.setItem('nrf2_unlocked','true');
+    errEl.textContent='';
+    pw_hide(true);
+  }else{
+    input.classList.add('error');
+    errEl.textContent='Incorrect code — check your purchase confirmation email.';
+    setTimeout(()=>input.classList.remove('error'),400);
+  }
+}
+
+function pw_hide(animate){
+  const el=document.getElementById('pw-overlay');
+  if(animate){
+    el.style.transition='opacity .35s';
+    el.style.opacity='0';
+    setTimeout(()=>el.classList.add('hidden'),360);
+  }else{
+    el.classList.add('hidden');
+  }
+}
+
+pw_check();
+</script>
+
+<div class="page">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-txt">Clearing the Body of<br>Toxins &amp; Parasites</div>
+    <div class="sb-logo-sub">Scientific Edition</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb0')"><div class="sb-num">0</div><div class="sb-mod-name">Course Overview</div></div>
+      <div class="sb-lessons" id="sb0">
+        <a href="#philosophy" class="sb-lesson">Core Philosophy</a>
+        <a href="#overview" class="sb-lesson">Module Index</a>
+      </div>
+    </div>
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb1')"><div class="sb-num">1</div><div class="sb-mod-name">Your Body's Natural Detox System</div></div>
+      <div class="sb-lessons" id="sb1">
+        <a href="#l1-1" class="sb-lesson">1.1 Hidden Intelligence</a>
+        <a href="#l1-2" class="sb-lesson">1.2 The Liver Master Alchemist</a>
+        <a href="#l1-3" class="sb-lesson">1.3 The Full Symphony</a>
+        <a href="#l1-4" class="sb-lesson">1.4 Hormesis Protocol</a>
+      </div>
+    </div>
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb2')"><div class="sb-num">2</div><div class="sb-mod-name">Parasites — Biology &amp; Reality</div></div>
+      <div class="sb-lessons" id="sb2">
+        <a href="#l2-1" class="sb-lesson">2.1 What Are Parasites?</a>
+        <a href="#l2-2" class="sb-lesson">2.2 Lifecycles</a>
+        <a href="#l2-3" class="sb-lesson">2.3 Mechanisms of Harm</a>
+        <a href="#l2-4" class="sb-lesson">2.4 Risk: Australia vs Travel</a>
+      </div>
+    </div>
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb3')"><div class="sb-num">3</div><div class="sb-mod-name">Treatments — What Works</div></div>
+      <div class="sb-lessons" id="sb3">
+        <a href="#l3-1" class="sb-lesson">3.1 Pharmaceutical Gold Standard</a>
+        <a href="#l3-2" class="sb-lesson">3.2 Natural Compounds</a>
+        <a href="#l3-3" class="sb-lesson">3.3 Why Cleanses Fail</a>
+      </div>
+    </div>
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb4')"><div class="sb-num">4</div><div class="sb-mod-name">History &amp; Lessons</div></div>
+      <div class="sb-lessons" id="sb4">
+        <a href="#l4-1" class="sb-lesson">4.1 Ancient Remedies</a>
+        <a href="#l4-2" class="sb-lesson">4.2 Medieval to Modern</a>
+        <a href="#l4-3" class="sb-lesson">4.3 What We Still Use</a>
+        <a href="#l4-4" class="sb-lesson">4.4 Timeless Principles</a>
+      </div>
+    </div>
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb5')"><div class="sb-num">5</div><div class="sb-mod-name">Your Lifelong Protocol</div></div>
+      <div class="sb-lessons" id="sb5">
+        <a href="#l5-1" class="sb-lesson">5.1 Prevention Is the Best Cleanse</a>
+        <a href="#l5-2" class="sb-lesson">5.2 When to See a Doctor</a>
+        <a href="#l5-3" class="sb-lesson">5.3 Lifelong Healthy Habits</a>
+        <a href="#l5-4" class="sb-lesson">5.4 Your Personal Protocol</a>
+      </div>
+    </div>
+    <div class="sb-mod">
+      <div class="sb-mod-hd" onclick="toggleSb('sb6')"><div class="sb-num">+</div><div class="sb-mod-name">Bonus Resources</div></div>
+      <div class="sb-lessons" id="sb6">
+        <a href="#resources" class="sb-lesson">Further Reading</a>
+        <a href="#tracker" class="sb-lesson">Symptom Tracker</a>
+        <a href="#doctor-guide" class="sb-lesson">Doctor Discussion Guide</a>
+      </div>
+    </div>
+    <a href="#l5-4" class="sb-tools-link"><div class="sb-tools-dot"></div>Interactive Tools ↓</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Scientific, Evidence-Based Edition &nbsp;·&nbsp; 5 Modules &nbsp;·&nbsp; ~3–5 hours</div>
+  <h1 class="hero-title">Clearing the Body of<br><em>Toxins &amp; Parasites</em></h1>
+  <p class="hero-sub">Understand the science, avoid the myths, and take safe, effective action. Your body is a 3.8-billion-year-old alchemical laboratory.</p>
+  <div class="hero-meta">
+    <span class="hero-tag">Beginner to Intermediate</span>
+    <span class="hero-tag">Self-paced</span>
+    <span class="hero-tag">Evidence-Based</span>
+    <span class="hero-tag">Queensland, Australia</span>
+  </div>
+</div>
+
+<!-- MODULE INDEX -->
+<div id="overview" class="mod-index">
+  <div class="mi-title">Course Modules</div>
+  <div class="mi-grid">
+    <a href="#module1" class="mi-card"><div class="mi-num">Module 1</div><div class="mi-name">Your Body's Natural Detox System</div><div class="mi-time">~60 min</div></a>
+    <a href="#module2" class="mi-card"><div class="mi-num">Module 2</div><div class="mi-name">Parasites — Biology, Lifecycles &amp; Reality Check</div><div class="mi-time">~50–70 min</div></a>
+    <a href="#module3" class="mi-card"><div class="mi-num">Module 3</div><div class="mi-name">Treatments — What Actually Works</div><div class="mi-time">~50 min</div></a>
+    <a href="#module4" class="mi-card"><div class="mi-num">Module 4</div><div class="mi-name">History &amp; Lessons from the Past</div><div class="mi-time">~30–40 min</div></a>
+    <a href="#module5" class="mi-card"><div class="mi-num">Module 5</div><div class="mi-name">Your Lifelong Protocol &amp; Action Plan</div><div class="mi-time">~40–60 min</div></a>
+  </div>
+</div>
+
+<!-- PHILOSOPHY -->
+<div id="philosophy" class="philosophy">
+  <div class="ph-inner">
+    <div class="ph-tag">Core Philosophy</div>
+    <div class="ph-quote">"The best cleanse is daily prevention + hormetic training — not occasional aggressive protocols."</div>
+    <div class="ph-bullets">
+      <span class="ph-pill">Natural ≠ Safe</span>
+      <span class="ph-pill">Evidence &gt; Marketing</span>
+      <span class="ph-pill">Consistency beats intensity</span>
+      <span class="ph-pill">Support, don't "cleanse"</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════
+     MODULE 1
+═══════════════════════════════════════════════════ -->
+<div id="module1" class="module">
+  <div class="mod-header">
+    <div class="mod-num-big">1</div>
+    <div class="mod-meta">
+      <div class="mod-eyebrow">Module 1</div>
+      <div class="mod-title">Your Body's Natural Detox System</div>
+      <div class="mod-time">Advanced, Mysterious, Transformative Understanding</div>
+    </div>
+  </div>
+  <div class="mod-overview">
+    <div class="mo-title">Key Takeaways</div>
+    <div class="mo-list">
+      <div class="mo-item"><div class="mo-dot"></div>Nrf2 = Master detox switch, activated by broccoli sprouts</div>
+      <div class="mo-item"><div class="mo-dot"></div>Phase I (CYP enzymes) can create more toxic intermediates</div>
+      <div class="mo-item"><div class="mo-dot"></div>Phase II (glutathione, sulfation, etc.) = safe packaging and elimination</div>
+      <div class="mo-item"><div class="mo-dot"></div>Hormesis = Controlled stress upgrades your entire detox system</div>
+      <div class="mo-item"><div class="mo-dot"></div>Gut-Liver Axis = Critical — fibre prevents toxin reabsorption</div>
+      <div class="mo-item"><div class="mo-dot"></div><strong>Daily Must-Do:</strong> Broccoli sprouts + high protein + cruciferous vegetables</div>
+    </div>
+  </div>
+
+  <!-- 1.1 -->
+  <div id="l1-1" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 1.1</div>
+      <h2 class="lesson-title">The Hidden Intelligence of Your Inner Ecosystem</h2>
+      <div class="lesson-sub">The Primordial Intelligence — Cellular Consciousness — Nrf2 Pathway</div>
+    </div>
+    <div class="lesson-body">
+      <p>Your body is not a passive machine — it is a living alchemical laboratory running continuous, elegant detoxification rituals refined over billions of years of evolution. Toxins are not just "bad chemicals." They include endogenous byproducts of metabolism, inflammation, and oxidative stress, as well as exogenous environmental pollutants, heavy metals, pharmaceuticals, and food additives.</p>
+      <div class="callout callout-mystery">
+        <div class="callout-tag">Profound Insight</div>
+        <div class="callout-text">Your detoxification network is a living archive of planetary history — a molecular memory of 3.8 billion years of adaptation. Long before humans walked the Earth, single-celled organisms developed sophisticated chemical defense systems to survive in a world of volcanic gases, UV radiation, and plant secondary metabolites.</div>
+      </div>
+      <div class="sec-h">The Toxin Spectrum — Layers of Threat</div>
+      <ul class="checklist">
+        <li><span class="cl-icon cl-grn"><span class="cl-dot"></span></span><span><strong>Reactive Oxygen Species (ROS):</strong> Normal byproducts of mitochondrial energy production. In balance, they act as signaling molecules. In excess, they become the "silent fire" damaging DNA, proteins, and lipids.</span></li>
+        <li><span class="cl-icon cl-gold"><span class="cl-dot"></span></span><span><strong>Xenobiotics:</strong> Foreign chemicals — plastics, pesticides, drugs. The body uses the same ancient machinery, sometimes inefficiently.</span></li>
+        <li><span class="cl-icon cl-gold"><span class="cl-dot"></span></span><span><strong>Endobiotic Overload:</strong> Excess cholesterol metabolites, bilirubin, steroid hormones that must be cleared to maintain homeostasis.</span></li>
+      </ul>
+      <div class="callout callout-fact">
+        <div class="callout-tag">Mysterious Truth</div>
+        <div class="callout-text">Some "toxins" are actually essential signaling molecules at low doses — hormesis. The dose makes the poison, and the medicine.</div>
+      </div>
+      <div class="sec-h">The Nrf2 Pathway — Your Body's Master Switch</div>
+      <p>Think of Nrf2 as your body's master protector switch — a superhero control button inside your cells.</p>
+      <div class="pathway">
+        <div class="pw-step pw-gold">Normal: Nrf2 locked (attached to Keap1)</div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-rust">Danger arrives: toxins, pollution, stress, heavy exercise</div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-blue">Keap1 releases Nrf2 → Nrf2 enters nucleus</div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-grn">Hundreds of protective genes activated simultaneously</div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-row">
+          <div class="pw-step pw-grn">Glutathione synthesis</div>
+          <div class="pw-step pw-grn">Phase II enzymes</div>
+          <div class="pw-step pw-grn">Anti-inflammatory proteins</div>
+          <div class="pw-step pw-grn">Repair tools</div>
+        </div>
+      </div>
+      <div class="callout callout-insight">
+        <div class="callout-tag">Best Natural Activators</div>
+        <div class="callout-text"><strong>Broccoli sprouts</strong> (most powerful) · Broccoli, kale, Brussels sprouts, cabbage · Turmeric (curcumin) · Green tea · Garlic · Exercise</div>
+      </div>
+      <div class="sec-h">The Stress-Detox Connection</div>
+      <p>Chronic activation of the HPA axis (stress response) diverts energy away from detoxification, downregulates certain CYP enzymes, increases gut permeability, and depletes glutathione and magnesium. This creates a vicious cycle: more perceived toxicity → more stress → poorer detoxification.</p>
+    </div>
+    <div class="questions">
+      <div class="q-title">Contemplation Questions</div>
+      <div class="q-section">
+        <div class="q-item">If detoxification is an ancient intelligence, what does it mean that modern life presents it with chemical challenges it has never encountered in evolutionary history?</div>
+        <div class="q-item">In what ways might symptoms like brain fog or fatigue actually be adaptive signals from this intelligent system rather than simple "damage"?</div>
+        <div class="q-item">How does the concept of hormesis apply to your personal approach to detoxification?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1.2 -->
+  <div id="l1-2" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 1.2</div>
+      <h2 class="lesson-title">The Liver — Master Alchemist</h2>
+      <div class="lesson-sub">Phase I &amp; Phase II in Depth · Molecular, Genetic &amp; Hormetic Mastery</div>
+    </div>
+    <div class="lesson-body">
+      <p>The liver is the body's supreme biochemical orchestrator — a 1.5 kg organ that performs over 500 functions every single minute. It is the most critical interface between your internal world and the chemical chaos of modern life.</p>
+      <div class="pathway">
+        <div class="pw-step pw-gold">Bloodstream — Toxins arrive</div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-rust">Phase I — CYP450 Orchestra<br><small style="font-size:10px;opacity:.8">CYP1A2 · CYP3A4 · CYP2D6 · CYP2E1</small></div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-gold">Reactive Intermediates <small style="font-size:10px;opacity:.8">(sometimes more dangerous)</small></div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-grn">Phase II — Conjugation Guardians<br><small style="font-size:10px;opacity:.8">Glutathione · Sulfation · Glucuronidation · Methylation</small></div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-step pw-blue">Water-soluble, neutralised metabolites</div>
+        <div class="pw-arrow">↓</div>
+        <div class="pw-row">
+          <div class="pw-step pw-grn">Bile → Gut → Stool</div>
+          <div class="pw-step pw-blue">Blood → Kidneys → Urine</div>
+        </div>
+      </div>
+      <div class="sec-h">The Six Phase II Conjugation Pathways</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Pathway</th><th>Cofactors Needed</th><th>Foods That Support It</th><th>What It Handles</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Glutathione</strong></td><td>Cysteine, Glycine, Glutamate, NAC, Selenium</td><td>Garlic, onions, cruciferous veg</td><td>Most reactive intermediates</td></tr>
+            <tr><td><strong>Sulfation</strong></td><td>Sulfur, Molybdenum, B vitamins</td><td>Eggs, garlic, onions, cruciferous</td><td>Phenols, alcohols, hormones</td></tr>
+            <tr><td><strong>Glucuronidation</strong></td><td>Glucuronic acid, B vitamins</td><td>Cruciferous veg, citrus, fibre</td><td>Bilirubin, drugs, hormones</td></tr>
+            <tr><td><strong>Methylation</strong></td><td>SAMe, B12, Folate, Choline</td><td>Leafy greens, beets, eggs</td><td>Heavy metals, neurotransmitters</td></tr>
+            <tr><td><strong>Acetylation</strong></td><td>Acetyl-CoA, B vitamins</td><td>High-protein foods</td><td>Drugs, toxins, neurotransmitters</td></tr>
+            <tr><td><strong>Amino Acid</strong></td><td>Glycine, Taurine, Glutamine</td><td>Bone broth, meat, fish</td><td>Benzoates, salicylates</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-warning">
+        <div class="callout-tag">Critical Balance</div>
+        <div class="callout-text"><strong>Fast Phase I + Slow Phase II = Reactive Intermediate Buildup.</strong> When someone with fast CYP enzymes starts a strong "detox" protocol (high-dose herbs, fasting, sauna), they can flood their system with reactive intermediates faster than Phase II can clear them. This causes the "healing crisis" — fatigue, headaches, brain fog, skin flares. Always support Phase II FIRST.</div>
+      </div>
+      <div class="protocol">
+        <div class="prot-title">Advanced Practical Protocol</div>
+        <div class="prot-section">
+          <div class="prot-tag">Phase II Priority (Do This First)</div>
+          <div class="prot-item"><div class="prot-dot"></div>High-quality protein (1.2–1.6g per kg body weight) — amino acids for conjugation</div>
+          <div class="prot-item"><div class="prot-dot"></div>Cruciferous vegetables + broccoli sprouts (daily) — strongest Nrf2 + glutathione activator</div>
+          <div class="prot-item"><div class="prot-dot"></div>Magnesium + B-complex (B6, B12, folate) — cofactors for multiple pathways</div>
+          <div class="prot-item"><div class="prot-dot"></div>NAC (N-Acetyl Cysteine) 600–1200mg/day if needed — direct glutathione precursor</div>
+        </div>
+        <div class="prot-rule"></div>
+        <div class="prot-section">
+          <div class="prot-tag">Phase I Support (After Phase II is Solid)</div>
+          <div class="prot-item"><div class="prot-dot"></div>Gentle bitter herbs (dandelion, milk thistle, artichoke) for bile flow</div>
+          <div class="prot-item"><div class="prot-dot"></div>Sauna 2–3× week (sweat + heat shock proteins)</div>
+          <div class="prot-item"><div class="prot-dot"></div>16:8 intermittent fasting (activates autophagy + Nrf2)</div>
+        </div>
+      </div>
+    </div>
+    <div class="questions">
+      <div class="q-title">Self-Exploration Questions</div>
+      <div class="q-section">
+        <div class="q-section-name">Deep Reflection</div>
+        <div class="q-item">Why might someone with fast CYP2E1 activity feel terrible during a water fast, while someone with slow activity feels great?</div>
+        <div class="q-item">How does chronic psychological stress sabotage liver detoxification at the molecular level?</div>
+        <div class="q-item">Why is supporting glutathione before doing aggressive detox protocols so important?</div>
+      </div>
+      <div class="q-section">
+        <div class="q-section-name">Technical Self-Test</div>
+        <div class="q-item">Name three major Phase II conjugation pathways and one food that supports each.</div>
+        <div class="q-item">What is bioactivation and why is it a risk in Phase I?</div>
+        <div class="q-item">How does Nrf2 connect Phase I and Phase II?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1.3 -->
+  <div id="l1-3" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 1.3</div>
+      <h2 class="lesson-title">The Full Symphony — All Organs in Concert</h2>
+      <div class="lesson-sub">Systems Biology &amp; Integrated Detox Mastery</div>
+    </div>
+    <div class="lesson-body">
+      <p>Detoxification is not the job of the liver alone. It is a coordinated symphony involving multiple organs working in harmony. The liver is the conductor — but the kidneys, gut, lungs, skin, and lymphatic system are essential musicians. When one player is weak, the entire orchestra suffers.</p>
+      <div class="two-col">
+        <div class="info-box">
+          <div class="ib-title">The Kidneys</div>
+          <div class="ib-body">Filter ~180L of blood daily. Excrete water-soluble toxins, regulate pH, activate vitamin D. Warning signs: puffy eyes/ankles, dark urine, high blood pressure.<br><br><strong>Support:</strong> 2.5–3.5L filtered water daily, parsley, celery, dandelion tea.</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">Lungs &amp; Skin</div>
+          <div class="ib-body">Lungs exhale volatile organic compounds, alcohol metabolites, CO₂. Skin sweats out heavy metals (arsenic, cadmium, lead), BPA, and pesticides.<br><br><strong>Support:</strong> 20–30 min sauna 2–3× week, exercise that makes you sweat, dry brushing.</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">The Gut-Liver Axis</div>
+          <div class="ib-body">Liver sends conjugated toxins into bile → small intestine. Healthy gut binds toxins to fibre → leaves in stool. Unhealthy gut = enterohepatic recirculation — toxins reabsorbed back to liver.<br><br><strong>Support:</strong> 30–40g fibre daily, fermented foods, avoid unnecessary antibiotics.</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">The Lymphatic System</div>
+          <div class="ib-body">Silent waste removal service with no pump — relies on movement, breathing, muscle contractions. Stagnation causes puffy face, brain fog, frequent infections.<br><br><strong>Support:</strong> 10–15 min daily rebounding, dry brushing, deep diaphragmatic breathing.</div>
+        </div>
+      </div>
+    </div>
+    <div class="questions">
+      <div class="q-title">Self-Exploration Questions</div>
+      <div class="q-section">
+        <div class="q-item">Why might someone with chronic constipation have worse "detox symptoms" even if their liver is working well?</div>
+        <div class="q-item">How does poor sleep affect all five detox organs simultaneously?</div>
+        <div class="q-item">What is enterohepatic recirculation and how do you prevent it?</div>
+        <div class="q-item">Why is movement non-negotiable for detoxification, even if you eat perfectly?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1.4 -->
+  <div id="l1-4" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 1.4</div>
+      <h2 class="lesson-title">The Hormesis Protocol</h2>
+      <div class="lesson-sub">Upgrade Your Detox System Through Controlled Stress</div>
+    </div>
+    <div class="lesson-body">
+      <p>Hormesis is the biological principle that low to moderate doses of stress trigger powerful adaptive responses that make you stronger, while high doses cause damage. Your body is not designed to live in a perfectly sterile, stress-free environment. It is designed to thrive through challenge.</p>
+      <div class="callout callout-insight">
+        <div class="callout-tag">Key Principle</div>
+        <div class="callout-text"><strong>Too Little Stress →</strong> No adaptation (system stays weak)<br><strong>Hormesis Zone →</strong> Strong adaptation (Nrf2 up, glutathione up, autophagy up)<br><strong>Too Much Stress →</strong> Overwhelm, inflammation, damage</div>
+      </div>
+      <div class="sec-h">The Hormesis Protocol — Practical System</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Practice</th><th>Frequency</th><th>Duration</th><th>Main Benefit</th><th>Strength</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Sauna / Heat Therapy</strong></td><td>2–3× per week</td><td>20–30 min</td><td>Heat shock proteins + Nrf2</td><td>★★★★</td></tr>
+            <tr><td><strong>20–24h Water Fast</strong></td><td>1× per week</td><td>20–24 hrs</td><td>Deep autophagy + toxin release</td><td>★★★★</td></tr>
+            <tr><td><strong>Cold Exposure</strong></td><td>3–5× per week</td><td>30–60 sec</td><td>Mitochondrial resilience</td><td>★★★</td></tr>
+            <tr><td><strong>High-Intensity Sprint</strong></td><td>1× per week</td><td>10–15 min</td><td>Strong ROS + Nrf2 spike</td><td>★★★★</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="red-flags">
+        <div class="rf-title">⚠ Safety Rules — Do NOT do intense hormesis if you have:</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Active chronic illness or autoimmune flare</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Severe adrenal fatigue</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>History of eating disorders</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Are underweight or malnourished</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Are pregnant or breastfeeding</div>
+      </div>
+    </div>
+    <div class="assignment">
+      <div class="assign-tag">Assignment</div>
+      <div class="assign-title">Design Your Personal Hormesis Protocol</div>
+      <div class="assign-item"><div class="assign-num">1</div>Choose 3 daily and 2 weekly hormetic practices from the tables above</div>
+      <div class="assign-item"><div class="assign-num">2</div>Commit to them for 14 days</div>
+      <div class="assign-item"><div class="assign-num">3</div>Track energy, digestion, skin clarity, mental clarity, and sleep quality in your Weekly Nrf2 Tracker</div>
+      <div class="assign-item"><div class="assign-num">4</div>Write a short reflection: "What changed when I started using hormesis intentionally?"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODULE 2
+═══════════════════════════════════════════════════ -->
+<div id="module2" class="module">
+  <div class="mod-header">
+    <div class="mod-num-big">2</div>
+    <div class="mod-meta">
+      <div class="mod-eyebrow">Module 2</div>
+      <div class="mod-title">Parasites — Biology, Lifecycles &amp; Reality Check</div>
+      <div class="mod-time">50–70 minutes · The Ancient Shadow Players</div>
+    </div>
+  </div>
+  <div class="mod-overview">
+    <div class="mo-title">Key Rules</div>
+    <div class="mo-list">
+      <div class="mo-item"><div class="mo-dot"></div>True parasitic infections are rare in developed countries with good sanitation</div>
+      <div class="mo-item"><div class="mo-dot"></div>Prevention &gt; Treatment — always</div>
+      <div class="mo-item"><div class="mo-dot"></div>Direct lifecycles (pinworm, giardia) = hygiene breaks them</div>
+      <div class="mo-item"><div class="mo-dot"></div>Indirect lifecycles (malaria, tapeworms) = break the chain</div>
+      <div class="mo-item"><div class="mo-dot"></div>Most "parasite symptoms" are actually from stress, diet, or gut issues</div>
+      <div class="mo-item"><div class="mo-dot"></div><strong>Key Rule:</strong> Only treat if properly tested and confirmed</div>
+    </div>
+  </div>
+
+  <!-- 2.1 -->
+  <div id="l2-1" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 2.1</div>
+      <h2 class="lesson-title">What Are Parasites?</h2>
+      <div class="lesson-sub">The Three Kingdoms · Evolutionary Genius · Why They Matter</div>
+    </div>
+    <div class="lesson-body">
+      <p>Parasites are not mere "invaders." They are master evolutionary strategists that have co-evolved with their hosts for hundreds of millions of years — organisms that thrive by living inside or on another living being.</p>
+      <div class="sec-h">The Three Kingdoms of Human Parasites</div>
+      <div class="two-col">
+        <div class="info-box">
+          <div class="ib-title">1. Protozoa — Single-Celled Shapeshifters</div>
+          <div class="ib-body">Microscopic, can reproduce rapidly inside the host, form protective cysts.<br><br><em>Examples:</em> Giardia, Cryptosporidium, Entamoeba histolytica, Plasmodium (malaria), Toxoplasma gondii</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">2. Helminths — Worms (Macro-Parasites)</div>
+          <div class="ib-body">Multicellular, can grow surprisingly large (tapeworms reach 7+ metres), often have complex lifecycles.<br><br><em>Examples:</em> Roundworms (Ascaris), Hookworms, Pinworms, Tapeworms, Flukes</div>
+        </div>
+        <div class="info-box" style="grid-column:1/-1">
+          <div class="ib-title">3. Ectoparasites — External Hitchhikers</div>
+          <div class="ib-body">Live on the outside of the body. Often vectors for other diseases.<br><em>Examples:</em> Lice, mites (scabies), fleas, ticks (Lyme disease, typhus)</div>
+        </div>
+      </div>
+      <div class="sec-h">Common Human Parasites — Quick Reference</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Parasite</th><th>Type</th><th>Main Transmission</th><th>Key Symptoms</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Pinworm</strong></td><td>Nematode</td><td>Fecal-oral (eggs)</td><td>Anal itching (especially at night)</td><td>Most common in children</td></tr>
+            <tr><td><strong>Ascaris (Roundworm)</strong></td><td>Nematode</td><td>Soil → lungs → gut</td><td>Cough, abdominal pain, malnutrition</td><td>Can block intestines when heavy</td></tr>
+            <tr><td><strong>Hookworm</strong></td><td>Nematode</td><td>Skin penetration (soil)</td><td>Anaemia, fatigue, protein loss</td><td>Major historical cause of anaemia</td></tr>
+            <tr><td><strong>Giardia</strong></td><td>Protozoa</td><td>Contaminated water</td><td>Foul-smelling diarrhoea, bloating</td><td>"Beaver fever"</td></tr>
+            <tr><td><strong>Taenia solium</strong></td><td>Tapeworm</td><td>Undercooked pork + fecal-oral</td><td>Often asymptomatic; cysticercosis causes seizures</td><td>Neurocysticercosis is serious</td></tr>
+            <tr><td><strong>Toxoplasma gondii</strong></td><td>Protozoa</td><td>Cat feces, undercooked meat</td><td>Usually mild; dangerous in pregnancy</td><td>One of the most common chronic infections worldwide</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2.2 -->
+  <div id="l2-2" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 2.2</div>
+      <h2 class="lesson-title">Parasite Lifecycles — Direct vs Indirect Strategies</h2>
+      <div class="lesson-sub">Evolutionary Strategy &amp; Transmission Mastery</div>
+    </div>
+    <div class="lesson-body">
+      <div class="two-col">
+        <div class="info-box">
+          <div class="ib-title">Direct (Monoxenous) Lifecycles</div>
+          <div class="ib-body">Complete lifecycle in one host. Often fecal-oral or direct contact. High transmission in close quarters.<br><br><strong>Examples:</strong> Pinworm, Giardia<br><br><strong>Prevention:</strong> Good hygiene and sanitation breaks the chain easily.</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">Indirect (Heteroxenous) Lifecycles</div>
+          <div class="ib-body">Requires two or more host species. Involves definitive host (sexual reproduction) and intermediate host(s).<br><br><strong>Examples:</strong> Malaria, Tapeworms, Schistosoma<br><br><strong>Prevention:</strong> Break any link in the chain — cook meat, safe water, mosquito control.</div>
+        </div>
+      </div>
+      <div class="callout callout-mystery">
+        <div class="callout-tag">Evolutionary Genius</div>
+        <div class="callout-text"><strong>Toxoplasma gondii</strong> famously makes infected rodents less afraid of cats — increasing the chance the parasite reaches its definitive host. Some evidence suggests it may influence human behaviour and risk-taking as well.</div>
+      </div>
+    </div>
+    <div class="questions">
+      <div class="q-title">Self-Exploration Questions</div>
+      <div class="q-section">
+        <div class="q-item">Why are indirect lifecycles evolutionarily advantageous for parasites even though they are more complex?</div>
+        <div class="q-item">Why is neurocysticercosis often more dangerous than intestinal tapeworm infection?</div>
+        <div class="q-item">How does breaking the lifecycle chain work differently for direct vs indirect parasites?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2.3 -->
+  <div id="l2-3" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 2.3</div>
+      <h2 class="lesson-title">Common Parasites — Mechanisms of Infection &amp; Harm</h2>
+      <div class="lesson-sub">Molecular Pathogenesis &amp; Clinical Mastery</div>
+    </div>
+    <div class="lesson-body">
+      <div class="sec-h">Pinworm — The Nighttime Invader</div>
+      <p>Eggs ingested via hands/bedding/dust → hatch in small intestine → migrate to colon → females crawl out at night to lay 10,000–15,000 eggs in perianal skin → intense itching → auto-infection cycle. Eggs become infectious within hours and survive on surfaces for 2–3 weeks.</p>
+      <div class="sec-h">Ascaris — The Giant Roundworm</div>
+      <p>Eggs ingested from contaminated soil → hatch → larvae penetrate intestinal wall → migrate through lungs (causing cough) → swallowed → mature to adults up to 35cm. Adults produce 200,000 eggs per day and live 1–2 years. Causes nutrient theft, obstruction, and Loeffler's syndrome.</p>
+      <div class="sec-h">Hookworms — The Blood Thieves</div>
+      <p>Infective larvae in soil penetrate skin (usually feet) → bloodstream → lungs → swallowed → attach to intestinal mucosa using cutting plates. Each worm consumes 0.03–0.2 ml of blood per day → iron-deficiency anaemia, protein loss, growth retardation.</p>
+      <div class="sec-h">Giardia — The Intestinal Hijacker</div>
+      <p>Cysts ingested → excyst in duodenum → trophozoites attach using ventral adhesive disk → disrupt gut barrier → malabsorption of fats, proteins, vitamins (A, B12, folate) → leaky gut. Directly impairs the Gut-Liver Axis and Phase II conjugation.</p>
+      <div class="sec-h">Taenia solium — The Double Threat</div>
+      <div class="two-col">
+        <div class="info-box">
+          <div class="ib-title">A. Taeniasis (Intestinal)</div>
+          <div class="ib-body">Undercooked pork → adult tapeworm 2–7 metres in small intestine. Usually mild or asymptomatic.</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">B. Cysticercosis (Tissue)</div>
+          <div class="ib-body">Ingesting eggs → larvae migrate to brain, muscle, eyes → massive inflammation when cysts die → seizures, neurological damage. Often more dangerous than the intestinal form.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2.4 -->
+  <div id="l2-4" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 2.4</div>
+      <h2 class="lesson-title">Parasite Risk — Australia/Queensland vs International Travel</h2>
+      <div class="lesson-sub">Regional Epidemiology &amp; Practical Risk Management</div>
+    </div>
+    <div class="lesson-body">
+      <div class="callout callout-insight">
+        <div class="callout-tag">Good News for Australians</div>
+        <div class="callout-text">Australia has excellent sanitation, clean drinking water, and strong food safety standards. True parasitic infections are relatively uncommon in the general population. Most serious parasitic infections in Australians are acquired during overseas travel, not at home.</div>
+      </div>
+      <div class="sec-h">Australian/Queensland Risks (Low-Moderate)</div>
+      <ul class="checklist">
+        <li><span class="cl-icon cl-gold"><span class="cl-dot"></span></span><strong>Threadworm (Pinworm)</strong> — Most common. Up to 50% of primary school children. Higher rates in Queensland's humid subtropical climate.</li>
+        <li><span class="cl-icon cl-gold"><span class="cl-dot"></span></span><strong>Giardia</strong> — "Beaver Fever." Common in remote areas and among campers drinking untreated water.</li>
+        <li><span class="cl-icon cl-gold"><span class="cl-dot"></span></span><strong>Cryptosporidium</strong> — Common cause of outbreaks in swimming pools and childcare centres. Chlorine-resistant.</li>
+        <li><span class="cl-icon cl-gold"><span class="cl-dot"></span></span><strong>Toxoplasma gondii</strong> — Cat ownership and undercooked meat. Serious in pregnancy.</li>
+        <li><span class="cl-icon cl-red"><span class="cl-dot"></span></span><strong>Hydatid Disease (Echinococcus)</strong> — Rare but serious. Rural areas with sheep and dogs.</li>
+      </ul>
+      <div class="sec-h">International Travel Risks</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Destination</th><th>High-Risk Parasites</th><th>Main Transmission</th><th>Risk Level</th></tr></thead>
+          <tbody>
+            <tr><td>Southeast Asia</td><td>Giardia, Ascaris, Hookworm, Strongyloides</td><td>Contaminated water/food, skin penetration</td><td>High</td></tr>
+            <tr><td>India &amp; South Asia</td><td>Giardia, Ascaris, Hookworm, Taenia</td><td>Water, food, poor sanitation</td><td>Very High</td></tr>
+            <tr><td>Sub-Saharan Africa</td><td>Malaria, Schistosomiasis, Hookworm</td><td>Mosquitoes, freshwater, soil</td><td>Very High</td></tr>
+            <tr><td>Latin America</td><td>Taenia solium, Giardia, Ascaris</td><td>Undercooked pork, water, food</td><td>High</td></tr>
+            <tr><td>Pacific Islands</td><td>Strongyloides, Hookworm</td><td>Soil, poor sanitation</td><td>Moderate</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-fact">
+        <div class="callout-tag">Travel Rule</div>
+        <div class="callout-text"><strong>Peel it, boil it, cook it, or forget it.</strong> The further you go from modern sanitation and safe water, the higher your risk. Wear shoes in rural areas, use insect repellent and bed nets in malaria zones, and drink only bottled or boiled water.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODULE 3
+═══════════════════════════════════════════════════ -->
+<div id="module3" class="module">
+  <div class="mod-header">
+    <div class="mod-num-big">3</div>
+    <div class="mod-meta">
+      <div class="mod-eyebrow">Module 3</div>
+      <div class="mod-title">Treatments — What Actually Works</div>
+      <div class="mod-time">50 minutes · Gold Standards to Natural Compounds</div>
+    </div>
+  </div>
+  <div class="mod-overview">
+    <div class="mo-title">Evidence Summary</div>
+    <div class="mo-list">
+      <div class="mo-item"><div class="mo-dot"></div>Pharmaceuticals: Gold Standard — confirmed infection, high efficacy (85–99% cure rates)</div>
+      <div class="mo-item"><div class="mo-dot"></div>Artemisinin (Tier 1) — Malaria, Nobel Prize 2015</div>
+      <div class="mo-item"><div class="mo-dot"></div>Berberine (Tier 1) — Giardia, under supervision</div>
+      <div class="mo-item"><div class="mo-dot"></div>Pumpkin Seeds (Tier 2) — Tapeworms (supportive)</div>
+      <div class="mo-item"><div class="mo-dot"></div>Commercial Cleanses (Tier 3) — Avoid. Often risky.</div>
+    </div>
+  </div>
+
+  <!-- 3.1 -->
+  <div id="l3-1" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 3.1</div>
+      <h2 class="lesson-title">Pharmaceutical Antiparasitics — The Gold Standard</h2>
+      <div class="lesson-sub">Molecular Mechanisms, Clinical Evidence &amp; Safety Mastery</div>
+    </div>
+    <div class="lesson-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Drug Class</th><th>Examples</th><th>Mechanism</th><th>Key Targets</th><th>Safety</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Benzimidazoles</strong></td><td>Albendazole, Mebendazole</td><td>Bind beta-tubulin → prevent microtubule formation → parasites starve and die</td><td>Roundworms, Hookworms, Pinworms, Tapeworms</td><td>Very safe. Mild abdominal discomfort.</td></tr>
+            <tr><td><strong>Ivermectin</strong></td><td>Ivermectin</td><td>Binds glutamate-gated chloride channels → paralysis and death. Safe in humans (blood-brain barrier)</td><td>Strongyloides, River blindness, Scabies</td><td>Extremely safe. Contraindicated in pregnancy.</td></tr>
+            <tr><td><strong>Praziquantel</strong></td><td>Praziquantel</td><td>Increases calcium permeability → muscle contraction, paralysis, tegumental damage</td><td>Schistosomiasis, All tapeworms, Flukes</td><td>Very safe. Mild dizziness.</td></tr>
+            <tr><td><strong>Metronidazole / Tinidazole</strong></td><td>Flagyl, Fasigyn</td><td>Reduces to toxic radicals in anaerobic organisms → DNA damage</td><td>Giardia, Amebiasis, Trichomonas</td><td>Safe short-term. Avoid alcohol.</td></tr>
+            <tr><td><strong>Artemisinin Derivatives</strong></td><td>Artemether, Artesunate</td><td>Endoperoxide bridge cleaved by parasite iron → free radicals damage parasite</td><td>Malaria (Plasmodium falciparum)</td><td>Very safe at therapeutic doses.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-insight">
+        <div class="callout-tag">Why Pharmaceuticals Win</div>
+        <div class="callout-text">High efficacy (85–99% cure rates) · Targeted molecular action · Extensive safety data · WHO &amp; CDC endorsed · Rapid action within days, not months. These are not "toxic chemicals" — they are precision tools designed to exploit specific vulnerabilities in parasite biology.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.2 -->
+  <div id="l3-2" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 3.2</div>
+      <h2 class="lesson-title">Natural Compounds &amp; Herbs — Evidence Levels</h2>
+      <div class="lesson-sub">Phytochemistry, Clinical Data &amp; Critical Evaluation</div>
+    </div>
+    <div class="lesson-body">
+      <div class="tier">
+        <span class="tier-badge tier-1">Tier 1 — Strong Evidence</span>
+        <div class="tier-text"><strong>Artemisinin (Artemisia annua)</strong> — Nobel Prize 2015. WHO gold standard for malaria. Endoperoxide bridge mechanism. Also shows promise against Schistosoma and Toxoplasma.</div>
+      </div>
+      <div class="tier">
+        <span class="tier-badge tier-1">Tier 1 — Strong Evidence</span>
+        <div class="tier-text"><strong>Berberine</strong> (Berberis, goldenseal, Oregon grape) — Good clinical data for Giardia and Entamoeba histolytica. Multiple randomised trials. 500mg 2–3× daily for 7–14 days under medical supervision. CYP3A4 inhibitor — check drug interactions.</div>
+      </div>
+      <div class="tier">
+        <span class="tier-badge tier-2">Tier 2 — Moderate Evidence</span>
+        <div class="tier-text"><strong>Pumpkin Seed Extract</strong> (Cucurbita pepo) — Contains cucurbitacin, which paralyses tapeworms. Small clinical studies on Taenia species. Very safe, often used in children. Not as effective as praziquantel for heavy infections.</div>
+      </div>
+      <div class="tier">
+        <span class="tier-badge tier-2">Tier 2 — Moderate Evidence</span>
+        <div class="tier-text"><strong>Papaya Seeds</strong> — Contains carpaine and benzyl isothiocyanate. Small human studies showing reduction in intestinal worm burden. Generally safe. 1 tsp crushed seeds daily for 7 days (traditional use, low risk).</div>
+      </div>
+      <div class="tier">
+        <span class="tier-badge tier-3">Tier 3 — Weak Evidence</span>
+        <div class="tier-text"><strong>Black Walnut + Wormwood + Clove (Hulda Clark Protocol)</strong> — Mostly anecdotal and weak lab/animal studies. Wormwood (thujone) can be neurotoxic in high doses. Not recommended for long-term use.</div>
+      </div>
+      <div class="tier">
+        <span class="tier-badge tier-3">Tier 3 — Avoid</span>
+        <div class="tier-text"><strong>Diatomaceous Earth, Essential Oils (internal), Commercial Parasite Kits</strong> — No good clinical evidence for internal parasite treatment. Can damage gut lining. Usually contain strong laxatives.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.3 -->
+  <div id="l3-3" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 3.3</div>
+      <h2 class="lesson-title">Why Most Commercial Cleanses Fail</h2>
+      <div class="lesson-sub">Marketing Psychology, Physiology &amp; Critical Thinking</div>
+    </div>
+    <div class="lesson-body">
+      <div class="red-flags">
+        <div class="rf-title">7 Red Flags of Parasite Cleanse Marketing</div>
+        <div class="rf-item"><div class="rf-bullet">1</div><strong>"Everyone has hidden parasites"</strong> — False. Most people in developed countries do not have clinically significant parasitic infections.</div>
+        <div class="rf-item"><div class="rf-bullet">2</div><strong>"Your symptoms = Parasites"</strong> — False. Fatigue, bloating, brain fog, skin issues have dozens of causes (stress, diet, sleep, gut dysbiosis).</div>
+        <div class="rf-item"><div class="rf-bullet">3</div><strong>"Our kit kills 100+ types of parasites"</strong> — Impossible. No single product safely and effectively targets that many organisms.</div>
+        <div class="rf-item"><div class="rf-bullet">4</div><strong>"You'll see worms in your stool"</strong> — Usually mucus, undigested food, or fibre. Real adult worms are rarely visible.</div>
+        <div class="rf-item"><div class="rf-bullet">5</div><strong>"Pharmaceuticals are toxic — our herbs are natural"</strong> — False. Many herbs are toxic in high doses. Pharmaceuticals are rigorously tested; herbal kits are not.</div>
+        <div class="rf-item"><div class="rf-bullet">6</div><strong>"No testing needed — just buy our product"</strong> — Dangerous and unscientific.</div>
+        <div class="rf-item"><div class="rf-bullet">7</div><strong>"Results guaranteed or money back"</strong> — Usually meaningless fine print.</div>
+      </div>
+      <div class="sec-h">Why People Feel Better Anyway</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Claim</th><th>Reality</th><th>Verdict</th></tr></thead>
+          <tbody>
+            <tr><td>"Parasites cause most modern diseases"</td><td>Extremely rare in developed countries with good sanitation</td><td>False</td></tr>
+            <tr><td>"You need to cleanse regularly"</td><td>Your liver, kidneys, and gut already do this continuously</td><td>False</td></tr>
+            <tr><td>"You'll see worms in stool"</td><td>Real worms are rarely visible; most "worms" are mucus or food</td><td>Misleading</td></tr>
+            <tr><td>"Herbs are always safer than drugs"</td><td>Many herbs have toxicity and drug interactions</td><td>False</td></tr>
+            <tr><td>"One kit fixes everything"</td><td>Parasites require specific, targeted treatment based on species</td><td>False</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-insight">
+        <div class="callout-tag">The Real Mechanism</div>
+        <div class="callout-text">People feel better because: (1) Strong laxative effect relieves constipation, (2) Broad antimicrobials temporarily reduce harmful bacteria, (3) Expectation &amp; placebo effect, (4) Unconscious calorie restriction and cleaner eating, (5) Confirmation bias from money spent.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODULE 4
+═══════════════════════════════════════════════════ -->
+<div id="module4" class="module">
+  <div class="mod-header">
+    <div class="mod-num-big">4</div>
+    <div class="mod-meta">
+      <div class="mod-eyebrow">Module 4</div>
+      <div class="mod-title">History &amp; Lessons from the Past</div>
+      <div class="mod-time">30–40 minutes · Evolutionary Medicine &amp; Cultural Wisdom</div>
+    </div>
+  </div>
+
+  <!-- 4.1 -->
+  <div id="l4-1" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 4.1</div>
+      <h2 class="lesson-title">Ancient Remedies — Ötzi, Egypt &amp; China</h2>
+      <div class="lesson-sub">The Oldest Evidence of Human Detox &amp; Parasite Treatment</div>
+    </div>
+    <div class="lesson-body">
+      <div class="two-col">
+        <div class="info-box">
+          <div class="ib-title">Ötzi the Iceman — 5,300 Years Ago</div>
+          <div class="ib-body">Scientists found whipworm eggs (Trichuris trichiura) and two species of Piptoporus betulinus (birch polypore fungus) in his stomach — which has antiparasitic, antibacterial, and anti-inflammatory properties. Even 5,300 years ago, humans were actively treating parasites with specific plants.</div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">Ancient Egypt — Ebers Papyrus (~1550 BCE)</div>
+          <div class="ib-body">Treatments for "worms in the belly" using: pomegranate root bark (ellagitannins with anthelmintic activity), wormwood (Artemisia absinthium), garlic and onions (sulfur compounds), castor oil as a powerful laxative to expel parasites.</div>
+        </div>
+        <div class="info-box" style="grid-column:1/-1">
+          <div class="ib-title">Ancient China — 2,000+ BCE</div>
+          <div class="ib-body">Qinghao (Artemisia annua) used for "intermittent fevers" (malaria) for over 2,000 years — the same plant that gave us artemisinin (Nobel Prize 2015). Bing Lang (betel nut) and Lei Wan (Omphalia) for tapeworms and roundworms. Emphasis on prevention through diet, movement, and balancing "Qi."</div>
+        </div>
+      </div>
+      <div class="callout callout-mystery">
+        <div class="callout-tag">Profound Pattern</div>
+        <div class="callout-text">Across three completely different ancient civilisations, humans independently discovered plants that contain real bioactive antiparasitic compounds still used or studied today. This is not coincidence — it is evolutionary medicine in action.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.2 -->
+  <div id="l4-2" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 4.2</div>
+      <h2 class="lesson-title">Medieval Purging to Modern Drugs</h2>
+      <div class="lesson-sub">From Dangerous Extremes to Targeted Medicine</div>
+    </div>
+    <div class="lesson-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Era</th><th>Approach</th><th>Outcome</th></tr></thead>
+          <tbody>
+            <tr><td>Medieval Purging</td><td>High-dose toxic herbs (male fern, hellebore, savin), bloodletting, violent diarrhea/vomiting to "expel worms"</td><td>Patients died from dehydration, electrolyte imbalance, liver failure. George Washington bled four times in one day for a throat infection — died shortly after.</td></tr>
+            <tr><td>1668 — Francesco Redi</td><td>Proved parasites come from eggs, not "bad humors" — first major scientific breakthrough</td><td>Began shift from superstition to targeted medicine</td></tr>
+            <tr><td>1850s–1900s</td><td>Mapping of complete parasite lifecycles — Schistosoma, hookworm, malaria, mosquito transmission</td><td>First understanding that parasites have specific vulnerabilities</td></tr>
+            <tr><td>1970s — Modern Revolution</td><td>Albendazole, mebendazole, ivermectin, artemisinin — targeted molecular mechanisms</td><td>85–99% cure rates, excellent safety profiles, Nobel Prizes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-danger">
+        <div class="callout-tag">The Lesson for Today</div>
+        <div class="callout-text">The commercial "parasite cleanse" and "detox" industry today often repeats the mistakes of medieval medicine — strong laxatives to create dramatic bowel movements, combining multiple herbs without proper dosing, claiming to "kill 100+ parasites" without evidence, ignoring the need for proper diagnosis. History's message is clear: aggressive, non-specific "cleansing" is dangerous and outdated.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.3 -->
+  <div id="l4-3" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 4.3</div>
+      <h2 class="lesson-title">What We Still Use Today from Traditional Knowledge</h2>
+      <div class="lesson-sub">Ancient Wisdom Validated by Modern Science</div>
+    </div>
+    <div class="lesson-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Ancient Herb</th><th>Ancient Use</th><th>Active Compound(s)</th><th>Modern Validation</th><th>Still Used?</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Artemisia annua (Qinghao)</strong></td><td>Malaria (China, 2000+ years)</td><td>Artemisinin</td><td>Nobel Prize 2015 — Gold standard for severe malaria</td><td>Yes (pharmaceutical)</td></tr>
+            <tr><td><strong>Cinchona bark</strong></td><td>Malaria (South America)</td><td>Quinine</td><td>First effective malaria drug (1820)</td><td>Yes (limited)</td></tr>
+            <tr><td><strong>Pumpkin seeds</strong></td><td>Tapeworms (Europe, Asia, Americas)</td><td>Cucurbitacin</td><td>Clinical evidence for tapeworms</td><td>Yes (safe)</td></tr>
+            <tr><td><strong>Berberis species</strong></td><td>Dysentery, parasites (India, China)</td><td>Berberine</td><td>Good evidence for Giardia &amp; amebiasis</td><td>Yes (supplement)</td></tr>
+            <tr><td><strong>Pomegranate root</strong></td><td>Intestinal worms (Egypt, Greece)</td><td>Ellagitannins + alkaloids</td><td>Confirmed anthelmintic effects</td><td>Supportive</td></tr>
+            <tr><td><strong>Artemisia absinthium (Wormwood)</strong></td><td>Intestinal worms &amp; fevers</td><td>Thujone + sesquiterpenes</td><td>Moderate antiparasitic activity</td><td>Limited (toxic in high doses)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-warning">
+        <div class="callout-tag">Critical Warning — The Dark Side</div>
+        <div class="callout-text">"Natural" does not equal "safe." History is full of deadly traditional remedies: mercury (neurological damage, kidney failure), lead (Roman cosmetics/medicines → widespread poisoning), hellebore (seizures and death), male fern (blindness, liver damage), savin (kidney and liver toxicity), aconite (cardiac arrest from small doses). The reason we have modern medicine is because science developed rigorous testing, standardised dosing, and safety monitoring that traditional systems lacked.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.4 -->
+  <div id="l4-4" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 4.4</div>
+      <h2 class="lesson-title">The 7 Timeless Principles from History</h2>
+    </div>
+    <div class="lesson-body">
+      <div class="principle"><div class="prin-num">1</div><div class="prin-body"><div class="prin-title">Targeted Treatment Beats Broad Purging</div><div class="prin-text">Ancient and medieval "purge everything" approaches often caused more harm than good. Modern targeted drugs are vastly superior.</div></div></div>
+      <div class="principle"><div class="prin-num">2</div><div class="prin-body"><div class="prin-title">Plants Contain Real Medicine — But Dose and Quality Matter</div><div class="prin-text">Many ancient herbs worked because they contained bioactive compounds. However, crude preparations were inconsistent and sometimes toxic.</div></div></div>
+      <div class="principle"><div class="prin-num">3</div><div class="prin-body"><div class="prin-title">Prevention Has Always Been More Powerful Than Treatment</div><div class="prin-text">Ancient cultures that emphasised hygiene, clean water, and cooking food had far lower parasite burdens.</div></div></div>
+      <div class="principle"><div class="prin-num">4</div><div class="prin-body"><div class="prin-title">Fear-Based Marketing Is Not New</div><div class="prin-text">Throughout history, healers and charlatans sold "miracle cures" for parasites and toxins using the same psychological tactics used today — fear plus testimonials.</div></div></div>
+      <div class="principle"><div class="prin-num">5</div><div class="prin-body"><div class="prin-title">Science + Tradition = Best Results</div><div class="prin-text">The greatest advances occurred when traditional knowledge was rigorously tested and refined by science — artemisinin, ivermectin, quinine.</div></div></div>
+      <div class="principle"><div class="prin-num">6</div><div class="prin-body"><div class="prin-title">The Body's Natural Defenses Are Powerful</div><div class="prin-text">History shows that well-nourished, hormonetically resilient people had better outcomes even without modern medicine.</div></div></div>
+      <div class="principle"><div class="prin-num">7</div><div class="prin-body"><div class="prin-title">Never Stop Testing and Questioning</div><div class="prin-text">Every generation thought its treatments were advanced. We must remain humble and evidence-based.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODULE 5
+═══════════════════════════════════════════════════ -->
+<div id="module5" class="module">
+  <div class="mod-header">
+    <div class="mod-num-big">5</div>
+    <div class="mod-meta">
+      <div class="mod-eyebrow">Module 5</div>
+      <div class="mod-title">Action Plan &amp; Long-Term Strategy</div>
+      <div class="mod-time">40–60 minutes · Integration, Personalisation &amp; Lifelong Mastery</div>
+    </div>
+  </div>
+
+  <!-- 5.1 -->
+  <div id="l5-1" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 5.1</div>
+      <h2 class="lesson-title">Prevention Is the Best Cleanse</h2>
+    </div>
+    <div class="lesson-body">
+      <div class="pullquote">The best way to "clear toxins and parasites" is to never let them become a problem in the first place.</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Pillar</th><th>Why It Works</th><th>Practical Daily Action</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1. Strong Gut Barrier</strong></td><td>Prevents absorption of toxins &amp; parasites</td><td>30–40g fibre + fermented foods daily</td></tr>
+            <tr><td><strong>2. Robust Immune System</strong></td><td>Controls parasites before they establish</td><td>Sleep 7–9 hrs + broccoli sprouts + exercise</td></tr>
+            <tr><td><strong>3. Clean Water &amp; Food Safety</strong></td><td>Breaks transmission chains</td><td>Filter water when traveling + cook meat thoroughly</td></tr>
+            <tr><td><strong>4. Hormetic Training</strong></td><td>Upgrades your natural detox &amp; immune systems</td><td>Daily broccoli sprouts + 16:8 fasting + movement</td></tr>
+            <tr><td><strong>5. Stress &amp; Sleep Management</strong></td><td>Prevents HPA axis sabotage of detox</td><td>Consistent bedtime + stress-reduction practices</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.2 -->
+  <div id="l5-2" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 5.2</div>
+      <h2 class="lesson-title">When to See a Doctor + Red Flags</h2>
+      <div class="lesson-sub">Knowing When Self-Care Is Not Enough</div>
+    </div>
+    <div class="lesson-body">
+      <div class="red-flags">
+        <div class="rf-title">Red Flags That Require Medical Evaluation</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Unexplained weight loss</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Persistent diarrhoea or malabsorption lasting more than 2 weeks</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Blood in stool</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Severe abdominal pain</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Fever + travel history to high-risk areas</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Neurological symptoms (seizures, confusion) + possible exposure</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Anaemia that does not respond to iron</div>
+        <div class="rf-item"><div class="rf-bullet">!</div>Nighttime anal itching in children (possible pinworm — easy to test)</div>
+      </div>
+      <div class="callout callout-fact">
+        <div class="callout-tag">Recommended Tests</div>
+        <div class="callout-text">Stool PCR panel (most accurate) · Blood tests (eosinophil count, IgE, specific serology) · Imaging (if cysticercosis or hydatid disease suspected). <strong>Never self-treat with strong antiparasitics without confirmation.</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.3 -->
+  <div id="l5-3" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 5.3</div>
+      <h2 class="lesson-title">Building Lifelong Healthy Habits</h2>
+    </div>
+    <div class="lesson-body">
+      <div class="protocol">
+        <div class="prot-title">The Daily Non-Negotiables</div>
+        <div class="prot-section">
+          <div class="prot-tag">Morning — Activation</div>
+          <div class="prot-item"><div class="prot-dot"></div>Warm lemon water + pinch of sea salt</div>
+          <div class="prot-item"><div class="prot-dot"></div>Broccoli sprouts or sulforaphane-rich food</div>
+          <div class="prot-item"><div class="prot-dot"></div>High-protein breakfast</div>
+        </div>
+        <div class="prot-rule"></div>
+        <div class="prot-section">
+          <div class="prot-tag">Throughout the Day</div>
+          <div class="prot-item"><div class="prot-dot"></div>30–40g fibre (especially soluble)</div>
+          <div class="prot-item"><div class="prot-dot"></div>2.5–3.5 litres filtered water with electrolytes</div>
+          <div class="prot-item"><div class="prot-dot"></div>Movement that makes you sweat (Zone 2 + strength)</div>
+        </div>
+        <div class="prot-rule"></div>
+        <div class="prot-section">
+          <div class="prot-tag">Evening — Recovery</div>
+          <div class="prot-item"><div class="prot-dot"></div>Magnesium-rich foods or supplement</div>
+          <div class="prot-item"><div class="prot-dot"></div>Consistent sleep window (liver repair peaks 1–3 AM)</div>
+          <div class="prot-item"><div class="prot-dot"></div>10-minute "Inner Alchemist" reflection or journal</div>
+        </div>
+        <div class="prot-rule"></div>
+        <div class="prot-section">
+          <div class="prot-tag">Weekly Boosters</div>
+          <div class="prot-item"><div class="prot-dot"></div>2–3 sauna sessions (heat shock proteins + Nrf2)</div>
+          <div class="prot-item"><div class="prot-dot"></div>1× 20–24h water fast (if tolerated)</div>
+          <div class="prot-item"><div class="prot-dot"></div>High-intensity movement once per week</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.4 -->
+  <div id="l5-4" class="lesson">
+    <div class="lesson-hd">
+      <div class="lesson-tag">Lesson 5.4</div>
+      <h2 class="lesson-title">Creating Your Personal Protocol</h2>
+      <div class="lesson-sub">Your 30-Day Optimisation Plan</div>
+    </div>
+    <div class="lesson-body">
+      <p style="font-size:14px;color:var(--ink2);margin-bottom:1.25rem;">Use the interactive suite below to build your personalised 30-day protocol and generate your doctor letter — everything runs in this page, no external links needed.</p>
+
+      <!-- ══════════════════════════════════════════
+           EMBEDDED HEALTH OPTIMISATION SUITE
+      ══════════════════════════════════════════ -->
+      <div class="suite-embed">
+        <div class="suite-tabs">
+          <button class="suite-tab on" id="stab-pb" onclick="suiteTab('pb')">
+            <span class="suite-tab-label">30-Day Protocol Builder</span>
+            <span class="suite-tab-sub">Assessment · foundations · weekly tracker</span>
+          </button>
+          <button class="suite-tab" id="stab-dl" onclick="suiteTab('dl')">
+            <span class="suite-tab-label">Doctor Letter Builder</span>
+            <span class="suite-tab-sub">Decision tree · AI letter generator</span>
+          </button>
+        </div>
+        <div class="suite-tool on" id="stool-pb">
+          <div id="pb-prog"></div>
+          <div id="pb-main"></div>
+        </div>
+        <div class="suite-tool" id="stool-dl">
+          <div id="dl-main"></div>
+        </div>
+      </div>
+      <!-- ══════════════════════════════════════════ -->
+
+    </div>
+    <div class="assignment">
+      <div class="assign-tag">Final Assignment</div>
+      <div class="assign-title">Your 30-Day Personal Health Optimisation Plan</div>
+      <div class="assign-item"><div class="assign-num">1</div>Your current baseline scores (energy, digestion, sleep, skin, mental clarity)</div>
+      <div class="assign-item"><div class="assign-num">2</div>Your chosen daily foundations — minimum 4</div>
+      <div class="assign-item"><div class="assign-num">3</div>Your chosen weekly boosters — minimum 2</div>
+      <div class="assign-item"><div class="assign-num">4</div>One monthly reset if appropriate</div>
+      <div class="assign-item"><div class="assign-num">5</div>How you will track progress using the Weekly Nrf2 Tracker for 30 days</div>
+      <div class="assign-item"><div class="assign-num">6</div>Three red flags you will watch for in marketing claims</div>
+      <div class="assign-item"><div class="assign-num">7</div>One doctor visit or test you will schedule if symptoms persist</div>
+    </div>
+    <div class="pullquote">"What changed when I stopped chasing quick fixes and started supporting my body's ancient intelligence every single day?"</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     FINAL TRUTHS
+═══════════════════════════════════════════════════ -->
+<div id="final-truths" style="padding:3rem 0 1rem">
+  <div class="final-truths">
+    <div class="ft-title">Final Truths</div>
+    <div class="ft-item"><div class="ft-dot"></div>Your body already detoxes 24/7 — support it, don't "cleanse" it.</div>
+    <div class="ft-item"><div class="ft-dot"></div>Most symptoms blamed on "toxins/parasites" have simpler causes.</div>
+    <div class="ft-item"><div class="ft-dot"></div>Fear-based marketing is the real parasite.</div>
+    <div class="ft-item"><div class="ft-dot"></div>Consistency beats intensity every single time.</div>
+    <div class="ft-item"><div class="ft-dot"></div>Your Body's Ancient Intelligence + Modern Evidence = Lifelong Health.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     BONUS RESOURCES
+═══════════════════════════════════════════════════ -->
+<div id="resources" style="padding:2rem 0">
+  <h2 class="sh" style="margin-bottom:1.5rem">Bonus Resources</h2>
+
+  <div class="resources">
+    <div class="res-title">Further Reading — Authoritative Sources</div>
+    <div class="res-item"><div class="res-icon">CDC</div><div><div class="res-name">CDC DPDx — Parasite Image Library &amp; Diagnostic Procedures</div><div class="res-url">https://www.cdc.gov/dpdx/</div></div></div>
+    <div class="res-item"><div class="res-icon">WHO</div><div><div class="res-name">WHO — Neglected Tropical Diseases &amp; Antiparasitic Guidelines</div><div class="res-url">https://www.who.int/teams/control-of-neglected-tropical-diseases</div></div></div>
+    <div class="res-item"><div class="res-icon">Pub</div><div><div class="res-name">PubMed — Search "parasite detoxification Nrf2" or specific compounds</div><div class="res-url">https://pubmed.ncbi.nlm.nih.gov/</div></div></div>
+    <div class="res-item"><div class="res-icon">NCC</div><div><div class="res-name">NCCIH — National Center for Complementary and Integrative Health (evidence on herbs)</div><div class="res-url">https://www.nccih.nih.gov/</div></div></div>
+  </div>
+
+  <div id="tracker" class="assignment">
+    <div class="assign-tag">Bonus Resource 2</div>
+    <div class="assign-title">Symptom Tracker Template — 4 Week Daily Log</div>
+    <div class="tbl-wrap" style="margin-top:.75rem;border-radius:var(--r8)">
+      <table>
+        <thead><tr><th>Day</th><th>Energy</th><th>Digestion</th><th>Sleep</th><th>Skin</th><th>Mental Clarity</th><th>Bloating</th><th>Brain Fog</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>28</td><td></td><td></td><td></td><td colspan="5" style="color:var(--ink3);font-size:12px;">Rate 1–10 or Yes/No daily</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="doctor-guide" class="card" style="background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r16);padding:1.5rem;margin-bottom:.75rem;">
+    <div class="pst">Bonus Resource 3 — Doctor Discussion Guide</div>
+    <div class="sh" style="margin-bottom:1rem;font-size:20px">Questions to Ask Your Doctor</div>
+    <ul class="checklist">
+      <li><span class="cl-icon cl-grn"><span class="cl-dot"></span></span>"Given my symptoms and risk factors, would you recommend a stool PCR panel?"</li>
+      <li><span class="cl-icon cl-grn"><span class="cl-dot"></span></span>"What tests would you run to rule out parasitic infection or liver dysfunction?"</li>
+      <li><span class="cl-icon cl-grn"><span class="cl-dot"></span></span>"Are there any red flags in my history that concern you?"</li>
+      <li><span class="cl-icon cl-grn"><span class="cl-dot"></span></span>"If tests are negative, what other causes should we investigate?"</li>
+    </ul>
+    <div class="callout callout-insight" style="margin-bottom:0;margin-top:1rem">
+      <div class="callout-tag">Interactive Tool</div>
+      <div class="callout-text">Use the <a href="#l5-4" style="color:var(--grnd);font-weight:500" onclick="document.getElementById('stab-dl').click()">Doctor Letter Builder</a> embedded in Lesson 5.4 — follow the decision tree and generate a personalised, AI-written doctor letter in minutes.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</main>
+</div><!-- /page -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   HEALTH SUITE — TAB SWITCHER
+═══════════════════════════════════════════════════════════════ */
+function suiteTab(t){
+  document.getElementById('stool-pb').classList.toggle('on',t==='pb');
+  document.getElementById('stool-dl').classList.toggle('on',t==='dl');
+  document.getElementById('stab-pb').classList.toggle('on',t==='pb');
+  document.getElementById('stab-dl').classList.toggle('on',t==='dl');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED DATA
+═══════════════════════════════════════════════════════════════ */
+const SECS=[
+{key:'energy',name:'Energy',icon:'E',ibg:'#FAEEDA',ic:'#834E0A',hint:'3 questions · daily energy patterns',qs:[
+ {q:'How do you typically feel when you wake up in the morning?',opts:[{t:'Exhausted — hard to get out of bed regardless of how long I sleep',s:2},{t:'Tired, but I push through after a slow start',s:4},{t:'OK after about 20–30 minutes',s:7},{t:'Alert and ready to go almost straight away',s:10}]},
+ {q:'How does your energy hold up during the afternoon slump (2–4pm)?',opts:[{t:'I crash badly — need caffeine, sugar, or a nap to function',s:2},{t:'I feel sluggish and struggle to stay on task',s:4},{t:'Mild dip but manageable without any intervention',s:7},{t:'Steady — no noticeable afternoon drop at all',s:10}]},
+ {q:'How often do you rely on caffeine or stimulants to feel functional?',opts:[{t:'Multiple times a day — I genuinely cannot function without it',s:2},{t:'Once daily and I feel it strongly when I skip',s:4},{t:'Occasionally by choice, not out of necessity',s:7},{t:'Rarely or never — my energy is naturally sustained',s:10}]}
+]},
+{key:'digestion',name:'Digestion',icon:'D',ibg:'#E8F2DC',ic:'#3A6B10',hint:'3 questions · gut health and patterns',qs:[
+ {q:'How regular and comfortable are your daily bowel movements?',opts:[{t:'Irregular — less than once a day, often uncomfortable or strained',s:2},{t:'Once a day but often bloated, gassy, or feels incomplete',s:4},{t:'Once a day, mostly fine with occasional discomfort',s:7},{t:'1–2 times daily — easy, complete, no bloating or discomfort',s:10}]},
+ {q:'How often do you experience bloating, gas, or stomach pain after eating?',opts:[{t:'Almost every meal triggers noticeable bloating or pain',s:2},{t:'Several times a week',s:4},{t:'Occasionally, usually with specific foods',s:7},{t:'Rarely or never',s:10}]},
+ {q:'How clear and consistent are your hunger and fullness signals?',opts:[{t:'No clear signals — I eat out of habit or feel sick after meals',s:2},{t:'Erratic — swinging between no appetite and sudden intense hunger',s:4},{t:'Generally readable with occasional cravings or overeating',s:7},{t:'Clear and consistent — I always know when I am hungry or satisfied',s:10}]}
+]},
+{key:'sleep',name:'Sleep',icon:'Sl',ibg:'#DFF3EC',ic:'#07503D',hint:'3 questions · sleep quality and recovery',qs:[
+ {q:'How many hours of uninterrupted sleep do you typically get per night?',opts:[{t:'Under 5 hours',s:2},{t:'5–6 hours',s:4},{t:'6–7 hours',s:7},{t:'7–9 hours consistently',s:10}]},
+ {q:'How long does it typically take you to fall asleep after lying down?',opts:[{t:'Over an hour — mind racing or body restless',s:2},{t:'30–60 minutes with some effort',s:4},{t:'15–30 minutes fairly naturally',s:7},{t:'Under 15 minutes — I fall asleep easily and quickly',s:10}]},
+ {q:'How do you feel during the day in terms of sleep-related energy?',opts:[{t:'Constantly drowsy — fighting to stay awake throughout the day',s:2},{t:'Tired for most of the day, relying on stimulants to cope',s:4},{t:'OK but not mentally sharp — manageable most of the time',s:7},{t:'Well-rested, clear-headed, and alert all day',s:10}]}
+]},
+{key:'skin',name:'Skin clarity',icon:'Sk',ibg:'#F9EAF0',ic:'#702340',hint:'3 questions · skin health and reactivity',qs:[
+ {q:'How would you describe your skin on most days?',opts:[{t:'Frequent breakouts, ongoing inflammation, rashes, or hives',s:2},{t:'Regular breakouts or persistent dullness and uneven skin tone',s:4},{t:'Occasional minor breakouts or patches of irritation',s:7},{t:'Clear, calm, and even-toned most of the time',s:10}]},
+ {q:'How does your skin feel in terms of oil and moisture balance?',opts:[{t:'Very dry and flaky OR excessively oily — hard to manage',s:2},{t:'Often swings between too dry and too oily throughout the day',s:4},{t:'Mostly balanced with occasional patches of dryness or shine',s:7},{t:'Consistently comfortable and balanced regardless of season',s:10}]},
+ {q:'Do you notice your skin reacting visibly to stress, food, or hormones?',opts:[{t:'Yes — strong, frequent, and hard-to-ignore reactions',s:2},{t:'Yes — fairly often and noticeably',s:4},{t:'Sometimes — mild and temporary reactions',s:7},{t:'Rarely or not noticeably at all',s:10}]}
+]},
+{key:'mental',name:'Mental clarity',icon:'Mc',ibg:'#ECEDFB',ic:'#3A328A',hint:'3 questions · focus, cognition, and mood',qs:[
+ {q:'How easily can you focus on a single task for 30 or more minutes?',opts:[{t:'Very difficult — my mind wanders constantly and I cannot sustain focus',s:2},{t:'Hard — frequent distractions and low motivation to even start',s:4},{t:'Manageable with effort — occasional brain fog slows me down',s:7},{t:'Sharp, sustained focus with minimal effort',s:10}]},
+ {q:'How often do you experience brain fog, forgetfulness, or mental fatigue?',opts:[{t:'Daily — it significantly impacts how I function',s:2},{t:'Several times a week',s:4},{t:'Occasionally, usually tied to poor sleep or high stress',s:7},{t:'Rarely or never',s:10}]},
+ {q:'How would you describe your mood and emotional stability on a typical day?',opts:[{t:'Very unstable — frequent mood swings, anxiety, or persistent low mood',s:2},{t:'Often anxious, irritable, or emotionally flat',s:4},{t:'Generally OK with some fluctuation week to week',s:7},{t:'Stable, calm, and emotionally resilient most days',s:10}]}
+]}
+];
+const FOUNDS=[{l:'Broccoli sprouts',s:'Most important Nrf2 activator'},{l:'16:8 intermittent fasting',s:'Daily eating window restriction'},{l:'High-protein + cruciferous veg',s:'Nutrient-dense meal foundation'},{l:'Movement + sweating',s:'Daily physical activity'},{l:'Sleep optimisation',s:'7–9 hours, consistent timing'},{l:'Stress management',s:'Meditation, breathwork, or nature'}];
+const BOOSTS=[{l:'Sauna 2–3× per week',s:'Heat stress and detoxification'},{l:'20–24h fast once per week',s:'Autophagy and cellular repair boost'},{l:'Cold exposure',s:'Cold shower or cold plunge'},{l:'High-intensity sprint',s:'1–2 HIIT sessions per week'}];
+const TIERS=[
+ {max:20,label:'Depleted',desc:'Your body is signalling across multiple systems. Start with recovery fundamentals — sleep, nourishment, and gentle movement — before adding any intensity.',c:'#E14848',bg:'#FBEAEA',tc:'#7A1F1F'},
+ {max:30,label:'Low reserve',desc:'Several systems are under-functioning. Consistent daily foundations over the next 30 days will unlock fast, visible gains.',c:'#E09020',bg:'#FAF0DA',tc:'#633806'},
+ {max:38,label:'Building',desc:'You have a working foundation. Targeted attention on your 2 weakest areas will accelerate your results this month.',c:'#B87316',bg:'#FAF2E2',tc:'#412302'},
+ {max:44,label:'Functional',desc:'Most systems are working well. You are ready for advanced protocols — boosters and resets will amplify your progress.',c:'#1C9C73',bg:'#DFF3EC',tc:'#07503D'},
+ {max:50,label:'Optimised',desc:'Excellent baseline. Your protocol can focus on performance optimisation and long-term maintenance.',c:'#4E9018',bg:'#E8F2DC',tc:'#1D4A07'}
+];
+const ADV={
+ energy:{low:'Energy signals adrenal fatigue or mitochondrial depletion. Fix sleep and protein intake before adding fasting or high-intensity protocols.',mid:'Energy is moderate. Morning movement and consistent meal timing will give the fastest lift.',high:'Strong energy baseline. Layer in intensity-based boosters like HIIT and cold exposure.'},
+ digestion:{low:'Low digestion score suggests gut inflammation or poor microbiome diversity. Prioritise cruciferous vegetables and avoid extended fasts until digestion improves.',mid:'Digestion is functional but not optimal. Intermittent fasting and daily broccoli sprouts will accelerate improvement.',high:'Gut health is a current strength. Maintain it with fibre variety and fermented foods.'},
+ sleep:{low:'Sleep is your highest-leverage intervention right now. No other protocol works effectively without it — address this before adding anything else.',mid:'Sleep quality has real room to grow. Consistent sleep and wake times and reducing evening screen light will compound quickly.',high:'Solid sleep foundation — your recovery system is working. Protect it as you add more demanding protocols.'},
+ skin:{low:'Skin reflects internal toxin load and inflammation. Sweating protocols and broccoli sprouts for liver support are your priority.',mid:'Skin clarity is in progress. More water, daily sprouts, and cutting processed foods will show visible change within 2–3 weeks.',high:'Clear skin signals healthy detox pathways. Maintain with weekly sauna and high antioxidant intake.'},
+ mental:{low:'Low mental clarity often signals blood sugar instability, poor sleep, or high cortisol. Stabilise meals and stress first.',mid:'Mental clarity responds quickly to sleep optimisation and Nrf2 activation via broccoli sprouts.',high:'Sharp cognitive baseline. Intermittent fasting and cold exposure will sharpen this further.'}
+};
+const RECMAP={energy:[0,2,3,4],digestion:[0,1,2,5],sleep:[4,5,3,2],skin:[0,3,2,1],mental:[0,5,4,2]};
+const Q1S=[{t:'Unexplained weight loss greater than 5kg',f:true},{t:'Persistent diarrhoea or greasy stools for more than 2 weeks',f:true},{t:'Blood in stool',f:true},{t:'Fever plus recent high-risk travel',f:true},{t:'Neurological symptoms — seizures or severe confusion',f:true},{t:'Severe anaemia not responding to iron supplementation',f:true}];
+const Q2S=[{t:'Energy below 5/10 on most days'},{t:'Frequent bloating, gas, or irregular bowel movements'},{t:'Brain fog — difficulty concentrating or remembering'},{t:'Skin issues — rashes, hives, or persistent breakouts'},{t:'Nighttime anal itching'},{t:'History of untreated water or poor hygiene during travel or camping'}];
+
+/* Shared utilities */
+function scol(v){if(v<=3)return'#E14848';if(v<=5)return'#E09020';if(v<=7)return'#B87316';if(v<=9)return'#1C9C73';return'#4E9018';}
+function sc2bg(v){if(v<=3)return'#FBEAEA';if(v<=5)return'#FAF0DA';if(v<=7)return'#FAF2E2';if(v<=9)return'#DFF3EC';return'#E8F2DC';}
+function sc2tc(v){if(v<=3)return'#7A1F1F';if(v<=5)return'#633806';if(v<=7)return'#412302';if(v<=9)return'#07503D';return'#1D4A07';}
+function getTier(t){return TIERS.find(x=>t<=x.max)||TIERS[TIERS.length-1];}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROTOCOL BUILDER
+═══════════════════════════════════════════════════════════════ */
+let PB={step:0,answers:{},foundInit:false,foundations:[],boosters:[],reset:false,resetType:'3-day water fast',flags:['','',''],doctorVisit:'',reflection:'',trackerData:{},open:{energy:true,digestion:false,sleep:false,skin:false,mental:false}};
+const PB_NAMES=['Assessment','Foundations','Boosters','Monthly reset','Tracking','Your plan'];
+
+function pb_secScore(key){const sec=SECS.find(s=>s.key===key);const vals=sec.qs.map((_,i)=>PB.answers[key+'_'+i]).filter(v=>v!==undefined);if(!vals.length)return null;return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);}
+function pb_allScores(){const o={};SECS.forEach(s=>{o[s.key]=pb_secScore(s.key);});return o;}
+function pb_totalScore(){return Object.values(pb_allScores()).filter(v=>v!==null).reduce((a,b)=>a+b,0);}
+function pb_getRecs(){const sc=pb_allScores();const sorted=SECS.map(s=>({key:s.key,v:sc[s.key]||0})).sort((a,b)=>a.v-b.v);const weak=sorted.slice(0,2).map(s=>s.key);const r=[];weak.forEach(k=>(RECMAP[k]||[]).forEach(i=>{if(!r.includes(i))r.push(i);}));if(!r.includes(0))r.unshift(0);return r.slice(0,5);}
+
+function pb_renderProg(){
+ const el=document.getElementById('pb-prog');if(!el)return;
+ el.innerHTML=`<div class="prog"><div class="prog-track">${PB_NAMES.map((_,i)=>`<div class="pt ${i<PB.step?'done':i===PB.step?'now':''}"></div>`).join('')}</div><div class="prog-info"><span>Step ${PB.step+1} of 6 — ${PB_NAMES[PB.step]}</span><span>${Math.round((PB.step/5)*100)}% complete</span></div></div>`;
+}
+function pb_renderS0(){
+ const done=Object.keys(PB.answers).length,pct=Math.round((done/15)*100),allDone=done===15;
+ let h=`<div class="stag">Step 1 of 6</div><h2 class="sh">Assess your current state</h2><p class="sp">Answer honestly — scores are calculated automatically based on your responses.</p><div class="aprog"><div class="aprog-t"><div class="aprog-f" style="width:${pct}%"></div></div><div class="aprog-l">${done}/15 answered</div></div>`;
+ SECS.forEach(sec=>{
+  const ss=pb_secScore(sec.key),qd=sec.qs.filter((_,qi)=>PB.answers[sec.key+'_'+qi]!==undefined).length,isOpen=PB.open[sec.key];
+  const badge=ss!==null?`<span class="acc-bd" style="background:${sc2bg(ss)};color:${sc2tc(ss)}">${ss}/10</span>`:`<span class="acc-bd" style="background:#EDECE8;color:#98988E">${qd}/3</span>`;
+  h+=`<div class="acc"><div class="acc-hd" onclick="pb_togSec('${sec.key}')"><div class="acc-ic" style="background:${sec.ibg};color:${sec.ic}">${sec.icon}</div><div class="acc-mt"><div class="acc-nm">${sec.name}</div><div class="acc-ht">${sec.hint}</div></div>${badge}<span class="chv ${isOpen?'op':''}" id="pbchv-${sec.key}">&#9660;</span></div><div class="acc-body" id="pbbdy-${sec.key}" style="display:${isOpen?'block':'none'}">`;
+  sec.qs.forEach((q,qi)=>{
+   h+=`<div class="qblk"><div class="qnum">Question ${qi+1} of 3</div><div class="qtxt">${q.q}</div><div class="opts">`;
+   q.opts.forEach((o,oi)=>{const sel=PB.answers[sec.key+'_'+qi]===o.s;h+=`<div class="opt ${sel?'sel':''}" onclick="pb_pick('${sec.key}',${qi},${oi},${o.s})"><div class="rb"><div class="rbd"></div></div><span>${o.t}</span></div>`;});
+   h+=`</div></div>`;
+  });
+  h+=`</div></div>`;
+ });
+ if(allDone){
+  const sc=pb_allScores(),tot=pb_totalScore(),avg=(tot/5).toFixed(1),tier=getTier(tot);
+  const sorted=SECS.map(s=>({...s,v:sc[s.key]})).sort((a,b)=>a.v-b.v);
+  h+=`<div class="rflash" id="pb-rflash"><div class="rf-hero"><div class="rf-circ" style="background:${tier.bg};border:2px solid ${tier.c}"><span class="rf-big" style="color:${tier.c}">${avg}</span><span class="rf-sm" style="color:${tier.c}80">/ 10</span></div><div><div class="rf-tier" style="color:${tier.c}">${tier.label}</div><div class="rf-desc">${tier.desc}</div></div></div><div style="margin-bottom:1rem">${SECS.map(s=>{const v=sc[s.key],c=scol(v);return`<div class="rbar-row"><span class="rbar-lbl">${s.name}</span><div class="rbar-t"><div class="rbar-f" style="width:${v*10}%;background:${c}"></div></div><span class="rbar-v" style="color:${c}">${v}/10</span></div>`;}).join('')}</div><div style="border-top:1px solid var(--bdr);padding-top:1rem"><div class="pst" style="margin-bottom:.5rem">Priority focus areas</div>${sorted.slice(0,2).map(p=>{const v=p.v,adv=v<=3?ADV[p.key].low:v<=6?ADV[p.key].mid:ADV[p.key].high;return`<div class="pri-item"><div class="pri-sc" style="background:${sc2bg(v)};color:${sc2tc(v)}">${v}</div><div class="pri-txt"><strong>${p.name}</strong> — ${adv}</div></div>`;}).join('')}</div><div class="notice n-tl" style="margin-top:.75rem;margin-bottom:0"><div class="ndot"></div><span>Your foundations on the next step have been pre-selected based on your two lowest-scoring areas. Adjust freely.</span></div></div>`;
+ }
+ h+=`<div class="nav"><div></div><button class="btn btn-tl" ${!allDone?'disabled':''} onclick="pb_goStep(1)">Continue →</button></div>`;
+ const el=document.getElementById('pb-main');if(el)el.innerHTML=h;
+ if(allDone){const r=document.getElementById('pb-rflash');if(r)r.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+function pb_renderS1(){
+ if(!PB.foundInit){PB.foundations=[...pb_getRecs()];PB.foundInit=true;}
+ const recs=pb_getRecs(),cnt=PB.foundations.length,sc=pb_allScores(),tot=pb_totalScore(),avg=(tot/5).toFixed(1),tier=getTier(tot);
+ let h=`<div class="stag">Step 2 of 6</div><h2 class="sh">Choose your daily foundations</h2><p class="sp">Non-negotiable daily practices for 30 days. Select a minimum of 4.</p><div class="notice n-tl"><div class="ndot"></div><span>Based on your baseline of <strong>${avg}/10 (${tier.label})</strong>, foundations have been pre-selected to target your weakest areas.</span></div><div class="ctr">Selected: <span class="cn">${cnt}</span> / minimum 4 required</div><div class="cgrid">${FOUNDS.map((f,i)=>{const sel=PB.foundations.includes(i),rec=recs.includes(i);return`<div class="ch ${sel?'sel':''}" onclick="pb_togF(${i})"><div class="chbox"><div class="ckm"></div></div><div><div class="cht">${f.l}${rec?'<span class="rec-tag">★ rec</span>':''}</div><div class="chs">${f.s}</div></div></div>`;}).join('')}</div><div class="nav"><button class="btn" onclick="pb_goStep(0)">← Back</button><button class="btn btn-tl" ${cnt<4?'disabled':''} onclick="pb_goStep(2)">Continue →</button></div>`;
+ const el=document.getElementById('pb-main');if(el)el.innerHTML=h;
+}
+function pb_renderS2(){
+ const cnt=PB.boosters.length;
+ let h=`<div class="stag">Step 3 of 6</div><h2 class="sh">Choose your weekly boosters</h2><p class="sp">Layer these in each week for amplified results. Select at least 2.</p><div class="ctr">Selected: <span class="cn">${cnt}</span> / minimum 2 required</div><div class="cgrid">${BOOSTS.map((b,i)=>{const sel=PB.boosters.includes(i);return`<div class="ch ${sel?'sel':''}" onclick="pb_togB(${i})"><div class="chbox"><div class="ckm"></div></div><div><div class="cht">${b.l}</div><div class="chs">${b.s}</div></div></div>`;}).join('')}</div><div class="nav"><button class="btn" onclick="pb_goStep(1)">← Back</button><button class="btn btn-tl" ${cnt<2?'disabled':''} onclick="pb_goStep(3)">Continue →</button></div>`;
+ const el=document.getElementById('pb-main');if(el)el.innerHTML=h;
+}
+function pb_renderS3(){
+ const rt=['3-day water fast','5-day water fast','Fasting-mimicking diet (FMD)'];
+ let h=`<div class="stag">Step 4 of 6</div><h2 class="sh">Monthly reset <span style="font-size:14px;font-weight:400;color:var(--ink2);">(optional)</span></h2><p class="sp">For those in good health. Skip if unsure — consult your doctor first.</p><div class="card"><div class="ropt ${PB.reset?'sel':''}" onclick="pb_togReset()"><div class="chbox"><div class="ckm"></div></div><div><div class="cht" style="font-weight:500">Include a monthly reset</div><div class="chs">I am in good health and understand what is required</div></div></div>${PB.reset?`<div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--bdr)"><div class="pst" style="margin-bottom:.6rem">Reset type:</div>${rt.map(r=>`<div class="ropt ${PB.resetType===r?'sel':''}" onclick="pb_setRT('${r}')"><div class="ropt-rb"><div class="ropt-rbd"></div></div><span style="font-size:13px">${r}</span></div>`).join('')}</div>`:''}</div><div class="notice n-am"><div class="ndot"></div><span>Not suitable if pregnant, breastfeeding, underweight, diabetic, or on medication.</span></div><div class="nav"><button class="btn" onclick="pb_goStep(2)">← Back</button><button class="btn btn-tl" onclick="pb_goStep(4)">Continue →</button></div>`;
+ const el=document.getElementById('pb-main');if(el)el.innerHTML=h;
+}
+function pb_renderS4(){
+ let h=`<div class="stag">Step 5 of 6</div><h2 class="sh">Track, flag and follow up</h2><p class="sp">Document your 3 marketing red flags and schedule a health check if symptoms persist.</p><div class="card">${[0,1,2].map(i=>`<div class="flag-row"><div class="fn">${i+1}</div><input class="ti" type="text" placeholder='e.g. "Guaranteed results in 3 days"' value="${PB.flags[i]}" oninput="PB.flags[${i}]=this.value"></div>`).join('')}</div><div class="card"><div style="font-size:13px;font-weight:500;margin-bottom:.5rem">Doctor visit or test to schedule:</div><input class="ti" type="text" placeholder="e.g. Full blood panel, thyroid check, or GP review" value="${PB.doctorVisit}" oninput="PB.doctorVisit=this.value"></div><div class="nav"><button class="btn" onclick="pb_goStep(3)">← Back</button><button class="btn btn-tl" onclick="pb_goStep(5)">Generate my plan →</button></div>`;
+ const el=document.getElementById('pb-main');if(el)el.innerHTML=h;
+}
+function pb_renderS5(){
+ const sc=pb_allScores(),tot=pb_totalScore(),avg=(tot/5).toFixed(1),tier=getTier(tot);
+ const flist=PB.foundations.map(i=>FOUNDS[i].l),blist=PB.boosters.map(i=>BOOSTS[i].l);
+ const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+ let h=`<div class="stag">Step 6 of 6 — Complete plan</div><h2 class="sh">Your 30-day personal protocol</h2><p class="sp">Begin today. Enter scores directly into the tracker each day — your data stays in this session.</p><div class="tier-pill" style="background:${tier.bg};color:${tier.tc};border-color:${tier.c}50">Baseline: ${tier.label} · ${avg} / 10</div>
+ <div class="psec"><div class="pst">Baseline scores</div><div class="sg">${SECS.map(s=>{const v=sc[s.key],c=scol(v);return`<div class="sc"><div class="scn">${s.name}</div><div class="scv" style="color:${c}">${v}</div></div>`;}).join('')}</div></div>
+ <div class="psec"><div class="pst">Daily foundations</div><div class="card card-sm">${flist.map(f=>`<div class="prow"><div class="pdot" style="background:var(--tlm)"></div><span class="ptx">${f}</span></div>`).join('')}</div></div>
+ <div class="psec"><div class="pst">Weekly boosters</div><div class="card card-sm">${blist.map(b=>`<div class="prow"><div class="pdot" style="background:var(--goldm)"></div><span class="ptx">${b}</span></div>`).join('')}</div></div>
+ ${PB.reset?`<div class="psec"><div class="pst">Monthly reset</div><div class="card card-sm"><div class="prow"><div class="pdot" style="background:var(--gc)"></div><span class="ptx">${PB.resetType}</span></div></div></div>`:''}
+ <div class="psec"><div class="pst">Weekly Nrf2 tracker — type 1–10 in each cell</div><div class="card card-sm"><div class="trkwrap"><div class="trk">
+  <div class="tkh"></div>${days.map(d=>`<div class="tkh">${d}</div>`).join('')}
+  ${SECS.map(sec=>`
+   <div class="tkl">${sec.name}</div>
+   ${days.map(d=>{
+    const k=sec.key+'_'+d,v=PB.trackerData[k]||'';
+    return`<input type="number" min="1" max="10" class="tkc-in${v?' filled':''}" value="${v}" placeholder="–" data-key="${k}" oninput="pb_tkInput(this)">`;
+   }).join('')}
+  `).join('')}
+ </div></div></div></div>
+ ${PB.flags.some(f=>f.trim())?`<div class="psec"><div class="pst">Red flags to watch for</div><div class="card card-sm">${PB.flags.filter(f=>f.trim()).map((f,i)=>`<div class="prow"><div class="fn" style="flex-shrink:0">${i+1}</div><span class="ptx">${f}</span></div>`).join('')}</div></div>`:''}
+ ${PB.doctorVisit?`<div class="psec"><div class="pst">Health check to schedule</div><div class="card card-sm"><div class="prow"><div class="pdot" style="background:var(--goldm)"></div><span class="ptx">${PB.doctorVisit}</span></div></div></div>`:''}
+ <div class="psec"><div class="pst">Reflection prompt</div><div class="pullquote">"What changed when I stopped chasing quick fixes and started supporting my body's ancient intelligence every single day?"</div><textarea class="ti ta" style="margin-top:8px" placeholder="Write your reflection here after 30 days…" oninput="PB.reflection=this.value">${PB.reflection}</textarea></div>
+ <div class="nav"><button class="btn" onclick="pb_goStep(4)">← Edit</button><button class="btn" onclick="pb_goStep(0)">Start over ↺</button></div>
+ <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--bdr)">
+  <div class="pst" style="margin-bottom:.6rem">Save or export your plan</div>
+  <div class="save-row">
+   <button class="save-btn save-btn-primary" onclick="pb_printPlan()"><span class="save-btn-icon">🖨</span>Print / Save as PDF</button>
+   <button class="save-btn" onclick="pb_downloadTxt()"><span class="save-btn-icon">📄</span>Download as text</button>
+   <button class="save-btn" onclick="pb_downloadCSV()"><span class="save-btn-icon">📊</span>Download tracker CSV</button>
+   <button class="save-btn" id="pb-copy-btn" onclick="pb_copyPlan()"><span class="save-btn-icon">📋</span>Copy to clipboard</button>
+  </div>
+ </div>`;
+ const el=document.getElementById('pb-main');if(el)el.innerHTML=h;
+}
+function pb_tkInput(input){
+ const k=input.dataset.key;
+ const n=parseInt(input.value);
+ if(n>=1&&n<=10){
+  PB.trackerData[k]=n;
+  input.classList.add('filled');
+ }else{
+  delete PB.trackerData[k];
+  input.classList.remove('filled');
+ }
+}
+function pb_buildPlanText(){
+ const sc=pb_allScores(),tot=pb_totalScore(),avg=(tot/5).toFixed(1),tier=getTier(tot);
+ const flist=PB.foundations.map(i=>FOUNDS[i].l);
+ const blist=PB.boosters.map(i=>BOOSTS[i].l);
+ const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+ let t='30-DAY PERSONAL HEALTH PROTOCOL\n';
+ t+='================================\n\n';
+ t+=`Baseline: ${tier.label} · ${avg}/10 overall\n\n`;
+ t+='BASELINE SCORES\n';
+ SECS.forEach(s=>{t+=`  ${s.name}: ${sc[s.key]}/10\n`;});
+ t+='\nDAILY FOUNDATIONS\n';
+ flist.forEach(f=>{t+=`  • ${f}\n`;});
+ t+='\nWEEKLY BOOSTERS\n';
+ blist.forEach(b=>{t+=`  • ${b}\n`;});
+ if(PB.reset){t+=`\nMONTHLY RESET\n  • ${PB.resetType}\n`;}
+ t+='\nWEEKLY NRF2 TRACKER (Week 1)\n';
+ t+='Metric         '+days.join('    ')+'\n';
+ t+='─'.repeat(60)+'\n';
+ SECS.forEach(s=>{
+  const row=s.name.padEnd(15);
+  const scores=days.map(d=>{const v=PB.trackerData[s.key+'_'+d];return(v||'–').toString().padEnd(7);}).join('');
+  t+=row+scores+'\n';
+ });
+ const validFlags=PB.flags.filter(f=>f.trim());
+ if(validFlags.length){t+='\nRED FLAGS TO WATCH FOR\n';validFlags.forEach((f,i)=>{t+=`  ${i+1}. ${f}\n`;});}
+ if(PB.doctorVisit){t+=`\nHEALTH CHECK TO SCHEDULE\n  ${PB.doctorVisit}\n`;}
+ if(PB.reflection){t+=`\nMY REFLECTION\n  ${PB.reflection}\n`;}
+ return t;
+}
+function pb_printPlan(){
+ const sc=pb_allScores(),tot=pb_totalScore(),avg=(tot/5).toFixed(1),tier=getTier(tot);
+ const flist=PB.foundations.map(i=>FOUNDS[i].l);
+ const blist=PB.boosters.map(i=>BOOSTS[i].l);
+ const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+ const printEl=document.getElementById('pb-plan-print');
+ if(!printEl)return;
+ printEl.innerHTML=`
+  <h1>My 30-Day Health Protocol</h1>
+  <p style="color:#888;font-size:12px;margin-bottom:1.25rem">Baseline: <strong style="color:#1A1714">${tier.label}</strong> · ${avg}/10 · Generated ${new Date().toLocaleDateString('en-AU')}</p>
+  <div class="pp-section">
+   <div class="pp-label">Baseline scores</div>
+   <div class="pp-grid">${SECS.map(s=>{const v=sc[s.key],c=scol(v);return`<div class="pp-score"><div class="pp-score-lbl">${s.name}</div><div class="pp-score-val" style="color:${c}">${v}</div></div>`;}).join('')}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem">
+   <div class="pp-section"><div class="pp-label">Daily foundations</div>${flist.map(f=>`<div class="pp-item">• ${f}</div>`).join('')}</div>
+   <div class="pp-section"><div class="pp-label">Weekly boosters</div>${blist.map(b=>`<div class="pp-item">• ${b}</div>`).join('')}${PB.reset?`<div class="pp-item" style="margin-top:4px;border-top:1px solid #eee;padding-top:4px"><strong>Monthly reset:</strong> ${PB.resetType}</div>`:''}</div>
+  </div>
+  <div class="pp-section">
+   <div class="pp-label">Weekly Nrf2 tracker — week 1</div>
+   <table><thead><tr><th>Metric</th>${days.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
+   <tbody>${SECS.map(s=>`<tr><td><strong>${s.name}</strong></td>${days.map(d=>{const v=PB.trackerData[s.key+'_'+d]||'';return`<td style="${v?`color:${scol(v)};font-weight:500`:''}">${v||'–'}</td>`;}).join('')}</tr>`).join('')}</tbody></table>
+  </div>
+  ${PB.flags.some(f=>f.trim())?`<div class="pp-section"><div class="pp-label">Red flags to watch for</div>${PB.flags.filter(f=>f.trim()).map((f,i)=>`<div class="pp-item">${i+1}. ${f}</div>`).join('')}</div>`:''}
+  ${PB.doctorVisit?`<div class="pp-section"><div class="pp-label">Health check to schedule</div><div class="pp-item">${PB.doctorVisit}</div></div>`:''}
+  ${PB.reflection?`<div class="pp-section"><div class="pp-label">My reflection</div><div class="pp-reflection">${PB.reflection}</div></div>`:''}
+ `;
+ document.body.classList.add('printing-plan');
+ window.print();
+ setTimeout(()=>document.body.classList.remove('printing-plan'),1000);
+}
+function pb_downloadTxt(){
+ const txt=pb_buildPlanText();
+ const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='my-30-day-health-protocol.txt';
+ a.click();
+ URL.revokeObjectURL(a.href);
+}
+function pb_downloadCSV(){
+ const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+ let csv='Metric,'+days.join(',')+'\n';
+ SECS.forEach(s=>{
+  const row=[s.name,...days.map(d=>PB.trackerData[s.key+'_'+d]||'')];
+  csv+=row.map(v=>typeof v==='string'&&v.includes(',')? `"${v}"`:v).join(',')+'\n';
+ });
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='nrf2-tracker-week1.csv';
+ a.click();
+ URL.revokeObjectURL(a.href);
+}
+function pb_copyPlan(){
+ const txt=pb_buildPlanText();
+ navigator.clipboard.writeText(txt).then(()=>{
+  const btn=document.getElementById('pb-copy-btn');
+  if(btn){btn.innerHTML='<span class="save-btn-icon">✓</span>Copied!';btn.style.borderColor='var(--tlm)';btn.style.color='var(--tl)';setTimeout(()=>{btn.innerHTML='<span class="save-btn-icon">📋</span>Copy to clipboard';btn.style.borderColor='';btn.style.color='';},2000);}
+ }).catch(()=>{
+  const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  const btn=document.getElementById('pb-copy-btn');if(btn){btn.innerHTML='<span class="save-btn-icon">✓</span>Copied!';setTimeout(()=>{btn.innerHTML='<span class="save-btn-icon">📋</span>Copy to clipboard';},2000);}
+ });
+}
+function pb_pick(key,qi,oi,score){
+ PB.answers[key+'_'+qi]=score;
+ const sec=SECS.find(s=>s.key===key);
+ if(sec.qs.every((_,i)=>PB.answers[key+'_'+i]!==undefined)){const idx=SECS.findIndex(s=>s.key===key);if(idx<SECS.length-1){PB.open[SECS[idx+1].key]=true;PB.open[key]=false;}}
+ pb_renderS0();
+}
+function pb_togSec(k){PB.open[k]=!PB.open[k];pb_renderS0();}
+function pb_togF(i){const idx=PB.foundations.indexOf(i);if(idx>-1)PB.foundations.splice(idx,1);else PB.foundations.push(i);pb_renderS1();}
+function pb_togB(i){const idx=PB.boosters.indexOf(i);if(idx>-1)PB.boosters.splice(idx,1);else PB.boosters.push(i);pb_renderS2();}
+function pb_togReset(){PB.reset=!PB.reset;pb_renderS3();}
+function pb_setRT(t){PB.resetType=t;pb_renderS3();}
+function pb_goStep(n){if(n===0)PB.foundInit=false;PB.step=n;pb_renderProg();[pb_renderS0,pb_renderS1,pb_renderS2,pb_renderS3,pb_renderS4,pb_renderS5][n]();}
+
+/* ═══════════════════════════════════════════════════════════════
+   DOCTOR LETTER BUILDER
+═══════════════════════════════════════════════════════════════ */
+let DL={phase:0,q1chk:[],q2chk:[],form:{name:'',age:'',gender:'Female',location:'Australia / Queensland',travel:false,travelCountries:'',water:false,pets:false,diet:7,stress:5,energy:5,digestion:5,sleep:5,skin:5,mental:5,bloating:'Occasional (a few times a week)',brainFog:'Occasional (a few times a week)',bowels:'1',itching:false,otherSymptoms:''},results:null,error:null,editLetter:''};
+
+function dl_flowInd(){
+ const nodes=[{l:'Question 1',p:0},{l:'Question 2',p:1},{l:'Question 3',p:2},{l:'Build letter',p:4}];
+ return`<div class="flow">${nodes.map((n,i)=>`<span class="fnode ${DL.phase===n.p?'act':DL.phase>n.p?'done':''}">${n.l}</span>${i<nodes.length-1?'<span class="farr">→</span>':''}`).join('')}</div>`;
+}
+function dl_renderP0(){
+ let h=`<div class="stag">Step 1 — Decision tree</div><h2 class="sh">Have you had any of these in the last 6 months?</h2><p class="sp">These are red-flag symptoms that always warrant a doctor visit.</p>${dl_flowInd()}<div class="qhdr"><div class="qnum-circle">1</div><div class="qhdr-text">Urgent symptoms — any single one is enough to use the letter tool immediately</div></div><div class="symlist">${Q1S.map((s,i)=>`<div class="sym ${DL.q1chk.includes(i)?'chk':''}" onclick="dl_togQ1(${i})"><div class="sym-box"><div class="ckm3"></div></div><span>${s.t}</span><span class="sym-flag">Red flag</span></div>`).join('')}</div><div class="notice n-am"><div class="ndot"></div><span>Any one of these warrants medical review. This tool helps you communicate clearly — it is not a substitute for emergency care.</span></div><div class="yn-row"><button class="yn yn-yes" onclick="dl_q1Answer(true)">Yes — one or more applies</button><button class="yn" onclick="dl_q1Answer(false)">No — none of these apply</button></div>`;
+ const el=document.getElementById('dl-main');if(el)el.innerHTML=h;
+}
+function dl_renderP1(){
+ const cnt=DL.q2chk.length;
+ let h=`<div class="stag">Step 1 — Decision tree</div><h2 class="sh">Do you have 3 or more of these for more than 4 weeks?</h2><p class="sp">Select all that currently apply.</p>${dl_flowInd()}<div class="qhdr"><div class="qnum-circle">2</div><div class="qhdr-text">3 or more symptoms for 4+ weeks suggests investigation is warranted</div></div><div class="symlist">${Q2S.map((s,i)=>`<div class="sym ${DL.q2chk.includes(i)?'chk':''}" onclick="dl_togQ2(${i})"><div class="sym-box"><div class="ckm3"></div></div><span>${s.t}</span></div>`).join('')}</div><div style="font-size:13px;color:var(--ink2);margin-bottom:.75rem">Selected: <strong style="color:${cnt>=3?'var(--bluem)':'var(--ink2)'}">${cnt} of 6</strong>${cnt>=3?' — threshold met':''}</div><div class="yn-row"><button class="yn yn-yes" onclick="dl_q2Answer(true)">Yes — 3 or more apply</button><button class="yn" onclick="dl_q2Answer(false)">No — fewer than 3</button></div><div class="nav" style="margin-top:1rem"><button class="btn" onclick="dl_goPhase(0)">← Back</button><div></div></div>`;
+ const el=document.getElementById('dl-main');if(el)el.innerHTML=h;
+}
+function dl_renderP2(){
+ let h=`<div class="stag">Step 1 — Decision tree</div><h2 class="sh">Are your symptoms mild and slowly improving?</h2><p class="sp">With consistent broccoli sprouts, 16:8 fasting, high-fibre diet, and good sleep.</p>${dl_flowInd()}<div class="qhdr"><div class="qnum-circle">3</div><div class="qhdr-text">If improving steadily with natural support, continued monitoring may be sufficient</div></div><div class="card">${['Daily broccoli sprouts','16:8 intermittent fasting','High-protein, high-fibre, cruciferous vegetables','7–9 hours consistent sleep'].map(i=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bdr);font-size:13px;color:var(--ink)"><div style="width:6px;height:6px;border-radius:50%;background:var(--tlm);flex-shrink:0"></div>${i}</div>`).join('')}</div><div class="yn-row"><button class="yn yn-yes" onclick="dl_goPhase(3)">Yes — improving steadily</button><button class="yn" style="border-color:var(--bluem)" onclick="dl_goPhase(4)">No — use letter tool</button></div><div class="nav" style="margin-top:1rem"><button class="btn" onclick="dl_goPhase(1)">← Back</button><div></div></div>`;
+ const el=document.getElementById('dl-main');if(el)el.innerHTML=h;
+}
+function dl_renderP3(){
+ let h=`${dl_flowInd()}<div class="result-nat"><div style="width:48px;height:48px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;margin:0 auto .75rem"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="10" stroke="#3A6B10" stroke-width="1.5"/><path d="M6 11l3.5 3.5L16 8" stroke="#3A6B10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="rnat-title">Continue natural support</div><div class="rsub">Re-check in 6–8 weeks. If anything changes or stops improving, use the letter tool.</div><button class="btn" onclick="dl_goPhase(0)" style="margin:0 auto;display:inline-flex">Start over ↺</button></div><div class="notice n-am"><div class="ndot"></div><span><strong>Final rule:</strong> When in doubt — use the letter tool. Better to have the conversation than stay stuck.</span></div><div class="nav"><div></div><button class="btn" style="background:var(--bluem);color:#fff;border-color:var(--bluem)" onclick="dl_goPhase(4)">Use the letter tool anyway →</button></div>`;
+ const el=document.getElementById('dl-main');if(el)el.innerHTML=h;
+}
+function dl_renderP4(){
+ const F=DL.form;
+ let h=`<div class="stag">Step 2 — Build your letter</div><h2 class="sh">Enter your details</h2><p class="sp">Fill in as much as you can. The AI uses this to generate a specific, credible letter.</p><div class="notice n-bl"><div class="ndot"></div><span>Your information stays in this browser session only and is not stored anywhere.</span></div>
+ <div class="form-sec"><div class="form-sec-title">Personal details</div><div class="fgrid"><div class="frow"><label class="flabel">Your name (for letter sign-off)</label><input class="ti" type="text" placeholder="e.g. Sarah Mitchell" value="${F.name}" oninput="DL.form.name=this.value"></div><div class="frow"><label class="flabel">Age</label><input class="ti" type="text" placeholder="e.g. 34" value="${F.age}" oninput="DL.form.age=this.value"></div></div><div class="fgrid"><div class="frow"><label class="flabel">Gender</label><select class="ti" onchange="DL.form.gender=this.value">${['Female','Male','Non-binary','Prefer not to say'].map(o=>`<option ${F.gender===o?'selected':''}>${o}</option>`).join('')}</select></div><div class="frow"><label class="flabel">Location</label><select class="ti" onchange="DL.form.location=this.value">${['Australia / Queensland','Australia / Other','New Zealand','United Kingdom','United States','Other'].map(o=>`<option ${F.location===o?'selected':''}>${o}</option>`).join('')}</select></div></div></div>
+ <div class="form-sec"><div class="form-sec-title">Risk factors</div><div class="cb-row ${F.travel?'on':''}" onclick="dl_togCB('travel')"><div class="cb-box2"><div class="ckm2"></div></div><div><div class="cb-txt">International travel in the last 2 years</div><div class="cb-sub">Increases risk of parasitic or tropical infections</div></div></div>${F.travel?`<div class="frow" style="padding-left:24px"><label class="flabel">Countries visited</label><input class="ti" type="text" placeholder="e.g. Thailand, Bali, India" value="${F.travelCountries}" oninput="DL.form.travelCountries=this.value"></div>`:''}<div class="cb-row ${F.water?'on':''}" onclick="dl_togCB('water')"><div class="cb-box2"><div class="ckm2"></div></div><div><div class="cb-txt">Exposure to untreated water (camping, hiking, rainwater)</div><div class="cb-sub">Risk factor for Giardia and Cryptosporidium</div></div></div><div class="cb-row ${F.pets?'on':''}" onclick="dl_togCB('pets')"><div class="cb-box2"><div class="ckm2"></div></div><div><div class="cb-txt">Pet ownership — cats or dogs</div><div class="cb-sub">Risk factor for Toxocara and zoonotic parasites</div></div></div></div>
+ <div class="form-sec"><div class="form-sec-title">Current lifestyle baseline</div>${[['Diet quality',F.diet,'diet'],['Stress level (1=low, 10=extreme)',F.stress,'stress']].map(([l,v,k])=>`<div class="slider-row"><span class="sl-label">${l}</span><input type="range" min="1" max="10" step="1" value="${v}" oninput="DL.form.${k}=+this.value;document.getElementById('dlsv-${k}').textContent=this.value"><span class="sl-val" id="dlsv-${k}">${v}</span></div>`).join('')}</div>
+ <div class="form-sec"><div class="form-sec-title">4-week symptom averages</div><div class="notice n-am"><div class="ndot"></div><span>Use your averages from the Protocol Builder tracker, or estimate based on the last 4 weeks.</span></div>${[['Energy',F.energy,'energy'],['Digestion',F.digestion,'digestion'],['Sleep',F.sleep,'sleep'],['Skin clarity',F.skin,'skin'],['Mental clarity',F.mental,'mental']].map(([l,v,k])=>`<div class="slider-row"><span class="sl-label">${l}</span><input type="range" min="1" max="10" step="1" value="${v}" oninput="DL.form.${k}=+this.value;document.getElementById('dlsv-${k}').textContent=this.value+'/10';document.getElementById('dlsv-${k}').style.color=scol(+this.value)"><span class="sl-val" id="dlsv-${k}" style="color:${scol(v)}">${v}/10</span></div>`).join('')}</div>
+ <div class="form-sec"><div class="form-sec-title">Additional symptom detail</div><div class="fgrid"><div class="frow"><label class="flabel">Bloating / gas frequency</label><select class="ti" onchange="DL.form.bloating=this.value">${['Rarely or never','Occasional (a few times a week)','Daily','After almost every meal'].map(o=>`<option ${F.bloating===o?'selected':''}>${o}</option>`).join('')}</select></div><div class="frow"><label class="flabel">Brain fog frequency</label><select class="ti" onchange="DL.form.brainFog=this.value">${['Rarely or never','Occasional (a few times a week)','Most days','Daily and severe'].map(o=>`<option ${F.brainFog===o?'selected':''}>${o}</option>`).join('')}</select></div></div><div class="fgrid"><div class="frow"><label class="flabel">Bowel movements per day</label><select class="ti" onchange="DL.form.bowels=this.value">${['Less than 1','1','2','3 or more'].map(o=>`<option ${F.bowels===o?'selected':''}>${o}</option>`).join('')}</select></div><div class="frow" style="display:flex;align-items:flex-end"><div class="cb-row ${F.itching?'on':''}" onclick="dl_togCB('itching')" style="margin-bottom:0;flex:1"><div class="cb-box2"><div class="ckm2"></div></div><div><div class="cb-txt">Nighttime anal itching</div><div class="cb-sub">Indicator of pinworm</div></div></div></div></div><div class="frow"><label class="flabel">Other symptoms (optional)</label><textarea class="ti ta" placeholder="e.g. joint pain, rashes, nausea, weight changes…" oninput="DL.form.otherSymptoms=this.value">${F.otherSymptoms}</textarea></div></div>
+ <div class="nav"><button class="btn" onclick="dl_goPhase(${DL.phase>3?2:0})">← Back</button><button class="btn" style="background:var(--bluem);color:#fff;border-color:var(--bluem)" onclick="dl_startGenerate()">Generate my letter →</button></div>`;
+ const el=document.getElementById('dl-main');if(el)el.innerHTML=h;
+}
+function dl_renderP5(){
+ const el=document.getElementById('dl-main');
+ if(el)el.innerHTML=`<div class="gen-wrap"><div class="gen-spinner"></div><div class="gen-title">Generating your letter</div><div class="gen-sub">Building a professional letter tailored to your symptom profile</div><div class="gen-dots"><div class="gdot"></div><div class="gdot"></div><div class="gdot"></div></div></div>`;
+}
+function dl_renderP6(){
+ const R=DL.results;if(!R){dl_goPhase(4);return;}
+ let h=`<div class="stag">Step 2 — Your generated letter</div><h2 class="sh">Your doctor letter is ready</h2><p class="sp">Edit if needed, then print and bring to your appointment.</p>
+ <div class="res-sec"><div class="res-hdr" style="background:var(--bluel)"><div class="res-hdr-icon" style="background:var(--bluem);color:#fff">A</div><div class="res-hdr-title" style="color:var(--bld)">Professional doctor letter</div><button class="copy-btn" id="dl-copy-btn" onclick="dl_copyLetter()">Copy</button></div><div class="res-body"><textarea class="letter-edit" id="dl-letter-edit" oninput="DL.editLetter=this.value">${DL.editLetter||R.letter}</textarea></div></div>
+ <div class="res-sec"><div class="res-hdr" style="background:#F0F8F4"><div class="res-hdr-icon" style="background:var(--tlm);color:#fff">B</div><div class="res-hdr-title">Recommended tests to request</div></div><div class="res-body">${R.tests.map((t,i)=>`<div class="test-item"><div class="test-num">${i+1}</div><div><div class="test-name">${t.name}</div><div class="test-reason">${t.reason}</div></div></div>`).join('')}</div></div>
+ <div class="res-sec"><div class="res-hdr" style="background:var(--goldl)"><div class="res-hdr-icon" style="background:var(--goldm);color:#fff">C</div><div class="res-hdr-title" style="color:var(--gold)">If the doctor dismisses your request</div></div><div class="res-body">${R.scripts.map(s=>`<div class="script-item">"${s}"</div>`).join('')}</div></div>
+ <div class="notice n-am"><div class="ndot"></div><span>Review and personalise before your appointment. Tests are evidence-based suggestions — your doctor makes the final clinical decision.</span></div>
+ <div class="nav"><button class="btn" onclick="dl_goPhase(4)">← Edit details</button><div style="display:flex;gap:8px"><button class="btn" onclick="dl_goPhase(0)">Start over ↺</button><button class="btn" style="background:var(--bluem);color:#fff;border-color:var(--bluem)" onclick="window.print()">Print letter</button></div></div>`;
+ const el=document.getElementById('dl-main');if(el)el.innerHTML=h;
+ if(DL.editLetter){const te=document.getElementById('dl-letter-edit');if(te)te.value=DL.editLetter;}
+}
+function dl_togQ1(i){const idx=DL.q1chk.indexOf(i);if(idx>-1)DL.q1chk.splice(idx,1);else DL.q1chk.push(i);dl_renderP0();}
+function dl_togQ2(i){const idx=DL.q2chk.indexOf(i);if(idx>-1)DL.q2chk.splice(idx,1);else DL.q2chk.push(i);dl_renderP1();}
+function dl_q1Answer(yes){dl_goPhase(yes?4:1);}
+function dl_q2Answer(yes){dl_goPhase(yes?4:2);}
+function dl_togCB(key){DL.form[key]=!DL.form[key];dl_renderP4();}
+function dl_copyLetter(){const txt=document.getElementById('dl-letter-edit').value;navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById('dl-copy-btn');b.textContent='Copied!';b.classList.add('copied');setTimeout(()=>{b.textContent='Copy';b.classList.remove('copied');},2000);});}
+function dl_goPhase(n){DL.phase=n;[dl_renderP0,dl_renderP1,dl_renderP2,dl_renderP3,dl_renderP4,dl_renderP5,dl_renderP6][n]();}
+
+async function dl_startGenerate(){
+ const F=DL.form;
+ if(!F.age||!F.gender){alert('Please enter at least your age and gender to continue.');return;}
+ DL.editLetter='';dl_goPhase(5);
+ const q1f=DL.q1chk.map(i=>Q1S[i].t),q2f=DL.q2chk.map(i=>Q2S[i].t);
+ const risks=[F.travel?`International travel (${F.travelCountries||'countries not specified'})`:'No recent international travel',F.water?'Untreated water exposure':'No untreated water exposure',F.pets?'Has cats or dogs':'No pets'].join('; ');
+ const prompt=`You are an expert medical communicator helping a patient communicate their health concerns to their doctor.\n\nPATIENT: ${F.name||'Patient'}, Age ${F.age}, ${F.gender}, ${F.location}\nRisks: ${risks}\nDiet: ${F.diet}/10, Stress: ${F.stress}/10\n${q1f.length?'Urgent symptoms: '+q1f.join('; '):''}\n${q2f.length?'Chronic symptoms (4+ weeks): '+q2f.join('; '):''}\nSymptom averages: Energy ${F.energy}/10, Digestion ${F.digestion}/10, Sleep ${F.sleep}/10, Skin ${F.skin}/10, Mental ${F.mental}/10\nBloating: ${F.bloating}, Brain fog: ${F.brainFog}, Bowels: ${F.bowels}/day, Nighttime itching: ${F.itching?'Yes':'No'}\n${F.otherSymptoms?'Other: '+F.otherSymptoms:''}\n\nReturn valid JSON only (no markdown, no backticks):\n{"letter":"Professional letter under 400 words. Start 'Dear Doctor,' end 'Kind regards,\\n${F.name||'[Your Name]'}'. Respectful but firm. Include symptoms, risk factors, polite request for testing to rule out parasitic infection and assess organ function.","tests":[{"name":"test name","reason":"one sentence specific to this patient"}],"scripts":["calm confident script 1","evidence-based script 2","asserting right to document script 3"]}\n\nGenerate 4-6 tests. Return only the JSON.`;
+ try{
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})});
+  const data=await resp.json();
+  if(!resp.ok||!data.content)throw new Error(data.error?.message||'API error');
+  const raw=data.content.find(b=>b.type==='text')?.text||'';
+  const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+  if(!parsed.letter||!parsed.tests||!parsed.scripts)throw new Error('Unexpected format');
+  DL.results=parsed;dl_goPhase(6);
+ }catch(err){
+  DL.results={
+   letter:`Dear Doctor,\n\nI have been carefully tracking my symptoms for the past 4 weeks and would like to discuss them with you today.\n\nMy averages: Energy ${F.energy}/10, Digestion ${F.digestion}/10, Sleep ${F.sleep}/10, Skin clarity ${F.skin}/10, Mental clarity ${F.mental}/10. I am also experiencing ${F.bloating.toLowerCase()} bloating/gas, ${F.brainFog.toLowerCase()} brain fog, and ${F.bowels} bowel movement(s) per day${F.itching?', along with nighttime anal itching':''}.\n\nRelevant risk factors: ${risks}.\n\nDespite following a clean diet and lifestyle, I have seen limited improvement. I would like to request appropriate testing to rule out parasitic infection and assess liver function.\n\nKind regards,\n${F.name||'[Your Name]'}`,
+   tests:[{name:'Stool PCR Panel',reason:'Screens for Giardia, Cryptosporidium, Blastocystis, and other common parasites.'},{name:'Complete Blood Count with Eosinophil count',reason:'Elevated eosinophils indicate parasitic infection or immune response.'},{name:'Liver Function Tests + GGT',reason:'Assesses liver health given symptom profile and risk factors.'},{name:'Stool Ova and Parasite (O&P) x3',reason:'Detects organisms that PCR may miss in some cases.'},{name:'IgE and Allergy Panel',reason:'Elevated total IgE can support a parasitic or immune-mediated cause.'}],
+   scripts:['I understand this may seem unlikely, but I\'ve tracked my symptoms carefully for 4 weeks. Could we start with a basic stool PCR panel for peace of mind?','I\'ve reviewed CDC and WHO guidelines. Given my water exposure history and symptom pattern, I\'d feel much more comfortable ruling this out with testing.','I respect your professional judgment. However, these symptoms are significantly affecting my quality of life and I would like it documented that I requested these tests today.']
+  };
+  dl_goPhase(6);
+ }
+}
+
+/* ── INIT TOOLS ── */
+pb_renderProg();
+pb_renderS0();
+dl_goPhase(0);
+
+function toggleSb(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+// Auto-open sidebar section based on scroll
+const modIds={module1:'sb1',module2:'sb2',module3:'sb3',module4:'sb4',module5:'sb5'};
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting&&modIds[e.target.id]){
+      const sbId=modIds[e.target.id];
+      const el=document.getElementById(sbId);
+      if(el&&!el.classList.contains('open')){el.classList.add('open');}
+    }
+  });
+},{threshold:0.15});
+Object.keys(modIds).forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+</script>
+<!-- Hidden plan print area -->
+<div id="pb-plan-print"></div>
+</body>
+</html>
