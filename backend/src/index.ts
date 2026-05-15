@@ -175,6 +175,14 @@ try {
   console.error('❌ Failed to load health intelligence routes:', e.message);
 }
 
+try {
+  const courseRouter = require('./routes/course').default;
+  app.use('/api/course', courseRouter);
+  console.log('✅ Course routes loaded');
+} catch (e: any) {
+  console.error('❌ Failed to load course routes:', e.message);
+}
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found', path: req.path });

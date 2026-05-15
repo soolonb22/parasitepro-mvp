@@ -536,7 +536,7 @@ select.ti{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
 <div id="pw-overlay">
   <div class="pw-card">
     <div class="pw-head">
-      <div class="pw-logo">Nrf2 Health Course</div>
+      <div class="pw-logo">ParasitePro Course</div>
       <div class="pw-title">Clearing the Body of<br>Toxins &amp; Parasites</div>
       <div class="pw-sub">Evidence-based · 5 modules · Interactive tools</div>
     </div>
@@ -552,12 +552,12 @@ select.ti{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
       <div class="pw-divider"><span>Already purchased? Enter your access code</span></div>
       <div class="pw-code-label">Access code from your purchase confirmation email</div>
       <div class="pw-input-row">
-        <input type="text" id="pw-code-input" class="pw-input" placeholder="e.g. NRF2DETOX2025" autocomplete="off" spellcheck="false" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')pw_unlock()">
+        <input type="text" id="pw-code-input" class="pw-input" placeholder="e.g. PP-XXXXXX-XXXXXX" autocomplete="off" spellcheck="false" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')pw_unlock()">
         <button class="pw-unlock-btn" onclick="pw_unlock()">Unlock →</button>
       </div>
       <div class="pw-err" id="pw-err"></div>
       <div class="pw-footer">
-        Questions? <a href="mailto:your@email.com">Contact support</a>
+        Questions? <a href="mailto:support@notworms.com">Contact support</a>
         &nbsp;·&nbsp;
         <a href="index.html">Back to course info</a>
       </div>
@@ -567,37 +567,81 @@ select.ti{appearance:none;cursor:pointer;background-image:url("data:image/svg+xm
 
 <script>
 /* ══════════════════════════════════════════
-   PAYWALL LOGIC
-   Access code: change ACCESS_CODE below.
-   Stripe redirect: in your Stripe Payment Link settings,
-   set the "After payment" success URL to:
-     https://yoursite.com/course_toxins_parasites.html?code=NRF2DETOX2025
-   Stripe will redirect buyers there and the code
-   auto-unlocks on arrival.
-══════════════════════════════════════════ */
-const ACCESS_CODE='NRF2DETOX2025'; // ← change to your preferred code
+   PAYWALL LOGIC — server-validated
+   The access code lives ONLY in the backend env var COURSE_ACCESS_CODE
+   (Railway). This file never contains the real code, so the repo can
+   stay public without leaking the $97 course.
 
-function pw_check(){
-  if(localStorage.getItem('nrf2_unlocked')==='true'){pw_hide(false);return;}
+   STRIPE CONFIG: In the Stripe Buy Button dashboard, set the
+   "After payment" success URL to:
+     https://notworms.com/course/access.html?code={THE_CODE}
+   so buyers auto-land unlocked. The same value goes in Railway env var
+   COURSE_ACCESS_CODE. Rotate both together when needed.
+══════════════════════════════════════════ */
+const API_BASE = 'https://parasitepro-mvp-production-b051.up.railway.app';
+const LS_KEY = 'pp_course_unlocked';
+
+async function validateCode(code){
+  try {
+    const r = await fetch(`${API_BASE}/api/course/validate-access`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    if (r.status === 429) {
+      return { valid: false, rateLimited: true };
+    }
+    const data = await r.json();
+    return { valid: !!data.valid };
+  } catch (err) {
+    console.warn('Course unlock check failed:', err);
+    return { valid: false, networkError: true };
+  }
+}
+
+async function pw_check(){
+  if(localStorage.getItem(LS_KEY)==='true'){pw_hide(false);return;}
   const params=new URLSearchParams(window.location.search);
   const c=params.get('code')||params.get('unlock')||params.get('access')||'';
-  if(c.trim().toUpperCase()===ACCESS_CODE){
-    localStorage.setItem('nrf2_unlocked','true');
-    pw_hide(false);
-    window.history.replaceState({},'',window.location.pathname);
-    return;
+  if(c){
+    const result = await validateCode(c.trim());
+    if (result.valid) {
+      localStorage.setItem(LS_KEY,'true');
+      pw_hide(false);
+      window.history.replaceState({},'',window.location.pathname);
+      return;
+    }
   }
   document.getElementById('pw-overlay').classList.remove('hidden');
 }
 
-function pw_unlock(){
+async function pw_unlock(){
   const input=document.getElementById('pw-code-input');
+  const btn=document.querySelector('.pw-unlock-btn');
   const errEl=document.getElementById('pw-err');
-  if(input.value.trim().toUpperCase()===ACCESS_CODE){
-    localStorage.setItem('nrf2_unlocked','true');
+  const code = input.value.trim();
+  if (!code) {
+    errEl.textContent='Enter your access code.';
+    return;
+  }
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  errEl.textContent='';
+  const result = await validateCode(code);
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+  if (result.valid) {
+    localStorage.setItem(LS_KEY,'true');
     errEl.textContent='';
     pw_hide(true);
-  }else{
+  } else if (result.rateLimited) {
+    input.classList.add('error');
+    errEl.textContent='Too many attempts. Wait a few minutes and try again.';
+    setTimeout(()=>input.classList.remove('error'),400);
+  } else if (result.networkError) {
+    errEl.textContent='Could not reach the server. Check your connection and try again.';
+  } else {
     input.classList.add('error');
     errEl.textContent='Incorrect code — check your purchase confirmation email.';
     setTimeout(()=>input.classList.remove('error'),400);
@@ -624,7 +668,7 @@ pw_check();
 <nav class="sidebar">
   <div class="sb-logo">
     <div class="sb-logo-txt">Clearing the Body of<br>Toxins &amp; Parasites</div>
-    <div class="sb-logo-sub">Scientific Edition</div>
+    <div class="sb-logo-sub">A ParasitePro Course</div>
   </div>
   <div class="sb-nav">
     <div class="sb-mod">
