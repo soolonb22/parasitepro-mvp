@@ -2,14 +2,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import StripeBuyButton from './StripeBuyButton';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
 
 const BUNDLES = [
-  { id: 'bundle_5',  credits: 5,  price: '$19.99', ppc: '$4.00 / analysis' },
-  { id: 'bundle_10', credits: 10, price: '$34.99', ppc: '$3.50 / analysis', popular: true },
-  { id: 'bundle_25', credits: 25, price: '$74.99', ppc: '$3.00 / analysis' },
+  { id: 'bundle_5',  credits: 5,  price: '$19.00', ppc: '$3.80 / analysis', buyButtonId: 'buy_btn_1TXMeAJVcqhzyDheK2BeEVuR' },
+  { id: 'bundle_10', credits: 10, price: '$34.00', ppc: '$3.40 / analysis', popular: true, buyButtonId: 'buy_btn_1TXMcHJVcqhzyDhewedBD2lE' },
+  { id: 'bundle_25', credits: 25, price: '$74.99', ppc: '$3.00 / analysis', buyButtonId: 'buy_btn_1TXMR4JVcqhzyDheZbOPiqyH' },
 ];
 
 const COPY = {
@@ -154,19 +155,15 @@ const ZeroCreditNudgeModal = ({ isOpen, onClose, context = 'results', accessToke
             ))}
           </div>
 
-          {/* Buy */}
-          <button
-            onClick={handlePurchase}
-            disabled={loading}
-            style={{
-              width:'100%',padding:'12px',
-              background:loading?'#6b9e8c':'#00BFA5',color:'#fff',
-              border:'none',borderRadius:10,fontSize:13,fontWeight:800,
-              cursor:loading?'not-allowed':'pointer',transition:'background .15s',marginBottom:7,
-            }}
-          >
-            {loading ? 'Taking you to checkout...' : `Get ${selectedBundle?.credits} credits - ${selectedBundle?.price}`}
-          </button>
+          {/* Buy — embedded Stripe Buy Button (re-renders when selected bundle changes) */}
+          <div style={{ marginBottom: 7 }}>
+            <StripeBuyButton
+              key={selected}
+              buyButtonId={selectedBundle?.buyButtonId}
+              onNativeClick={() => { /* native fallback: parent could show MobilePurchasePrompt */ }}
+              nativeLabel={`Get ${selectedBundle?.credits} credits - ${selectedBundle?.price}`}
+            />
+          </div>
           <button
             onClick={onClose}
             style={{width:'100%',padding:'8px',background:'transparent',color:'#9CA3AF',border:'none',fontSize:12,cursor:'pointer'}}

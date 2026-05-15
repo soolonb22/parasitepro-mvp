@@ -6,6 +6,7 @@ import SEO from '../components/SEO';
 import UrgencyTimer from '../components/UrgencyTimer';
 import MoneyBackGuarantee from '../components/MoneyBackGuarantee';
 import MobilePurchasePrompt from '../components/MobilePurchasePrompt';
+import StripeBuyButton from '../components/StripeBuyButton';
 import { isNativePlatform } from '../utils/mobile';
 import { useAuthStore } from '../store/authStore';
 import axios from 'axios';
@@ -36,14 +37,14 @@ const PricingPage = () => {
   const [showMobilePurchase, setShowMobilePurchase] = useState(false);
 
   const bundles = [
-    { id:'bundle_2',  name:'Starter Pack', price:'AUD $9.99',  credits:2,  perCredit:'$4.99', popular:false, tag:'Not sure yet?' },
-    { id:'bundle_5',  name:'5 Credits',    price:'AUD $19.99', credits:5,  perCredit:'$4.00', popular:false, tag:null },
-    { id:'bundle_10', name:'10 Credits',   price:'AUD $34.99', credits:10, perCredit:'$3.50', popular:true,  tag:null },
-    { id:'bundle_25', name:'25 Credits',   price:'AUD $74.99', credits:25, perCredit:'$3.00', popular:false, tag:'Best value' },
+    { id:'bundle_2',  name:'Starter Pack', price:'AUD $9.99',  credits:2,  perCredit:'$5.00', popular:false, tag:'Not sure yet?', buyButtonId:'buy_btn_1TXMgHJVcqhzyDheYBTitGZv' },
+    { id:'bundle_5',  name:'5 Credits',    price:'AUD $19.00', credits:5,  perCredit:'$3.80', popular:false, tag:null,            buyButtonId:'buy_btn_1TXMeAJVcqhzyDheK2BeEVuR' },
+    { id:'bundle_10', name:'10 Credits',   price:'AUD $34.00', credits:10, perCredit:'$3.40', popular:true,  tag:null,            buyButtonId:'buy_btn_1TXMcHJVcqhzyDhewedBD2lE' },
+    { id:'bundle_25', name:'25 Credits',   price:'AUD $74.99', credits:25, perCredit:'$3.00', popular:false, tag:'Best value',    buyButtonId:'buy_btn_1TXMR4JVcqhzyDheZbOPiqyH' },
   ];
 
   const faqs = [
-    { question:'How accurate is the AI analysis?', answer:'Our AI achieves 85-95% accuracy on clear images. Confidence scores are shown with every detection.' },
+    { question:'How accurate is the AI analysis?', answer:'Our analysis provides educational pattern-matching against scientific reference data — it is not a diagnostic tool. Each report flags how confident the pattern match is so you can decide whether to follow up with your GP.' },
     { question:'Is my data secure?', answer:'Yes — 256-bit SSL encryption protects all data. Your images and health info are never shared with third parties.' },
     { question:'What if I am not satisfied?', answer:'30-day money-back guarantee. Contact us within 30 days for a full refund, no questions asked.' },
     { question:'Do unused credits expire?', answer:'No — purchased credits never expire. Use them whenever you need an analysis.' },
@@ -135,9 +136,23 @@ const PricingPage = () => {
                   </div>
                 ))}
               </div>
-              <button type="button" className={b.popular ? 'pp-btn-primary' : 'pp-btn'} onClick={() => handlePurchase(b.id)} disabled={!!loading} style={{ width:'100%', padding:'12px', fontSize:14 }}>
-                {loading === b.id ? 'Processing…' : `Buy ${b.credits} Credits`}
-              </button>
+              {/* Buy — embedded Stripe Buy Button (web) or native fallback */}
+              {!user ? (
+                <button
+                  type="button"
+                  className={b.popular ? 'pp-btn-primary' : 'pp-btn'}
+                  onClick={() => navigate('/login')}
+                  style={{ width:'100%', padding:'12px', fontSize:14 }}
+                >
+                  Sign in to buy
+                </button>
+              ) : (
+                <StripeBuyButton
+                  buyButtonId={b.buyButtonId}
+                  onNativeClick={() => setShowMobilePurchase(true)}
+                  nativeLabel={`Buy ${b.credits} Credits`}
+                />
+              )}
             </div>
           ))}
         </div>

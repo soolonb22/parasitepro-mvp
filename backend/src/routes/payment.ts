@@ -13,7 +13,10 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.notworms.com';
 
 // Credit bundles — live Stripe price IDs (AUD)
 // bundle_2 uses inline price_data (no pre-created Stripe price needed)
-const BUNDLES: Record<string, { credits: number; priceId?: string; priceData?: { unit_amount: number; currency: string; product_data: { name: string; description: string } }; label: string; aud: number; popular?: boolean }> = {
+// buyButtonId references the embedded <stripe-buy-button> for web purchases (new path).
+// amount is the live AUD-cents price; the webhook uses it to identify the bundle
+// for Buy Button purchases (which carry client_reference_id, not metadata.userId).
+const BUNDLES: Record<string, { credits: number; priceId?: string; priceData?: { unit_amount: number; currency: string; product_data: { name: string; description: string } }; label: string; aud: number; buyButtonId?: string; popular?: boolean }> = {
   bundle_2:  {
     credits: 2,
     priceData: {
@@ -22,17 +25,30 @@ const BUNDLES: Record<string, { credits: number; priceId?: string; priceData?: {
       product_data: { name: 'ParasitePro Starter Pack — 2 Credits', description: '2 AI parasite analysis credits. Perfect for a first look. Credits never expire.' },
     },
     label: 'Starter Pack (2 Credits)', aud: 999,
+    buyButtonId: 'buy_btn_1TXMgHJVcqhzyDheYBTitGZv',
   },
-  bundle_5:  { credits: 5,  priceId: 'price_1T9ZvVI3iOfYVCAUk9F9LnbV', label: '5 Credits',  aud: 1999 },
-  bundle_10: { credits: 10, priceId: 'price_1T9ZvVI3iOfYVCAUKy6XHMnR', label: '10 Credits', aud: 3499, popular: true },
-  bundle_25: { credits: 25, priceId: 'price_1T9ZvWI3iOfYVCAUarVuV29g', label: '25 Credits', aud: 7499 },
+  bundle_5:  { credits: 5,  priceId: 'price_1T9ZvVI3iOfYVCAUk9F9LnbV', label: '5 Credits',  aud: 1900, buyButtonId: 'buy_btn_1TXMeAJVcqhzyDheK2BeEVuR' },
+  bundle_10: { credits: 10, priceId: 'price_1T9ZvVI3iOfYVCAUKy6XHMnR', label: '10 Credits', aud: 3400, buyButtonId: 'buy_btn_1TXMcHJVcqhzyDhewedBD2lE', popular: true },
+  bundle_25: { credits: 25, priceId: 'price_1T9ZvWI3iOfYVCAUarVuV29g', label: '25 Credits', aud: 7499, buyButtonId: 'buy_btn_1TXMR4JVcqhzyDheZbOPiqyH' },
 };
+
+// Reverse lookup: AUD-cents amount → credit count. Used by webhook when a
+// Buy Button payment arrives (no userId/credits in metadata — only client_reference_id
+// for the user and amount_total for identifying the bundle).
+function creditsForAmount(amountCents: number | null): number {
+  if (!amountCents) return 0;
+  for (const b of Object.values(BUNDLES)) {
+    if (b.aud === amountCents) return b.credits;
+  }
+  return 0;
+}
 
 // ── GET /api/payment/pricing ──────────────────────────────────────────────────
 router.get('/pricing', async (_req: Request, res: Response): Promise<void> => {
   const options = Object.entries(BUNDLES).map(([id, b]) => ({
     id, credits: b.credits, label: b.label, popular: b.popular || false,
     aud: (b.aud / 100).toFixed(2), audPerCredit: (b.aud / b.credits / 100).toFixed(2),
+    buyButtonId: b.buyButtonId || null,
   }));
   res.json({ options, currency: 'AUD' });
 });
@@ -118,10 +134,29 @@ router.post('/webhook', express.raw({ type: 'application/json' }),
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.payment_status !== 'paid') { res.json({ received: true }); return; }
 
-        const userId = session.metadata?.userId;
-        const credits = parseInt(session.metadata?.credits || '0');
+        // ── Resolve user + credits ─────────────────────────────────────────
+        // Two purchase paths land here:
+        //   1) Backend-created Checkout Session — userId + credits in metadata
+        //   2) Embedded <stripe-buy-button> — userId in client_reference_id,
+        //      bundle identified by amount_total
+        let userId = session.metadata?.userId || null;
+        let credits = parseInt(session.metadata?.credits || '0');
 
-        if (!userId || !credits) { console.error('❌ Missing metadata:', session.id); res.json({ received: true }); return; }
+        if (!userId && session.client_reference_id) {
+          userId = session.client_reference_id;
+          credits = creditsForAmount(session.amount_total);
+          if (credits) {
+            console.log(`🔁 Buy Button purchase resolved → user ${userId}, ${credits} credits ($${((session.amount_total || 0) / 100).toFixed(2)})`);
+          }
+        }
+
+        // Course Buy Button has no credits — log it for records and skip credit grant.
+        // Buyer access is handled separately by the Stripe success URL → access.html flow.
+        if (userId && credits === 0 && session.amount_total) {
+          console.log(`📚 Non-credit purchase recorded for user ${userId} ($${((session.amount_total || 0) / 100).toFixed(2)}) — likely course`);
+        }
+
+        if (!userId || !credits) { console.error('❌ Missing user/credits for session:', session.id); res.json({ received: true }); return; }
 
         const existing = await pool.query('SELECT id FROM payments WHERE stripe_payment_intent_id = $1', [session.id]);
         if (existing.rows.length > 0) { res.json({ received: true }); return; }

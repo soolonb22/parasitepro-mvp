@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import CldImage from '../components/CldImage';
 import { CourseUpsellBox } from '../components/CourseUpsellBox';
+import StripeBuyButton from '../components/StripeBuyButton';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -617,40 +618,27 @@ const GPReportPage = () => {
               <div style={{ textAlign: 'center', marginTop: '0.2rem' }}>
                 <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F2733' }}>10 Credits</div>
                 <div style={{ fontSize: '0.75rem', color: '#9CA3AF', textDecoration: 'line-through' }}>$39.99</div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>AUD $34.99</div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>AUD $34.00</div>
                 <div style={{ fontSize: '0.7rem', color: '#6B7280', margin: '0.2rem 0 0.75rem' }}>
                   Covers the whole family — credits never expire
                 </div>
-                <button
-                  onClick={() => handleUpsellPurchase('bundle_10')}
-                  disabled={!!upsellLoading}
-                  style={{
-                    width: '100%', padding: '13px',
-                    background: upsellLoading === 'bundle_10' ? '#9CA3AF' : '#0F2733',
-                    color: 'white', border: 'none', borderRadius: 12,
-                    fontSize: '0.93rem', fontWeight: 800, cursor: 'pointer',
-                    transition: 'background 0.15s',
-                  }}
-                >
-                  {upsellLoading === 'bundle_10' ? 'Opening checkout…' : 'Get 10 Credits — $34.99'}
-                </button>
+                <StripeBuyButton
+                  buyButtonId="buy_btn_1TXMcHJVcqhzyDhewedBD2lE"
+                  onNativeClick={() => handleUpsellPurchase('bundle_10')}
+                  nativeLabel="Get 10 Credits — $34.00"
+                />
               </div>
             </div>
 
             {/* Downsell — 5 credits */}
-            <button
-              onClick={() => handleUpsellPurchase('bundle_5')}
-              disabled={!!upsellLoading}
-              style={{
-                width: '100%', padding: '11px',
-                background: 'white', color: '#374151',
-                border: '1.5px solid #D1D5DB', borderRadius: 12,
-                fontSize: '0.86rem', fontWeight: 600, cursor: 'pointer',
-                marginBottom: '0.75rem',
-              }}
-            >
-              {upsellLoading === 'bundle_5' ? 'Opening checkout…' : '5 Credits — AUD $19.99'}
-            </button>
+            <div style={{ marginBottom: '0.75rem' }}>
+              <StripeBuyButton
+                buyButtonId="buy_btn_1TXMeAJVcqhzyDheK2BeEVuR"
+                onNativeClick={() => handleUpsellPurchase('bundle_5')}
+                nativeLabel="5 Credits — AUD $19.00"
+                nativeStyle={{ background: 'white', color: '#374151', border: '1.5px solid #D1D5DB', fontWeight: 600 }}
+              />
+            </div>
 
             {/* Subscription micro-pitch */}
             <p style={{ textAlign: 'center', fontSize: '0.73rem', color: '#9CA3AF', margin: 0 }}>
