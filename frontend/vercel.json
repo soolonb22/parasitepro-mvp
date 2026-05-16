@@ -11,7 +11,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; connect-src 'self' https://parasitepro-mvp-production-b051.up.railway.app https://api.stripe.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net; img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src https://js.stripe.com https://hooks.stripe.com; media-src 'self' https://res.cloudinary.com; object-src 'none';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; connect-src 'self' https://parasitepro-mvp-production-b051.up.railway.app https://api.stripe.com https://r.stripe.com https://m.stripe.network https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net; img-src 'self' data: blob: https://res.cloudinary.com https://*.stripe.com https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://buy.stripe.com; media-src 'self' https://res.cloudinary.com; object-src 'none';"
         },
         {
           "key": "X-Frame-Options",
