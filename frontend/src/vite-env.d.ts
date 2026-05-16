@@ -2,7 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
-  readonly VITE_STRIPE_PUBLIC_KEY: string; // pk_live_51SEURXKP9uxdve7jnKzYboXV37u42eKc5uM21TQ15iXhYLUPQi8Jz7b3VR7yJTGtXBj4EMi9DwnV8TNqb1DhDKmH00U4I1qbyF
+  readonly VITE_STRIPE_PUBLIC_KEY: string; // pk_live_51TSrn2JVcqhzyDhek4ilj0NuzHn2v2ITBezd5ISjfiVeqt2FH4s0g6q17Ub1ASqV1mp8IDTAwdWv1pJAf7MTsWVo00b9Xz8yhi
 }
 
 interface ImportMeta {

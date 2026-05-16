@@ -76,21 +76,6 @@ const ZeroCreditNudgeModal = ({ isOpen, onClose, context = 'results', accessToke
 
   if (!isOpen) return null;
 
-  const handlePurchase = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const res = await axios.post(`${API_URL}/payment/create-checkout-session`,
-        { type: selected, couponCode: '' },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      window.location.href = res.data.sessionUrl;
-    } catch {
-      setLoading(false);
-      alert('Unable to start checkout. Please try again.');
-    }
-  };
-
   return (
     <div
       onClick={e => e.target === e.currentTarget && onClose()}

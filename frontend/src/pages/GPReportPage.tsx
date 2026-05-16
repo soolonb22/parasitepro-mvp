@@ -116,19 +116,13 @@ const GPReportPage = () => {
     }
   };
 
-  const handleUpsellPurchase = async (bundleId) => {
-    if (!user) { navigate('/login'); return; }
-    setUpsellLoading(bundleId);
-    try {
-      const res = await axios.post(`${API_URL}/payment/create-checkout-session`,
-        { bundleId },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      window.location.href = res.data.sessionUrl;
-    } catch {
-      toast.error('Payment failed — please try again.');
-      setUpsellLoading('');
-    }
+  // Native fallback for the upsell Buy Buttons. With isNativePlatform()
+  // currently hardcoded false, this never fires from the embedded buttons;
+  // we keep the symbol valid as a navigate-to-pricing redirect for when
+  // native is added later (and any direct callers).
+  const handleUpsellPurchase = (_bundleId?: string) => {
+    setShowUpsell(false);
+    navigate('/pricing');
   };
 
   const handlePrint = () => {

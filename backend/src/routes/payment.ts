@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import Stripe from 'stripe';
-import { body, validationResult } from 'express-validator';
 import pool, { withTransaction } from '../config/database';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import dotenv from 'dotenv';
@@ -9,27 +8,16 @@ dotenv.config();
 
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2023-10-16' });
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.notworms.com';
 
-// Credit bundles — live Stripe price IDs (AUD)
-// bundle_2 uses inline price_data (no pre-created Stripe price needed)
-// buyButtonId references the embedded <stripe-buy-button> for web purchases (new path).
-// amount is the live AUD-cents price; the webhook uses it to identify the bundle
-// for Buy Button purchases (which carry client_reference_id, not metadata.userId).
-const BUNDLES: Record<string, { credits: number; priceId?: string; priceData?: { unit_amount: number; currency: string; product_data: { name: string; description: string } }; label: string; aud: number; buyButtonId?: string; popular?: boolean }> = {
-  bundle_2:  {
-    credits: 2,
-    priceData: {
-      unit_amount: 999,
-      currency: 'aud',
-      product_data: { name: 'ParasitePro Starter Pack — 2 Credits', description: '2 AI parasite analysis credits. Perfect for a first look. Credits never expire.' },
-    },
-    label: 'Starter Pack (2 Credits)', aud: 999,
-    buyButtonId: 'buy_btn_1TXMgHJVcqhzyDheYBTitGZv',
-  },
-  bundle_5:  { credits: 5,  priceId: 'price_1T9ZvVI3iOfYVCAUk9F9LnbV', label: '5 Credits',  aud: 1900, buyButtonId: 'buy_btn_1TXMeAJVcqhzyDheK2BeEVuR' },
-  bundle_10: { credits: 10, priceId: 'price_1T9ZvVI3iOfYVCAUKy6XHMnR', label: '10 Credits', aud: 3400, buyButtonId: 'buy_btn_1TXMcHJVcqhzyDhewedBD2lE', popular: true },
-  bundle_25: { credits: 25, priceId: 'price_1T9ZvWI3iOfYVCAUarVuV29g', label: '25 Credits', aud: 7499, buyButtonId: 'buy_btn_1TXMR4JVcqhzyDheZbOPiqyH' },
+// Credit bundles — buyButtonId points at the embedded Stripe Buy Button
+// (live in account pk_live_51TSrn2...). The legacy priceId/priceData fields
+// were removed when /create-checkout-session was retired — the webhook
+// resolves the bundle from amount_total via creditsForAmount().
+const BUNDLES: Record<string, { credits: number; label: string; aud: number; buyButtonId: string; popular?: boolean }> = {
+  bundle_2:  { credits: 2,  label: 'Starter Pack (2 Credits)', aud: 999,  buyButtonId: 'buy_btn_1TXMgHJVcqhzyDheYBTitGZv' },
+  bundle_5:  { credits: 5,  label: '5 Credits',                aud: 1900, buyButtonId: 'buy_btn_1TXMeAJVcqhzyDheK2BeEVuR' },
+  bundle_10: { credits: 10, label: '10 Credits',               aud: 3400, buyButtonId: 'buy_btn_1TXMcHJVcqhzyDhewedBD2lE', popular: true },
+  bundle_25: { credits: 25, label: '25 Credits',               aud: 7499, buyButtonId: 'buy_btn_1TXMR4JVcqhzyDheZbOPiqyH' },
 };
 
 // Reverse lookup: AUD-cents amount → credit count. Used by webhook when a
@@ -53,46 +41,11 @@ router.get('/pricing', async (_req: Request, res: Response): Promise<void> => {
   res.json({ options, currency: 'AUD' });
 });
 
-// ── POST /api/payment/create-checkout-session ─────────────────────────────────
-router.post('/create-checkout-session', authenticateToken,
-  [body('bundleId').isIn(Object.keys(BUNDLES)).withMessage('Invalid bundle')],
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) { res.status(400).json({ error: errors.array()[0].msg }); return; }
-
-    const { bundleId } = req.body;
-    const bundle = BUNDLES[bundleId];
-    const userId = req.userId!;
-
-    try {
-      const userRow = await pool.query('SELECT email FROM users WHERE id = $1', [userId]);
-      const email = userRow.rows[0]?.email;
-
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        line_items: [{
-          // Use pre-created Stripe price if available, otherwise use inline price_data
-          ...(bundle.priceId
-            ? { price: bundle.priceId }
-            : { price_data: bundle.priceData }
-          ),
-          quantity: 1,
-        }],
-        success_url: `${FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${FRONTEND_URL}/pricing?cancelled=1`,
-        customer_email: email,
-        metadata: { userId, credits: bundle.credits.toString(), bundleId },
-        payment_intent_data: { metadata: { userId, credits: bundle.credits.toString() } },
-      });
-
-      console.log(`✅ Checkout session: ${session.id} — ${bundle.label} — user ${userId}`);
-      res.json({ sessionUrl: session.url });
-    } catch (error) {
-      console.error('Create checkout session error:', error);
-      res.status(500).json({ error: 'Failed to create checkout session' });
-    }
-  }
-);
+// ── POST /api/payment/create-checkout-session ────────────────────────────────
+// REMOVED 15 May 2026. All purchase flows now use embedded Stripe Buy Buttons
+// (see frontend/src/components/StripeBuyButton.tsx). Buyer attribution comes
+// through session.client_reference_id rather than server-set metadata; bundle
+// resolution happens in the webhook via creditsForAmount(amount_total).
 
 // ── GET /api/payment/verify-session ──────────────────────────────────────────
 router.get('/verify-session', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {

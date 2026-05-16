@@ -52,20 +52,6 @@ const PricingPage = () => {
     { question:'How do I get beta credits?', answer:'Use promo code BETA3FREE when signing up to receive 3 free credits.' },
   ];
 
-  const handlePurchase = async (bundleId) => {
-    if (!user) { navigate('/login'); return; }
-    if (isNativePlatform()) { setShowMobilePurchase(true); return; }
-    setLoading(bundleId);
-    setError('');
-    try {
-      const res = await axios.post(`${API_URL}/payment/create-checkout-session`, { bundleId }, { headers:{ Authorization:`Bearer ${accessToken}` } });
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      setError(err.response?.data?.error || 'Payment failed — please try again.');
-      setLoading('');
-    }
-  };
-
   const handleApplyCoupon = () => {
     if (couponInput.trim()) {
       setCouponMessage(`Coupon "${couponInput.trim().toUpperCase()}" will be applied at checkout`);
