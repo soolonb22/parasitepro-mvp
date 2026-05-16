@@ -1,4 +1,6 @@
 import { Router, Request, Response } from 'express';
+import pool from '../config/database';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -58,6 +60,31 @@ router.post('/validate-access', (req: Request, res: Response) => {
   }
 
   res.json({ valid });
+});
+
+// ── GET /api/course/access-status ──────────────────────────────────────────
+// Authenticated. Returns whether the logged-in user has paid for the course.
+// Replaces the shared-code gate — every buyer's entitlement is per-account,
+// stored in users.has_course_access, set by the Stripe webhook on purchase.
+router.get('/access-status', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await pool.query(
+      'SELECT has_course_access, course_access_granted_at FROM users WHERE id = $1',
+      [req.userId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({ hasAccess: false, error: 'User not found' });
+      return;
+    }
+    const row = result.rows[0];
+    res.json({
+      hasAccess: !!row.has_course_access,
+      grantedAt: row.course_access_granted_at || null,
+    });
+  } catch (err) {
+    console.error('Course access-status error:', err);
+    res.status(500).json({ hasAccess: false, error: 'Server error' });
+  }
 });
 
 export default router;

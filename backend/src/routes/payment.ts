@@ -103,10 +103,114 @@ router.post('/webhook', express.raw({ type: 'application/json' }),
           }
         }
 
-        // Course Buy Button has no credits — log it for records and skip credit grant.
-        // Buyer access is handled separately by the Stripe success URL → access.html flow.
-        if (userId && credits === 0 && session.amount_total) {
-          console.log(`📚 Non-credit purchase recorded for user ${userId} ($${((session.amount_total || 0) / 100).toFixed(2)}) — likely course`);
+        // ── Detect course purchase ─────────────────────────────────────────
+        // Any non-credit-bundle payment that came through with a user attached
+        // is treated as a course purchase. This naturally handles full price
+        // ($97 / 9700c) and any future discounted price (e.g. PARA20 → $77.60).
+        const isCoursePurchase = !!(userId && credits === 0 && session.amount_total && session.amount_total > 0);
+
+        if (isCoursePurchase) {
+          // Idempotency — Stripe retries webhooks; don't grant twice
+          const existing = await pool.query(
+            'SELECT id FROM payments WHERE stripe_payment_intent_id = $1',
+            [session.id]
+          );
+          if (existing.rows.length > 0) {
+            console.log(`↩️  Course purchase already processed for session ${session.id}`);
+            res.json({ received: true });
+            return;
+          }
+
+          const amountAud = ((session.amount_total || 0) / 100).toFixed(2);
+
+          await withTransaction(async (client) => {
+            await client.query(
+              `UPDATE users SET has_course_access = TRUE, course_access_granted_at = NOW() WHERE id = $1`,
+              [userId]
+            );
+            await client.query(
+              `INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency, credits_purchased, status)
+               VALUES ($1, $2, $3, $4, $5, $6)`,
+              [userId, session.id, session.amount_total, session.currency, 0, 'succeeded']
+            );
+          });
+
+          console.log(`📚 Course access granted → user ${userId} ($${amountAud})`);
+
+          // Send TWO emails: one to the buyer with their access link, one to Fallon
+          if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+            try {
+              const buyerRow = await pool.query(
+                'SELECT email, first_name, last_name FROM users WHERE id = $1',
+                [userId]
+              );
+              const buyer = buyerRow.rows[0];
+              const buyerName = buyer ? `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || buyer.email : userId;
+              const buyerEmail = buyer?.email;
+
+              const nodemailer = await import('nodemailer');
+              const transporter = nodemailer.default.createTransport({
+                host: process.env.SMTP_HOST,
+                port: parseInt(process.env.SMTP_PORT || '587'),
+                secure: process.env.SMTP_SECURE === 'true',
+                auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+              });
+
+              // ── Email #1: to buyer (course access confirmation) ──
+              if (buyerEmail) {
+                await transporter.sendMail({
+                  from: process.env.SMTP_FROM || 'ParasitePro <noreply@notworms.com>',
+                  to: buyerEmail,
+                  subject: `Your ParasitePro course is unlocked 🔓`,
+                  html: `
+                    <div style="font-family:'DM Sans',sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0E0F11;color:#F5F0E8;border-radius:14px;">
+                      <h1 style="font-family:Georgia,serif;margin:0 0 6px 0;color:#F5F0E8;font-weight:400;font-size:26px;">Welcome to the course.</h1>
+                      <p style="color:#8B92A7;font-size:14px;margin:0 0 28px 0;">Clearing the Body of Toxins &amp; Parasites</p>
+                      <p style="font-size:15px;line-height:1.7;margin:0 0 20px 0;">Hi ${buyerName},</p>
+                      <p style="font-size:15px;line-height:1.7;margin:0 0 20px 0;">Your purchase of <strong style="color:#F5F0E8;">$${amountAud} AUD</strong> is confirmed and your course access is active on the account associated with this email.</p>
+                      <p style="font-size:15px;line-height:1.7;margin:0 0 24px 0;">To start, sign in to your ParasitePro account and head to the course page:</p>
+                      <a href="https://notworms.com/course/access.html" style="display:inline-block;background:#D97706;color:#0E0F11;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:0.02em;">Open the course →</a>
+                      <p style="font-size:13px;line-height:1.7;margin:32px 0 8px 0;color:#8B92A7;">5 modules · 2 interactive tools · lifetime access — including future updates.</p>
+                      <p style="font-size:12px;line-height:1.6;margin:24px 0 0 0;color:#6B7280;border-top:1px solid #1F2937;padding-top:20px;">If you have any trouble accessing the course, just reply to this email and we'll sort it for you.<br><br>This is an educational program. It is not a substitute for medical advice, diagnosis, or treatment from a qualified health practitioner.</p>
+                    </div>
+                  `,
+                });
+                console.log(`📧 Course access email sent → ${buyerEmail}`);
+              } else {
+                console.warn(`⚠️ Course purchase but no buyer email found for user ${userId}`);
+              }
+
+              // ── Email #2: to Fallon ──
+              await transporter.sendMail({
+                from: process.env.SMTP_FROM || 'ParasitePro <noreply@notworms.com>',
+                to: process.env.OWNER_NOTIFY_EMAIL || 'importantalerts@gmail.com',
+                subject: `📚 New COURSE Sale — $${amountAud} AUD`,
+                html: `
+                  <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0E0F11;color:#F5F0E8;border-radius:12px;">
+                    <h2 style="color:#D97706;margin:0 0 4px 0;">📚 New Course Sale!</h2>
+                    <p style="color:#6B7280;font-size:13px;margin:0 0 24px 0;">Clearing the Body of Toxins &amp; Parasites</p>
+                    <table style="width:100%;border-collapse:collapse;">
+                      <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Customer</td>
+                          <td style="padding:10px 0;border-bottom:1px solid #1F2937;font-weight:600;">${buyerName}</td></tr>
+                      <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Email</td>
+                          <td style="padding:10px 0;border-bottom:1px solid #1F2937;">${buyerEmail || 'no email on file'}</td></tr>
+                      <tr><td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#9CA3AF;">Amount</td>
+                          <td style="padding:10px 0;border-bottom:1px solid #1F2937;color:#D97706;font-size:20px;font-weight:700;">$${amountAud} AUD</td></tr>
+                      <tr><td style="padding:10px 0;color:#9CA3AF;">Access</td>
+                          <td style="padding:10px 0;font-weight:600;color:#10B981;">✓ Auto-granted</td></tr>
+                    </table>
+                    <p style="margin-top:24px;font-size:12px;color:#4B5563;">Course access has been granted automatically. The buyer received their welcome email.</p>
+                  </div>
+                `,
+              });
+              console.log(`📧 Course sale notification sent to owner`);
+            } catch (emailErr) {
+              console.error('⚠️ Course email failed (non-fatal — access still granted):', emailErr);
+            }
+          }
+
+          res.json({ received: true });
+          return;
         }
 
         if (!userId || !credits) { console.error('❌ Missing user/credits for session:', session.id); res.json({ received: true }); return; }

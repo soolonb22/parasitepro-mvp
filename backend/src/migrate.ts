@@ -129,6 +129,10 @@ export async function runHealthIntelligenceMigrations(): Promise<void> {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS is_subscriber BOOLEAN DEFAULT FALSE;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_started_at TIMESTAMPTZ;
 
+      -- Course access (one-time purchase entitlement)
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS has_course_access BOOLEAN DEFAULT FALSE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS course_access_granted_at TIMESTAMPTZ;
+
       -- Health journal entries
       CREATE TABLE IF NOT EXISTS health_journal_entries (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
