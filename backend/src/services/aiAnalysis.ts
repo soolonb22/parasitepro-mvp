@@ -301,14 +301,27 @@ You are receiving FOUR versions of the same image. Compare all four and use whic
     console.log('🤖 Sending 4-version image set to Claude...');
     const response = await anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-6',
-      max_tokens: 4096,
+      max_tokens: 16384, // Bumped from 4096 — schema is large (parasiteProfile + detections + differentials + remedies), 4096 was truncating mid-JSON
       messages: [{ role: 'user', content: contentBlocks }],
     });
 
     const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
-    console.log('✅ Deep analysis complete. First 400 chars:', rawText.substring(0, 400));
+    console.log(`✅ Deep analysis received. stop_reason=${response.stop_reason} usage=in:${response.usage?.input_tokens}/out:${response.usage?.output_tokens}`);
+    console.log('First 400 chars:', rawText.substring(0, 400));
 
-    const result = parseAnalysisResponse(rawText);
+    // Diagnostic: if Claude truncated due to max_tokens, log loudly — parser will likely fail next
+    if (response.stop_reason === 'max_tokens') {
+      console.error(`⚠️  RESPONSE TRUNCATED at max_tokens limit. Last 200 chars: ${rawText.slice(-200)}`);
+    }
+
+    let result: AIAnalysisResult;
+    try {
+      result = parseAnalysisResponse(rawText);
+    } catch (parseErr: any) {
+      console.error('❌ JSON parse failed. Full raw response below:');
+      console.error(rawText);
+      throw new Error(`JSON parse failed (stop_reason=${response.stop_reason}): ${parseErr.message}`);
+    }
 
     // ── Attach quality report to result ──────────────────────────────────────
     result.imageUsed = 'both';
@@ -319,7 +332,15 @@ You are receiving FOUR versions of the same image. Compare all four and use whic
     return result;
 
   } catch (error: any) {
-    console.error('❌ Analysis error:', error.message);
+    // Capture everything we can — Anthropic SDK errors have .status, .error.type, .headers
+    console.error('❌ Analysis error:', {
+      message: error.message,
+      name: error.name,
+      status: error.status,
+      type: error.error?.type || error.type,
+      requestId: error.request_id || error.headers?.['request-id'],
+    });
+    if (error.stack) console.error(error.stack);
     if (process.env.OPENAI_API_KEY) {
       console.log('🔄 GPT-4o fallback...');
       try { return await analyzeWithGPT4o(originalUrl, sampleType, userContext); }
