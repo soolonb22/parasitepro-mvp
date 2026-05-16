@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import SEO from '../components/SEO';
 import axios from 'axios';
@@ -23,6 +23,23 @@ const SignupPage = () => {
   const [sessionId] = useState(() => `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`);
   const { signup } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Honour ?next= for post-purchase course flow. Same-origin paths only.
+  const getSafeNext = () => {
+    const raw = searchParams.get('next');
+    if (!raw) return '/dashboard';
+    if (!raw.startsWith('/') || raw.startsWith('//')) return '/dashboard';
+    return raw;
+  };
+  const goNext = () => {
+    const dest = getSafeNext();
+    if (dest.startsWith('/course/')) {
+      window.location.href = dest;
+    } else {
+      navigate(dest);
+    }
+  };
 
   useEffect(() => {
     axios.post('/api/auth/track-funnel', { step: 'page_view', sessionId }).catch(() => {});
@@ -91,12 +108,12 @@ const SignupPage = () => {
         setVerificationLink(result.verificationLink || '');
         setSuccessMessage(result.message || 'Please check your email to verify your account.');
       } else {
-        // BETA: Auto-login flow - redirect directly to dashboard
+        // BETA: Auto-login flow - redirect directly to dashboard (or ?next=)
         if (result?.promoApplied) {
           setSuccessMessage(`Welcome! Promo code applied - you received ${result.imageCredits || 3} free credits!`);
-          setTimeout(() => navigate('/dashboard'), 1500);
+          setTimeout(goNext, 1500);
         } else {
-          navigate('/dashboard');
+          goNext();
         }
       }
     } catch (err) {
@@ -176,7 +193,10 @@ const SignupPage = () => {
             <button
               className="btn btn-primary"
               style={{ width: '100%', marginBottom: '1rem' }}
-              onClick={() => navigate('/login')}
+              onClick={() => {
+                const nextParam = searchParams.get('next');
+                navigate(`/login${nextParam ? '?next=' + encodeURIComponent(nextParam) : ''}`);
+              }}
             >
               Go to Login
             </button>
@@ -332,7 +352,10 @@ const SignupPage = () => {
 
           <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#6b7280' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#2563eb', fontWeight: '500' }}>
+            <Link
+              to={`/login${searchParams.get('next') ? '?next=' + encodeURIComponent(searchParams.get('next')) : ''}`}
+              style={{ color: '#2563eb', fontWeight: '500' }}
+            >
               Login
             </Link>
           </p>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import SEO from '../components/SEO';
 import axios from 'axios';
@@ -15,6 +15,17 @@ const LoginPage = () => {
   const [verificationEmail, setVerificationEmail] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Honour ?next= for post-purchase course flow + any other redirect.
+  // Allowlist same-origin paths only — never trust an absolute URL.
+  const getSafeNext = () => {
+    const raw = searchParams.get('next');
+    if (!raw) return '/dashboard';
+    // Reject absolute URLs, protocol-relative, and non-/ starting paths
+    if (!raw.startsWith('/') || raw.startsWith('//')) return '/dashboard';
+    return raw;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +35,13 @@ const LoginPage = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      const dest = getSafeNext();
+      // Course page is a static HTML file outside the SPA — use full reload
+      if (dest.startsWith('/course/')) {
+        window.location.href = dest;
+      } else {
+        navigate(dest);
+      }
     } catch (err) {
       console.error('Login error:', err);
       
@@ -413,7 +430,7 @@ const LoginPage = () => {
           }}>
             Don't have an account?{' '}
             <Link 
-              to="/signup" 
+              to={`/signup${searchParams.get('next') ? '?next=' + encodeURIComponent(searchParams.get('next')) : ''}`}
               style={{ 
                 color: '#2563eb', 
                 fontWeight: '600',
