@@ -100,7 +100,7 @@ const PricingPage = () => {
           <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:8, padding:'12px 16px', marginBottom:24, color:'#ef4444', fontSize:14, textAlign:'center' }}>{error}</div>
         )}
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))', gap:20, marginBottom:40 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))', gap:32, marginBottom:40 }}>
           {bundles.map(b => (
             <div key={b.id} className="pp-card" style={{ padding:'28px 24px', position:'relative', border:b.popular?'1px solid rgba(217,119,6,0.5)':b.tag==='Best value'?'1px solid rgba(34,197,94,0.4)':undefined, textAlign:'center' }}>
               {b.popular && (
