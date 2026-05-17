@@ -14,6 +14,15 @@ export const DashboardCourseBanner: React.FC = () => {
   }, []);
 
   const handleDismiss = () => {
+    // Track banner dismissal in Google Analytics
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'course_banner_dismissed', {
+        event_category: 'Course Funnel',
+        event_label: 'Dashboard Banner Dismissed',
+        source: 'dashboard'
+      });
+    }
+    
     localStorage.setItem('course_banner_dismissed', 'true');
     setDismissed(true);
   };
@@ -63,6 +72,18 @@ export const DashboardCourseBanner: React.FC = () => {
               style={{ background: '#1B6B5F', color: 'white' }}
               onMouseEnter={(e) => e.currentTarget.style.background = '#147A52'}
               onMouseLeave={(e) => e.currentTarget.style.background = '#1B6B5F'}
+              onClick={() => {
+                // Track course CTA click in Google Analytics
+                if (typeof window !== 'undefined' && (window as any).gtag) {
+                  (window as any).gtag('event', 'course_cta_click', {
+                    event_category: 'Course Funnel',
+                    event_label: 'Dashboard Banner',
+                    value: 77,
+                    source: 'dashboard',
+                    discount_code: 'PARA20'
+                  });
+                }
+              }}
             >
               <Sparkles className="w-4 h-4" />
               View Course — $77 AUD

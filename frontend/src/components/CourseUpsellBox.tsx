@@ -75,6 +75,18 @@ export const CourseUpsellBox: React.FC = () => {
             style={{ background: '#1B6B5F', color: 'white' }}
             onMouseEnter={(e) => e.currentTarget.style.background = '#147A52'}
             onMouseLeave={(e) => e.currentTarget.style.background = '#1B6B5F'}
+            onClick={() => {
+              // Track course CTA click in Google Analytics
+              if (typeof window !== 'undefined' && (window as any).gtag) {
+                (window as any).gtag('event', 'course_cta_click', {
+                  event_category: 'Course Funnel',
+                  event_label: 'GP Report Upsell Box',
+                  value: 77,
+                  source: 'gp_report',
+                  discount_code: 'PARA20'
+                });
+              }
+            }}
           >
             View Course
             <ArrowRight className="w-4 h-4" />
