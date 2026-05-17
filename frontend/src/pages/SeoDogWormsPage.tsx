@@ -471,7 +471,7 @@ const SeoDogWormsPage = () => {
               </Link>
             </div>
             <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', opacity: 0.8 }}>
-              Starting at $12.99/month with 3 analysis credits included.
+              First analysis free, then pay-per-use credit bundles starting at $9.99 AUD for 2 credits. Credits never expire.
             </p>
           </div>
         </section>

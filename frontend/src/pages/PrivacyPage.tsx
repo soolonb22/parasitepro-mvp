@@ -68,7 +68,7 @@ const PrivacyPage = () => {
           <section style={{ marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#111827', marginBottom: '0.75rem' }}>3. Data Security</h2>
             <p style={{ color: '#4b5563', lineHeight: 1.7 }}>
-              We implement industry-standard security measures to protect your data. All images are encrypted during transmission and storage. Uploaded images are automatically deleted after 30 days. We use secure HTTPS connections and follow best practices for data protection.
+              We implement industry-standard security measures to protect your data. All images are encrypted during transmission and are not stored beyond the active session. We use secure HTTPS connections and follow best practices for data protection.
             </p>
           </section>
           

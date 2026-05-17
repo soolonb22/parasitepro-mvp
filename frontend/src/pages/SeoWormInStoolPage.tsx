@@ -460,7 +460,7 @@ const SeoWormInStoolPage = () => {
               </Link>
             </div>
             <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', opacity: 0.8 }}>
-              Subscription required. Starting at $12.99/month with 3 analysis credits.
+              First analysis free, then pay-per-use credit bundles starting at $9.99 AUD for 2 credits. Credits never expire.
             </p>
           </div>
         </section>
