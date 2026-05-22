@@ -390,18 +390,18 @@ You are receiving FOUR versions of the same image. Compare all four and use whic
       { type: 'text', text: fullPrompt },
     ];
 
-    // ── Step 6: Send to Claude ────────────────────────────────────────────────
-    console.log('🤖 Sending 4-version image set to Claude...');
-    const ANALYSIS_TIMEOUT_MS = 90_000;
-    const apiCall = anthropic.messages.create({
+    // ── Step 6: Send to Claude (streaming — required by SDK for large max_tokens) ──
+    console.log('🤖 Sending 4-version image set to Claude via streaming...');
+    const ANALYSIS_TIMEOUT_MS = 300_000; // 5 min — generating 24K tokens via streaming is slow
+    const stream = anthropic.messages.stream({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-6',
-      max_tokens: 24576, // Schema grew (added symptomProgression, dietaryGuidance, protocolPreview, lifestyleFactors) — give headroom
+      max_tokens: 24576,
       messages: [{ role: 'user', content: contentBlocks }],
     });
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error(`Anthropic API timeout after ${ANALYSIS_TIMEOUT_MS / 1000}s`)), ANALYSIS_TIMEOUT_MS)
     );
-    const response: any = await Promise.race([apiCall, timeoutPromise]);
+    const response: any = await Promise.race([stream.finalMessage(), timeoutPromise]);
 
     const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
     console.log(`✅ Deep analysis received. stop_reason=${response.stop_reason} usage=in:${response.usage?.input_tokens}/out:${response.usage?.output_tokens}`);
