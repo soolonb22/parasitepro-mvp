@@ -222,13 +222,13 @@ export async function enhanceImageForAnalysis(inputBuffer: Buffer): Promise<Enha
   if (dominantIssue === 'too_dark' || quality.brightness < 60) {
     console.log('🌓 Pre-remediation: applying aggressive dark photo recovery...');
     workingBuffer = await sharp(workingBuffer)
-      .gamma(0.45)                                    // extreme gamma lift
+      .linear(1.0, 40)                                // shadow lift (Sharp gamma <1.0 unsupported)
       .modulate({ saturation: 1.6, brightness: 1.2 })
       .linear(1.5, -15)                               // contrast stretch
       .normalise()
       .jpeg({ quality: 95 })
       .toBuffer();
-    remediationApplied.push('Dark photo recovery: gamma 0.45, saturation +60%, linear contrast stretch');
+    remediationApplied.push('Dark photo recovery: shadow lift +40, saturation +60%, linear contrast stretch');
   } else if (dominantIssue === 'too_bright' || quality.brightness > 210) {
     console.log('☀️ Pre-remediation: recovering overexposed photo...');
     workingBuffer = await sharp(workingBuffer)
@@ -273,20 +273,24 @@ export async function enhanceImageForAnalysis(inputBuffer: Buffer): Promise<Enha
   processingApplied.push('Normalised to 1200px, JPEG 95%');
 
   // Step 3 — AUTO-CORRECT VERSION
-  // Adaptive gamma based on brightness + contrast boost + saturation lift
-  const gammaCurve = quality.brightness < 80 ? 0.6    // aggressive lift for dark
-                   : quality.brightness < 120 ? 0.75   // moderate lift
-                   : quality.brightness > 180 ? 1.4    // darken overexposed
-                   : 1.0;                               // near-perfect, minimal adjustment
+  // Adaptive tonal curve based on brightness — Sharp gamma() only supports 1.0–3.0,
+  // so for shadow lift (dark photos) we use .linear() offset instead.
+  // gammaCurve >= 1.0 darkens/leaves alone; shadowLiftOffset > 0 brightens shadows.
+  const gammaCurve = quality.brightness > 180 ? 1.4    // darken overexposed
+                   : 1.0;                              // safe baseline
+  const shadowLiftOffset = quality.brightness < 80 ? 25   // aggressive lift for dark
+                         : quality.brightness < 120 ? 12  // moderate lift
+                         : 0;                              // none needed
 
   const autoCorrect = await sharp(normalised)
-    .gamma(gammaCurve)                                  // gamma correction
+    .gamma(gammaCurve)                                  // gamma correction (safe range)
+    .linear(1.0, shadowLiftOffset)                      // shadow lift if needed
     .modulate({ saturation: 1.35, brightness: 1.0 })   // saturation boost for colour differentiation
     .sharpen({ sigma: 1.2, m1: 0.5, m2: 3.0 })         // adaptive unsharp mask
     .normalise()                 // percentile stretch (ignores outliers)
     .jpeg({ quality: 93 })
     .toBuffer();
-  processingApplied.push(`Auto-correct: gamma ${gammaCurve}, saturation +35%, percentile normalise`);
+  processingApplied.push(`Auto-correct: gamma ${gammaCurve}, shadow lift +${shadowLiftOffset}, saturation +35%, percentile normalise`);
 
   // Step 4 — LOCAL CONTRAST VERSION (CLAHE-style)
   const localContrast = await localContrastEnhance(normalised);
@@ -295,14 +299,14 @@ export async function enhanceImageForAnalysis(inputBuffer: Buffer): Promise<Enha
   // Step 5 — SHADOW RECOVERY VERSION
   // Specifically designed for dark toilet photos / dim specimen photos
   const shadowRecovery = await sharp(normalised)
-    .gamma(0.45)                                        // very aggressive gamma lift
+    .linear(1.0, 40)                                    // aggressive shadow lift (Sharp gamma <1.0 unsupported)
     .modulate({ saturation: 1.5, brightness: 1.15 })   // boost saturation + brightness
     .linear(1.4, -20)                                   // contrast stretch: multiply + offset
     .sharpen({ sigma: 1.5, m1: 1.0, m2: 3.5 })
     .normalise()
     .jpeg({ quality: 90 })
     .toBuffer();
-  processingApplied.push('Shadow recovery: aggressive gamma 0.45, contrast linear stretch');
+  processingApplied.push('Shadow recovery: aggressive linear shadow lift +40, contrast stretch');
 
   // Step 6 — ROI ZOOM VERSION
   // Detect specimen area and crop to max detail
@@ -322,6 +326,7 @@ export async function enhanceImageForAnalysis(inputBuffer: Buffer): Promise<Enha
         .extract({ left: roi.left, top: roi.top, width: roi.width, height: roi.height })
         .resize(1200, 1200, { fit: 'inside', withoutEnlargement: false })
         .gamma(gammaCurve)
+        .linear(1.0, shadowLiftOffset)
         .modulate({ saturation: 1.4 })
         .sharpen({ sigma: 1.0, m1: 0.8, m2: 3.0 })
         .normalise()
