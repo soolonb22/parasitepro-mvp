@@ -404,7 +404,21 @@ const AnalysisResultsPage = () => {
       <div className="text-center max-w-sm px-4">
         <AlertCircle size={32} className="mx-auto mb-4" style={{ color: '#EF4444' }} />
         <h2 className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>Analysis Failed</h2>
-        <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>The AI couldn't process this image. Try again with a clearer, well-lit photo.</p>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>The AI couldn't process this image. Try again with a clearer, well-lit photo.</p>
+        {analysis.errorMessage && (
+          <div style={{
+            background: 'rgba(239,68,68,0.1)',
+            border: '1px solid rgba(239,68,68,0.3)',
+            borderRadius: 8,
+            padding: '10px 12px',
+            marginBottom: '1rem',
+            textAlign: 'left',
+          }}>
+            <p className="font-mono text-xs" style={{ color: '#FCA5A5', wordBreak: 'break-word' }}>
+              {analysis.errorMessage}
+            </p>
+          </div>
+        )}
         <button onClick={() => navigate('/upload')} className="pp-btn-primary">Try Again</button>
       </div>
     </div>

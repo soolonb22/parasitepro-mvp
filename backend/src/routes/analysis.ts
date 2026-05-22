@@ -153,8 +153,21 @@ router.post(
           console.log('✅ Analysis saved to database:', analysisId);
         })
         .catch(async (error) => {
-          console.error('❌ AI analysis failed:', error);
-          await pool.query(`UPDATE analyses SET status = 'failed', processing_completed_at = NOW() WHERE id = $1`, [analysisId]);
+          // Capture detailed error info — message, type, status — into DB so frontend can show it
+          const errMsg = [
+            error?.message || String(error),
+            error?.status ? `[HTTP ${error.status}]` : '',
+            error?.error?.type || error?.type ? `[type=${error?.error?.type || error?.type}]` : '',
+          ].filter(Boolean).join(' ').slice(0, 1000);
+          console.error('❌ AI analysis failed:', errMsg, error?.stack);
+          try {
+            await pool.query(
+              `UPDATE analyses SET status = 'failed', processing_completed_at = NOW(), error_message = $2 WHERE id = $1`,
+              [analysisId, errMsg]
+            );
+          } catch (dbErr) {
+            console.error('❌ Failed to mark analysis as failed in DB:', dbErr);
+          }
         });
 
       res.status(202).json({ analysisId, status: 'processing', message: 'Image uploaded successfully. Analysis in progress.' });
@@ -189,7 +202,7 @@ router.get(
       const userId = req.userId!;
 
       const analysisResult = await pool.query(
-        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary, a.overall_assessment, a.visual_findings, a.urgency_level, a.image_quality, a.differential_diagnoses, a.recommended_actions, a.health_risks, a.treatment_options, a.gp_testing_list, a.gp_script_if_dismissed, a.natural_remedies FROM analyses a WHERE a.id = $1`,
+        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary, a.overall_assessment, a.visual_findings, a.urgency_level, a.image_quality, a.differential_diagnoses, a.recommended_actions, a.health_risks, a.treatment_options, a.gp_testing_list, a.gp_script_if_dismissed, a.natural_remedies, a.error_message FROM analyses a WHERE a.id = $1`,
         [id]
       );
 
@@ -239,6 +252,7 @@ router.get(
         gpTestingList: analysis.gp_testing_list || [],
         gpScriptIfDismissed: analysis.gp_script_if_dismissed || [],
         naturalRemedies: analysis.natural_remedies || [],
+        errorMessage: analysis.error_message || null,
         detections,
       });
     } catch (error) {

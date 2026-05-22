@@ -99,6 +99,7 @@ export async function runMigrations(): Promise<void> {
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS health_risks JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS treatment_options JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_testing_list JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS error_message TEXT;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_script_if_dismissed JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS natural_remedies JSONB;
       -- Fix sample_type constraint to allow all types

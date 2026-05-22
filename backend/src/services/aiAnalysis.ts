@@ -299,11 +299,16 @@ You are receiving FOUR versions of the same image. Compare all four and use whic
 
     // ── Step 6: Send to Claude ────────────────────────────────────────────────
     console.log('🤖 Sending 4-version image set to Claude...');
-    const response = await anthropic.messages.create({
+    const ANALYSIS_TIMEOUT_MS = 90_000;
+    const apiCall = anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-6',
       max_tokens: 16384, // Bumped from 4096 — schema is large (parasiteProfile + detections + differentials + remedies), 4096 was truncating mid-JSON
       messages: [{ role: 'user', content: contentBlocks }],
     });
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`Anthropic API timeout after ${ANALYSIS_TIMEOUT_MS / 1000}s`)), ANALYSIS_TIMEOUT_MS)
+    );
+    const response: any = await Promise.race([apiCall, timeoutPromise]);
 
     const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
     console.log(`✅ Deep analysis received. stop_reason=${response.stop_reason} usage=in:${response.usage?.input_tokens}/out:${response.usage?.output_tokens}`);
