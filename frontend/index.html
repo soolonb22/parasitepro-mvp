@@ -8,7 +8,21 @@
 
     <!-- Favicon & icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- PWA — manifest + theme -->
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#1B6B5F" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- iOS Safari PWA — required tags so "Add to Home Screen" works properly -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ParasitePro" />
+    <meta name="apple-touch-fullscreen" content="yes" />
 
     <!-- Sitemap discovery -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
@@ -35,10 +49,6 @@
         gtag('config', 'G-KVD57LGLV2');
       }
     </script>
-
-    <!-- PWA -->
-    <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#0E0F11" />
   </head>
   <body>
     <div id="root"></div>

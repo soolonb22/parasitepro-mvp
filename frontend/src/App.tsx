@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import { ParaAuthPanel, ParaAuthBanner } from './components/ParaAuthChat';
 import { Microscope, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import CookieConsent from './components/CookieConsent';
+import PWAInstallBanner from './components/PWAInstallBanner';
 
 // ── Core pages ────────────────────────────────────────────────────────────────
 import LandingPage from './pages/LandingPage';
@@ -326,6 +327,7 @@ function App() {
         }} />
         <ParasiteBot />
         <CookieConsent />
+        <PWAInstallBanner />
         <AppLayout>
         <Routes>
           {/* Public */}
