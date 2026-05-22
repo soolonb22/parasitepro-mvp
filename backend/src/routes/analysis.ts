@@ -126,7 +126,13 @@ router.post(
         .then(async (aiResult) => {
           const { detections, summary, overallAssessment, visualFindings, urgencyLevel, imageQuality,
                   differentialDiagnoses, recommendedActions, healthRisks, treatmentOptions,
-                  gpTestingList, gpScriptIfDismissed, naturalRemedies } = aiResult;
+                  gpTestingList, gpScriptIfDismissed, naturalRemedies,
+                  // Phase 1 — restored
+                  parasiteProfile, morphologicalEvidence, gpPreparationNotes, geographicContext, confidencePercentage,
+                  // Phase 2 — expansion
+                  symptomProgression, longTermDamage, lifestyleFactors, dietaryGuidance, thingsToAvoid,
+                  // Phase 3 — protocol preview
+                  protocolPreview } = aiResult;
           console.log('✅ AI analysis complete for:', analysisId);
           await withTransaction(async (client) => {
             for (const detection of detections) {
@@ -140,14 +146,29 @@ router.post(
               `UPDATE analyses SET status = 'completed', processing_completed_at = NOW(),
                ai_summary = $2, overall_assessment = $3, visual_findings = $4, urgency_level = $5,
                image_quality = $6, differential_diagnoses = $7, recommended_actions = $8,
-               health_risks = $9, treatment_options = $10, gp_testing_list = $11, gp_script_if_dismissed = $12, natural_remedies = $13
+               health_risks = $9, treatment_options = $10, gp_testing_list = $11, gp_script_if_dismissed = $12, natural_remedies = $13,
+               parasite_profile = $14, morphological_evidence = $15, gp_preparation_notes = $16, geographic_context = $17, confidence_percentage = $18,
+               symptom_progression = $19, long_term_damage = $20, lifestyle_factors = $21, dietary_guidance = $22, things_to_avoid = $23,
+               protocol_preview = $24
                WHERE id = $1`,
               [analysisId, summary || overallAssessment || null, overallAssessment || null,
                visualFindings || null, urgencyLevel || null, imageQuality || null,
                JSON.stringify(differentialDiagnoses || []), JSON.stringify(recommendedActions || []),
                JSON.stringify(healthRisks || []), JSON.stringify(treatmentOptions || []),
                JSON.stringify(gpTestingList || []), JSON.stringify(gpScriptIfDismissed || []),
-               JSON.stringify(naturalRemedies || [])]
+               JSON.stringify(naturalRemedies || []),
+               parasiteProfile ? JSON.stringify(parasiteProfile) : null,
+               JSON.stringify(morphologicalEvidence || []),
+               gpPreparationNotes || null,
+               geographicContext || null,
+               confidencePercentage || null,
+               JSON.stringify(symptomProgression || []),
+               longTermDamage || null,
+               lifestyleFactors ? JSON.stringify(lifestyleFactors) : null,
+               dietaryGuidance ? JSON.stringify(dietaryGuidance) : null,
+               JSON.stringify(thingsToAvoid || []),
+               protocolPreview ? JSON.stringify(protocolPreview) : null,
+              ]
             );
           });
           console.log('✅ Analysis saved to database:', analysisId);
@@ -202,7 +223,11 @@ router.get(
       const userId = req.userId!;
 
       const analysisResult = await pool.query(
-        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary, a.overall_assessment, a.visual_findings, a.urgency_level, a.image_quality, a.differential_diagnoses, a.recommended_actions, a.health_risks, a.treatment_options, a.gp_testing_list, a.gp_script_if_dismissed, a.natural_remedies, a.error_message FROM analyses a WHERE a.id = $1`,
+        `SELECT a.id, a.image_url, a.thumbnail_url, a.status, a.sample_type, a.collection_date, a.location, a.uploaded_at, a.processing_started_at, a.processing_completed_at, a.user_id, a.ai_summary, a.overall_assessment, a.visual_findings, a.urgency_level, a.image_quality, a.differential_diagnoses, a.recommended_actions, a.health_risks, a.treatment_options, a.gp_testing_list, a.gp_script_if_dismissed, a.natural_remedies, a.error_message,
+                a.parasite_profile, a.morphological_evidence, a.gp_preparation_notes, a.geographic_context, a.confidence_percentage,
+                a.symptom_progression, a.long_term_damage, a.lifestyle_factors, a.dietary_guidance, a.things_to_avoid,
+                a.protocol_preview
+         FROM analyses a WHERE a.id = $1`,
         [id]
       );
 
@@ -253,6 +278,20 @@ router.get(
         gpScriptIfDismissed: analysis.gp_script_if_dismissed || [],
         naturalRemedies: analysis.natural_remedies || [],
         errorMessage: analysis.error_message || null,
+        // Phase 1 — restored
+        parasiteProfile: analysis.parasite_profile || null,
+        morphologicalEvidence: analysis.morphological_evidence || [],
+        gpPreparationNotes: analysis.gp_preparation_notes || null,
+        geographicContext: analysis.geographic_context || null,
+        confidencePercentage: analysis.confidence_percentage || null,
+        // Phase 2 — expansion
+        symptomProgression: analysis.symptom_progression || [],
+        longTermDamage: analysis.long_term_damage || null,
+        lifestyleFactors: analysis.lifestyle_factors || null,
+        dietaryGuidance: analysis.dietary_guidance || null,
+        thingsToAvoid: analysis.things_to_avoid || [],
+        // Phase 3 — protocol preview
+        protocolPreview: analysis.protocol_preview || null,
         detections,
       });
     } catch (error) {

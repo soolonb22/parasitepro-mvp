@@ -100,6 +100,20 @@ export async function runMigrations(): Promise<void> {
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS treatment_options JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_testing_list JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS error_message TEXT;
+      -- Phase 1: restore previously discarded AI output
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS parasite_profile JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS morphological_evidence JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_preparation_notes TEXT;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS geographic_context TEXT;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS confidence_percentage INTEGER;
+      -- Phase 2: richer educational content
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS symptom_progression JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS long_term_damage TEXT;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS lifestyle_factors JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS dietary_guidance JSONB;
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS things_to_avoid JSONB;
+      -- Phase 3: protocol preview teaser (course funnel)
+      ALTER TABLE analyses ADD COLUMN IF NOT EXISTS protocol_preview JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS gp_script_if_dismissed JSONB;
       ALTER TABLE analyses ADD COLUMN IF NOT EXISTS natural_remedies JSONB;
       -- Fix sample_type constraint to allow all types

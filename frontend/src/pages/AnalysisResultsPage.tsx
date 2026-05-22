@@ -5,6 +5,7 @@ import {
   ArrowLeft, Loader, AlertTriangle, CheckCircle, AlertCircle,
   Microscope, ClipboardList, BookOpen, Pill, Leaf, MessageSquare,
   ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, Activity, FileText, X, ExternalLink,
+  Calendar, Heart, Utensils, Lock, ShieldAlert, TrendingDown,
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -14,6 +15,7 @@ import DeepDiveModal from '../components/DeepDiveModal';
 import ParasiteBot from '../components/ParasiteBot';
 import ParasiteProfile from '../components/ParasiteProfile';
 import CldImage from '../components/CldImage';
+import { CourseUpsellBox } from '../components/CourseUpsellBox';
 
 const _BASE = import.meta.env.VITE_API_URL || 'https://parasitepro-mvp-production-b051.up.railway.app';
 const API_URL = _BASE.endsWith('/api') ? _BASE : `${_BASE}/api`;
@@ -559,6 +561,48 @@ const AnalysisResultsPage = () => {
           {analysis.overallAssessment && (
             <DetailSection icon={Activity} title="Full Clinical Assessment" defaultOpen>
               <p className="text-sm leading-relaxed mt-3" style={{ color: 'var(--text-secondary)' }}>{analysis.overallAssessment}</p>
+
+              {analysis.confidencePercentage != null && (
+                <div className="mt-4 rounded-lg p-3 flex items-center justify-between" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>AI Confidence</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
+                      <div className="h-full" style={{
+                        width: `${analysis.confidencePercentage}%`,
+                        background: analysis.confidencePercentage >= 70 ? '#10B981' : analysis.confidencePercentage >= 40 ? '#F59E0B' : '#EF4444',
+                      }} />
+                    </div>
+                    <span className="text-xs font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{analysis.confidencePercentage}%</span>
+                  </div>
+                </div>
+              )}
+
+              {analysis.morphologicalEvidence?.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>🔬 Morphological Evidence</p>
+                  <ul className="space-y-1.5">
+                    {analysis.morphologicalEvidence.map((feature, i) => (
+                      <li key={i} className="text-xs leading-relaxed flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+                        <span style={{ color: 'var(--amber)', marginTop: '2px' }}>•</span>{feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {analysis.geographicContext && (
+                <div className="mt-4 rounded-lg p-3" style={{ background: 'rgba(96,165,250,0.05)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                  <p className="text-xs font-semibold mb-1 flex items-center gap-1.5" style={{ color: '#60A5FA' }}>🇦🇺 Australian Context</p>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{analysis.geographicContext}</p>
+                </div>
+              )}
+
+              {analysis.gpPreparationNotes && (
+                <div className="mt-4 rounded-lg p-3" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                  <p className="text-xs font-semibold mb-1 flex items-center gap-1.5" style={{ color: 'var(--amber)' }}>🩺 For Your GP Visit</p>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{analysis.gpPreparationNotes}</p>
+                </div>
+              )}
             </DetailSection>
           )}
 
@@ -608,6 +652,45 @@ const AnalysisResultsPage = () => {
             </DetailSection>
           )}
 
+          {analysis.symptomProgression?.length > 0 && (
+            <DetailSection icon={Calendar} title="Typical Symptom Progression" iconColor="#A78BFA">
+              <p className="text-xs mt-3 mb-3" style={{ color: 'var(--text-muted)' }}>
+                Educational timeline based on clinical literature — your experience may differ.
+              </p>
+              <div className="space-y-3">
+                {analysis.symptomProgression.map((stage, i) => (
+                  <div key={i} className="relative pl-5 pb-1">
+                    <div className="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full" style={{ background: '#A78BFA' }} />
+                    {i < analysis.symptomProgression.length - 1 && (
+                      <div className="absolute left-1 top-4 bottom-0 w-px" style={{ background: 'rgba(167,139,250,0.3)' }} />
+                    )}
+                    <div className="rounded-lg p-3" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--bg-border)' }}>
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{stage.stage}</p>
+                        {stage.timeframe && (
+                          <span className="text-xs font-mono px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: 'rgba(167,139,250,0.1)', color: '#A78BFA', border: '1px solid rgba(167,139,250,0.3)' }}>{stage.timeframe}</span>
+                        )}
+                      </div>
+                      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{stage.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </DetailSection>
+          )}
+
+          {analysis.longTermDamage && (
+            <DetailSection icon={TrendingDown} title="What This Can Do If Untreated" iconColor="#EF4444">
+              <div className="mt-3 rounded-xl p-4" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{analysis.longTermDamage}</p>
+                <div className="mt-3 flex items-start gap-2 text-xs pt-3" style={{ color: 'var(--text-muted)', borderTop: '1px solid rgba(239,68,68,0.15)' }}>
+                  <AlertCircle size={11} style={{ marginTop: '2px', flexShrink: 0, color: 'var(--amber)' }} />
+                  <span>This is educational information about typical disease progression — not a prediction about your specific case. Early treatment significantly reduces these risks.</span>
+                </div>
+              </div>
+            </DetailSection>
+          )}
+
           {analysis.treatmentOptions?.length > 0 && (
             <DetailSection icon={Pill} title="Treatment Categories" iconColor="#10B981">
               <div className="space-y-3 mt-3">
@@ -628,6 +711,115 @@ const AnalysisResultsPage = () => {
                   <span style={{ color: 'var(--text-muted)' }}>Always consult a qualified healthcare professional before starting any treatment. No specific doses are provided.</span>
                 </div>
               </div>
+            </DetailSection>
+          )}
+
+          {analysis.lifestyleFactors && (analysis.lifestyleFactors.worsens?.length > 0 || analysis.lifestyleFactors.helps?.length > 0) && (
+            <DetailSection icon={Heart} title="Lifestyle Factors" iconColor="#F472B6">
+              <p className="text-xs mt-3 mb-3" style={{ color: 'var(--text-muted)' }}>
+                Educational guidance — typical factors documented to affect this condition.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                {analysis.lifestyleFactors.worsens?.length > 0 && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                    <p className="font-semibold text-sm mb-2 flex items-center gap-1.5" style={{ color: '#EF4444' }}>
+                      <ThumbsDown size={13} /> Typically worsens
+                    </p>
+                    <ul className="space-y-1.5">
+                      {analysis.lifestyleFactors.worsens.map((f, i) => (
+                        <li key={i} className="text-xs leading-relaxed flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+                          <span style={{ color: '#EF4444', marginTop: '2px' }}>•</span>{f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {analysis.lifestyleFactors.helps?.length > 0 && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)' }}>
+                    <p className="font-semibold text-sm mb-2 flex items-center gap-1.5" style={{ color: '#10B981' }}>
+                      <ThumbsUp size={13} /> Typically supports recovery
+                    </p>
+                    <ul className="space-y-1.5">
+                      {analysis.lifestyleFactors.helps.map((f, i) => (
+                        <li key={i} className="text-xs leading-relaxed flex items-start gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+                          <span style={{ color: '#10B981', marginTop: '2px' }}>•</span>{f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </DetailSection>
+          )}
+
+          {analysis.dietaryGuidance && (
+            <DetailSection icon={Utensils} title="Dietary Guidance" iconColor="#F59E0B">
+              <p className="text-xs mt-3 mb-3" style={{ color: 'var(--text-muted)' }}>
+                Foods &amp; drinks traditionally associated with this category of cleanse — educational, not medical prescription.
+              </p>
+              {analysis.dietaryGuidance.rationale && (
+                <div className="rounded-lg p-3 mb-3 text-xs italic" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', color: 'var(--text-secondary)' }}>
+                  {analysis.dietaryGuidance.rationale}
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {analysis.dietaryGuidance.foodsToFavour?.length > 0 && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)' }}>
+                    <p className="font-semibold text-xs mb-2" style={{ color: '#10B981' }}>🥗 FOODS TO FAVOUR</p>
+                    <ul className="space-y-1">
+                      {analysis.dietaryGuidance.foodsToFavour.map((f, i) => (
+                        <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>• {f}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {analysis.dietaryGuidance.foodsToAvoid?.length > 0 && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                    <p className="font-semibold text-xs mb-2" style={{ color: '#EF4444' }}>🚫 FOODS TO AVOID</p>
+                    <ul className="space-y-1">
+                      {analysis.dietaryGuidance.foodsToAvoid.map((f, i) => (
+                        <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>• {f}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {analysis.dietaryGuidance.drinksToFavour?.length > 0 && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(96,165,250,0.05)', border: '1px solid rgba(96,165,250,0.2)' }}>
+                    <p className="font-semibold text-xs mb-2" style={{ color: '#60A5FA' }}>💧 DRINKS TO FAVOUR</p>
+                    <ul className="space-y-1">
+                      {analysis.dietaryGuidance.drinksToFavour.map((d, i) => (
+                        <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>• {d}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {analysis.dietaryGuidance.drinksToAvoid?.length > 0 && (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                    <p className="font-semibold text-xs mb-2" style={{ color: '#F59E0B' }}>⚠️ DRINKS TO AVOID</p>
+                    <ul className="space-y-1">
+                      {analysis.dietaryGuidance.drinksToAvoid.map((d, i) => (
+                        <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>• {d}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </DetailSection>
+          )}
+
+          {analysis.thingsToAvoid?.length > 0 && (
+            <DetailSection icon={ShieldAlert} title="Things to Avoid" iconColor="#F59E0B">
+              <p className="text-xs mt-3 mb-3" style={{ color: 'var(--text-muted)' }}>
+                Specific behaviours, foods or exposures that may worsen the condition or slow recovery.
+              </p>
+              <ul className="space-y-2">
+                {analysis.thingsToAvoid.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 rounded-lg p-3 text-sm" style={{ background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.15)', color: 'var(--text-secondary)' }}>
+                    <X size={14} style={{ color: 'var(--amber)', marginTop: '2px', flexShrink: 0 }} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </DetailSection>
           )}
 
@@ -658,6 +850,60 @@ const AnalysisResultsPage = () => {
                     </div>
                   );
                 })}
+              </div>
+            </DetailSection>
+          )}
+
+          {analysis.protocolPreview && analysis.protocolPreview.weekOneActions?.length > 0 && (
+            <DetailSection icon={Calendar} title="Cleanse Protocol Framework (Week 1 Preview)" iconColor="#1B6B5F" defaultOpen>
+              <p className="text-xs mt-3 mb-3" style={{ color: 'var(--text-muted)' }}>
+                An educational preview of how a traditional parasite cleanse is typically structured. The full multi-week protocol is in the dedicated course.
+              </p>
+
+              {/* Week 1 — open */}
+              <div className="rounded-xl p-4 mb-3" style={{ background: 'linear-gradient(135deg, rgba(27,107,95,0.08) 0%, rgba(27,107,95,0.02) 100%)', border: '1px solid rgba(27,107,95,0.3)' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded" style={{ background: '#1B6B5F', color: 'white' }}>WEEK 1</span>
+                  <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{analysis.protocolPreview.weekOneTitle}</p>
+                </div>
+                {analysis.protocolPreview.weekOneFocus && (
+                  <p className="text-xs leading-relaxed mb-3 italic" style={{ color: 'var(--text-secondary)' }}>{analysis.protocolPreview.weekOneFocus}</p>
+                )}
+                <ul className="space-y-2">
+                  {analysis.protocolPreview.weekOneActions.map((action, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <CheckCircle size={13} style={{ color: '#1B6B5F', marginTop: '3px', flexShrink: 0 }} />
+                      <span>{action}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Weeks 2-5 — locked */}
+              <div className="space-y-2">
+                {[
+                  { week: 'WEEK 2', title: 'Targeted Herbal Support' },
+                  { week: 'WEEK 3', title: 'Die-Off Management & Detox Pathways' },
+                  { week: 'WEEK 4', title: 'Gut Lining Repair' },
+                  { week: 'WEEK 5', title: 'Reinoculation & Long-Term Maintenance' },
+                ].map((w, i) => (
+                  <div key={i} className="rounded-xl p-3 flex items-center justify-between gap-3" style={{ background: 'var(--bg-elevated)', border: '1px dashed var(--bg-border)', opacity: 0.7 }}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded" style={{ background: 'var(--bg-base)', color: 'var(--text-muted)', border: '1px solid var(--bg-border)' }}>{w.week}</span>
+                      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{w.title}</p>
+                    </div>
+                    <Lock size={13} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                  </div>
+                ))}
+              </div>
+
+              {analysis.protocolPreview.whatComesNext && (
+                <p className="text-xs mt-3 italic text-center" style={{ color: 'var(--text-muted)' }}>{analysis.protocolPreview.whatComesNext}</p>
+              )}
+
+              {/* Course upsell CTA */}
+              <div className="mt-4">
+                <CourseUpsellBox />
               </div>
             </DetailSection>
           )}

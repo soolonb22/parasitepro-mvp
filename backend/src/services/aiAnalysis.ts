@@ -32,6 +32,25 @@ export interface HealthRisk { category: string; description: string; severity: '
 export interface TreatmentOption { type: 'medical' | 'supportive' | 'environmental'; name: string; description: string; requiresPrescription: boolean; }
 export interface NaturalRemedy { name: string; category: 'herbal' | 'dietary' | 'topical' | 'environmental' | 'integrative'; description: string; evidenceLevel: 'anecdotal' | 'traditional' | 'preliminary' | 'emerging'; safetyNotes: string; }
 
+// Phase 2: richer education
+export interface SymptomStage { stage: string; timeframe: string; description: string; }
+export interface LifestyleFactors { worsens: string[]; helps: string[]; }
+export interface DietaryGuidance {
+  foodsToFavour: string[];
+  foodsToAvoid: string[];
+  drinksToFavour: string[];
+  drinksToAvoid: string[];
+  rationale?: string;
+}
+
+// Phase 3: protocol preview (week 1 only — full protocol in course)
+export interface ProtocolPreview {
+  weekOneTitle: string;
+  weekOneFocus: string;
+  weekOneActions: string[];
+  whatComesNext: string;
+}
+
 export interface AIAnalysisResult {
   detections: AIDetection[];
   differentialDiagnoses: DifferentialDiagnosis[];
@@ -54,6 +73,16 @@ export interface AIAnalysisResult {
   disclaimerAcknowledged: boolean;
   summary?: string;
   disclaimer?: string;
+  // Phase 1 restoration
+  parasiteProfile?: any;
+  // Phase 2 expansion
+  symptomProgression?: SymptomStage[];
+  longTermDamage?: string;
+  lifestyleFactors?: LifestyleFactors;
+  dietaryGuidance?: DietaryGuidance;
+  thingsToAvoid?: string[];
+  // Phase 3 protocol preview
+  protocolPreview?: ProtocolPreview;
 }
 
 // ─── BUILD CONTEXT BLOCK ─────────────────────────────────────────────────────
@@ -111,6 +140,22 @@ ANALYSIS PIPELINE:
 8. EDUCATIONAL SUMMARY — what is this organism, life cycle, transmission, why it matters. Plain English.
 
 9. GP PREPARATION NOTES — what to tell the GP, what tests are typically relevant, framed as questions to ask.
+
+10. SYMPTOM PROGRESSION — typical clinical presentation timeline as documented in medical literature. 3–5 stages with rough timeframes (e.g. "Early — first 1–2 weeks", "Established — weeks 2–8", "Chronic — beyond 3 months"). Each stage: what someone typically experiences. Educational only — frame as "typically reported" or "documented in cases".
+
+11. LONG-TERM DAMAGE IF UNTREATED — plain-English description of what this organism can do to body systems if it persists untreated, citing the affected systems (gut lining, nutrient absorption, immune burden, etc). Educational framing — "may contribute to" or "has been associated with", never "will cause".
+
+12. LIFESTYLE FACTORS — list 4–6 factors that typically worsen this condition (stress, sugar, alcohol, poor sleep, etc.) and 4–6 factors that typically support recovery (hydration, sleep, fibre, etc.). Educational, not prescriptive.
+
+13. DIETARY GUIDANCE (educational) — list 5–8 foods traditionally favoured during cleanses for this category of parasite, 5–8 foods traditionally avoided, 3–5 drinks traditionally favoured, 3–5 drinks traditionally avoided. Frame as "traditionally associated with" — these are educational patterns from historical and integrative literature, NOT medical prescriptions. Include one-sentence rationale.
+
+14. THINGS TO AVOID — 4–8 specific behaviours, foods, or exposures that may worsen the condition or interfere with recovery (e.g. "raw or undercooked meat during recovery phase", "sharing towels with affected family members", "high-sugar foods that feed candida overgrowth").
+
+15. PROTOCOL PREVIEW (WEEK 1 ONLY) — a teaser of what Week 1 of a traditional parasite cleanse framework typically looks like, for educational purposes. ONLY Week 1. The full multi-week protocol is reserved for the dedicated course "Clearing the Body of Toxins & Parasites" and must NOT be detailed here. Provide:
+    - weekOneTitle (e.g. "Foundation & Gentle Preparation")
+    - weekOneFocus (1–2 sentence focus statement)
+    - weekOneActions (4–6 specific, educational, non-prescriptive actions someone might take in Week 1)
+    - whatComesNext (1 sentence teasing Weeks 2–5 without giving them away — e.g. "Weeks 2–5 progress through targeted herbal support, die-off management, gut repair, and reinoculation — covered in the full course.")
 
 Respond with this exact JSON structure:
 
@@ -183,6 +228,52 @@ Respond with this exact JSON structure:
     }
   ],
   "geographicContext": "Australian/Queensland relevance and transmission risk notes",
+  "symptomProgression": [
+    {
+      "stage": "Early (typically first 1-2 weeks)",
+      "timeframe": "Days 1-14 post-exposure",
+      "description": "What is typically reported during this stage"
+    },
+    {
+      "stage": "Established",
+      "timeframe": "Weeks 2-8",
+      "description": "Typical presentation as condition becomes established"
+    },
+    {
+      "stage": "Chronic (if untreated)",
+      "timeframe": "Beyond 3 months",
+      "description": "Chronic presentation typically documented"
+    }
+  ],
+  "longTermDamage": "Plain-English educational description of body systems that may be affected if untreated — gut lining, nutrient absorption, immune system, etc. Use 'may contribute to' or 'has been associated with', never absolute claims.",
+  "lifestyleFactors": {
+    "worsens": ["Factor 1 that typically worsens", "Factor 2", "Factor 3", "Factor 4"],
+    "helps": ["Factor 1 that typically supports recovery", "Factor 2", "Factor 3", "Factor 4"]
+  },
+  "dietaryGuidance": {
+    "foodsToFavour": ["Food 1 traditionally favoured during cleanses", "Food 2", "Food 3", "Food 4", "Food 5"],
+    "foodsToAvoid": ["Food 1 traditionally avoided", "Food 2", "Food 3", "Food 4", "Food 5"],
+    "drinksToFavour": ["Drink 1", "Drink 2", "Drink 3"],
+    "drinksToAvoid": ["Drink 1", "Drink 2", "Drink 3"],
+    "rationale": "One sentence on why this pattern is traditionally used"
+  },
+  "thingsToAvoid": [
+    "Specific behaviour, food or exposure to avoid 1",
+    "Specific item 2",
+    "Specific item 3",
+    "Specific item 4"
+  ],
+  "protocolPreview": {
+    "weekOneTitle": "Week 1: Foundation & Gentle Preparation",
+    "weekOneFocus": "1-2 sentence statement of what Week 1 is focused on",
+    "weekOneActions": [
+      "Action 1 — educational, non-prescriptive",
+      "Action 2",
+      "Action 3",
+      "Action 4"
+    ],
+    "whatComesNext": "1 sentence teaser of weeks 2-5 without revealing the protocol — point to the course"
+  },
   "parasiteProfile": {
     "commonName": "Common name",
     "scientificName": "Genus species",
@@ -215,7 +306,9 @@ Respond with this exact JSON structure:
 
 RULES:
 - NEVER say "this is" or "you have" — always "consistent with", "resembles", "visual pattern suggests"
-- NEVER prescribe specific medications or dosages
+- NEVER prescribe specific medications, dosages, or supplement doses
+- For dietary guidance, symptom progression, and protocol preview: use educational language — "typically", "traditionally associated with", "documented in literature" — never "you should" or "do this"
+- Protocol preview MUST ONLY cover Week 1. Do not detail Weeks 2-5; that is reserved for the paid course
 - If image is unidentifiable, say so clearly in overallAssessment and explain what better photos would help
 - Include 3–5 natural/traditional remedies with honest evidence levels; include Aboriginal Australian remedies where relevant
 - confidenceScore: 0.0–1.0. confidencePercentage: 0–100
@@ -302,7 +395,7 @@ You are receiving FOUR versions of the same image. Compare all four and use whic
     const ANALYSIS_TIMEOUT_MS = 90_000;
     const apiCall = anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-6',
-      max_tokens: 16384, // Bumped from 4096 — schema is large (parasiteProfile + detections + differentials + remedies), 4096 was truncating mid-JSON
+      max_tokens: 24576, // Schema grew (added symptomProgression, dietaryGuidance, protocolPreview, lifestyleFactors) — give headroom
       messages: [{ role: 'user', content: contentBlocks }],
     });
     const timeoutPromise = new Promise<never>((_, reject) =>
@@ -398,6 +491,33 @@ function parseAnalysisResponse(rawText: string): AIAnalysisResult {
     disclaimerAcknowledged: true,
     summary: parsed.overallAssessment || '',
     disclaimer: '⚠️ This is an AI-assisted educational visual assessment only and does not constitute a medical diagnosis. Please consult a qualified healthcare professional for confirmation and treatment. In an emergency, call 000.',
+    // Phase 1 restoration
+    parasiteProfile: parsed.parasiteProfile || undefined,
+    // Phase 2 expansion
+    symptomProgression: Array.isArray(parsed.symptomProgression) ? parsed.symptomProgression : [],
+    longTermDamage: parsed.longTermDamage || '',
+    lifestyleFactors: parsed.lifestyleFactors && typeof parsed.lifestyleFactors === 'object'
+      ? { worsens: parsed.lifestyleFactors.worsens || [], helps: parsed.lifestyleFactors.helps || [] }
+      : undefined,
+    dietaryGuidance: parsed.dietaryGuidance && typeof parsed.dietaryGuidance === 'object'
+      ? {
+          foodsToFavour: parsed.dietaryGuidance.foodsToFavour || [],
+          foodsToAvoid: parsed.dietaryGuidance.foodsToAvoid || [],
+          drinksToFavour: parsed.dietaryGuidance.drinksToFavour || [],
+          drinksToAvoid: parsed.dietaryGuidance.drinksToAvoid || [],
+          rationale: parsed.dietaryGuidance.rationale || '',
+        }
+      : undefined,
+    thingsToAvoid: Array.isArray(parsed.thingsToAvoid) ? parsed.thingsToAvoid : [],
+    // Phase 3 protocol preview
+    protocolPreview: parsed.protocolPreview && typeof parsed.protocolPreview === 'object'
+      ? {
+          weekOneTitle: parsed.protocolPreview.weekOneTitle || 'Week 1: Foundation',
+          weekOneFocus: parsed.protocolPreview.weekOneFocus || '',
+          weekOneActions: Array.isArray(parsed.protocolPreview.weekOneActions) ? parsed.protocolPreview.weekOneActions : [],
+          whatComesNext: parsed.protocolPreview.whatComesNext || '',
+        }
+      : undefined,
   };
 }
 
