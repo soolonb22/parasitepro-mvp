@@ -1,6 +1,7 @@
 // services/aiAnalysis.ts — Deep Assessment Engine with Dual-Image + Context Support
 import Anthropic from '@anthropic-ai/sdk';
 import { enhanceImageForAnalysis } from './imageEnhancement';
+import { getValidParasiteList, isValidParasite } from '../data/validParasites';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -126,6 +127,8 @@ ANALYSIS PIPELINE:
 1. IMAGE QUALITY REPORT — assess resolution (good/marginal/poor), focus quality, lighting, obstructions. If two images provided, state which reveals more detail and why.
 
 2. PRIMARY VISUAL FINDING — most likely identification in plain English + scientific name in brackets. One clear sentence explaining the match. Use "visual pattern consistent with" or "resembles" — never "this is" or "you have".
+
+⚠️  CRITICAL CONSTRAINT: The organism MUST be from the STANDARD PARASITES list below. If the visual pattern does not match any known parasite, say so clearly in overallAssessment and set urgencyLevel to "low" with a note that specialist microscopy is needed.
 
 3. MORPHOLOGICAL EVIDENCE — list 5–8 specific visual features: exact colour description (not just "brown" — say "amber-brown with translucent lateral margins"), shape and symmetry, texture, segmentation, estimated size relative to any visible reference object, unusual features.
 
@@ -312,6 +315,7 @@ RULES:
 - If image is unidentifiable, say so clearly in overallAssessment and explain what better photos would help
 - Include 3–5 natural/traditional remedies with honest evidence levels; include Aboriginal Australian remedies where relevant
 - confidenceScore: 0.0–1.0. confidencePercentage: 0–100
+- **STRICT ORGANISM CONSTRAINT**: ONLY return organisms from the STANDARD PARASITES list below. If the visual pattern does not match any of these 24 known parasites, set overallAssessment to state clearly that identification is not possible with the provided image, and recommend professional microscopy. NEVER invent, guess, or return organisms outside this list (no "blood worm", no "mystery parasite", only organisms below).
 - Respond ONLY with the JSON object`;
 
 // ─── FETCH IMAGE AS BASE64 ────────────────────────────────────────────────────
@@ -365,7 +369,9 @@ export async function analyzeImage(
 - ${q.processingApplied.join('\n- ')}
 You are receiving FOUR versions of the same image. Compare all four and use whichever reveals the most diagnostic detail. Synthesise findings across versions — a feature visible in one version but not others is still valid evidence.`;
 
-    const fullPrompt = [qualityNote, contextBlock, sampleHint, DEEP_ANALYSIS_PROMPT].filter(Boolean).join('\n\n');
+    const parasiteList = getValidParasiteList();
+
+    const fullPrompt = [qualityNote, parasiteList, contextBlock, sampleHint, DEEP_ANALYSIS_PROMPT].filter(Boolean).join('\n\n');
 
     // ── Step 5: Build multi-image content blocks ──────────────────────────────
     const toBase64 = (buf: Buffer) => buf.toString('base64');
@@ -459,15 +465,26 @@ function parseAnalysisResponse(rawText: string): AIAnalysisResult {
     parsed = JSON.parse(match[0]);
   }
 
-  const detections: AIDetection[] = (parsed.detections || []).map((d: any, i: number) => ({
-    parasiteId: d.parasiteId || `detection-${i}`,
-    commonName: d.commonName || 'Unknown',
-    scientificName: d.scientificName || '',
-    confidenceScore: Math.max(0, Math.min(1, Number(d.confidenceScore) || 0.5)),
-    parasiteType: d.parasiteType || 'unknown',
-    urgencyLevel: d.urgencyLevel || 'low',
-    lifeStage: d.lifeStage || undefined,
-  }));
+  const detections: AIDetection[] = (parsed.detections || []).map((d: any, i: number) => {
+    // Validate that detected organism is in the approved list
+    const commonName = d.commonName || 'Unknown';
+    const scientificName = d.scientificName || '';
+    const isValid = isValidParasite(commonName, scientificName);
+    
+    if (!isValid && commonName !== 'Unknown') {
+      console.warn(`⚠️  Invalid parasite detected: "${commonName}" (${scientificName}) — NOT in VALID_PARASITES list. Organism will be flagged as unidentifiable.`);
+    }
+
+    return {
+      parasiteId: d.parasiteId || `detection-${i}`,
+      commonName: isValid ? commonName : 'Unidentifiable organism',
+      scientificName: isValid ? scientificName : '',
+      confidenceScore: isValid ? Math.max(0, Math.min(1, Number(d.confidenceScore) || 0.5)) : 0,
+      parasiteType: isValid ? (d.parasiteType || 'unknown') : 'unknown',
+      urgencyLevel: isValid ? (d.urgencyLevel || 'low') : 'low',
+      lifeStage: isValid ? (d.lifeStage || undefined) : undefined,
+    };
+  });
 
   return {
     detections,
